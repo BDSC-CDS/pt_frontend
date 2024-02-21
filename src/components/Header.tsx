@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useAuth } from './AuthContext';
+import { useAuth } from '../utils/AuthContext';
+import { Button, Modal } from 'flowbite-react';
+
 
 export default function Header() {
     // State to control visibility of the logout notification
@@ -44,16 +46,17 @@ export default function Header() {
                             <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Contact</span>
                         </Link>
                         {/* Register link */}
-                        <Link href="/user" passHref>
+                        {/* <Link href="/user" passHref>
                             <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Register</span>
-                        </Link>
-                        {/* conditional rendering based on login status */}
+                        </Link> */}
+                        {/* Conditional rendering based on login status */}
                         {isLoggedIn ?
-                            <button onClick={logout} className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded underline cursor-pointer">Log out</button>
+                            <button onClick={handleLogout} className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded underline cursor-pointer">Log out</button>
                             :
                             <Link href="/authenticate" passHref>
                                 <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
                             </Link>}
+
                     </div>
                 </nav>
             </header>
@@ -61,14 +64,21 @@ export default function Header() {
             {/* Main content */}
             <main>
                 {/* Logout notification */}
-                <div
-                    className={`container mx-auto absolute inset-0 top-20 flex flex-col justify-between h-2/6 w-4/12 p-6 rounded-md
-                    bg-[#D6D6D6] bg-opacity-80 text-lg text-center text-black ${visible ? 'visible' : 'invisible'}`}
-                >
-                    <p>you are logged out</p>
-                    {/* Button to close the notification */}
-                    <button onClick={closePopup} className="rounded-lg bg-white py-2 px-6 text-lg font-medium bg-opacity-50 hover:bg-opacity-100 cursor-pointer" >Close</button>
-                </div>
+                <Modal show={visible} onClose={() => setVisible(false)}>
+                    <Modal.Body>
+                        <div className="space-y-6">
+                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                You are logged out!
+                            </p>
+
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={() => setVisible(false)}>Close</Button>
+
+                    </Modal.Footer>
+                </Modal>
+
             </main>
         </>
     )
