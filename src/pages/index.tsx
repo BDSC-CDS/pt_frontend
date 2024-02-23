@@ -8,6 +8,7 @@ import SideMenu from "../components/SideMenu";
 import { BiCalculator, BiMessageSquareDetail, BiLayer } from 'react-icons/bi';
 import { IconContext } from "react-icons";
 import Link from "next/link";
+import FooterMenu from "~/components/Footer";
 
 /**
  * Home component that represents the main page of the application.
@@ -115,7 +116,9 @@ export default function Home() {
               </a>
             </div>
           </div>
+          <FooterMenu />
         </main>
+
       </div>
     </div>
   );

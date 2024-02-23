@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Sidebar } from 'flowbite-react';
 import { BiBuoy } from 'react-icons/bi';
-import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards, HiPresentationChartBar } from 'react-icons/hi';
+import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiQuestionMarkCircle, HiUser, HiViewBoards, HiPresentationChartBar } from 'react-icons/hi';
 import Image from 'next/image';
 
 export default function SideMenu() {
@@ -24,11 +24,11 @@ export default function SideMenu() {
                             <Sidebar.Item href="/risk_assess" icon={HiPresentationChartBar}>
                                 Risk Assessment
                             </Sidebar.Item>
-                            <Sidebar.Item href="#" icon={HiUser}>
+                            <Sidebar.Item href="#" icon={HiQuestionMarkCircle}>
                                 About us
                             </Sidebar.Item>
 
-                            <Sidebar.Item href="#" icon={HiUser}>
+                            <Sidebar.Item href="#" icon={HiDatabase}>
                                 Datasets
                             </Sidebar.Item>
                             <Sidebar.Item href="#" icon={HiShoppingBag}>
