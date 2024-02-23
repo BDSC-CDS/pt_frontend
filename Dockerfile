@@ -9,5 +9,5 @@ RUN pnpm install
 
 FROM build2 as deploy
 COPY . .
-EXPOSE 3000
+EXPOSE 3001
 CMD pnpm dev
