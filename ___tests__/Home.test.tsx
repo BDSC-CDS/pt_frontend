@@ -12,7 +12,7 @@ jest.mock('../src/utils/AuthContext', () => ({
   logout: jest.fn(),
 });
 
-xdescribe('Home', () => {
+describe('Home', () => {
   it('heading', () => {
     render(<Home />)
     const heading = screen.getByRole('heading', { level: 2, name: /Welcome to The Frontend App/i });
