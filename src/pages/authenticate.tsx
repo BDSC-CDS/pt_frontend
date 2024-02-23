@@ -72,7 +72,7 @@ export default function Authenticate() {
                     </form>
                     {/* Button to submit the form */}
                     <button onClick={authUser}
-                        className="rounded-lg bg-white bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
+                        className="rounded-lg bg-gray-500 bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
                     >
                         Log in
                     </button>
