@@ -1,4 +1,4 @@
-FROM registry.rdeid.unil.ch/ds-ubuntu:latest AS builder
+FROM registry.rdeid.unil.ch/pt-ubuntu:latest AS builder
 
 USER root
 
