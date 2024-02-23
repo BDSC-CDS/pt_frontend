@@ -23,7 +23,7 @@ pipeline {
               pnpm install --frozen-lockfile
               pnpm test
             '''
-            stash include: 'node_modules', name: 'node_modules_stash'
+            stash includes: 'node_modules', name: 'node_modules_stash'
         //   }
         // }
       }
