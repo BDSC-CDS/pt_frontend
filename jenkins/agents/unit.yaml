@@ -4,8 +4,8 @@ metadata:
   name: unit
 spec:
   containers:
-  - name: ds-ubuntu
-    image: registry.rdeid.unil.ch/ds-ubuntu
+  - name: pt-ubuntu
+    image: registry.rdeid.unil.ch/pt-ubuntu
     imagePullPolicy: Always
     tty: true
     volumeMounts:

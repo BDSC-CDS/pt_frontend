@@ -1,4 +1,4 @@
-FROM registry.rdeid.unil.ch/ds-ubuntu:latest
+FROM registry.rdeid.unil.ch/pt-ubuntu:latest
 
 USER root
 

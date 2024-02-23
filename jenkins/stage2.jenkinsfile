@@ -3,9 +3,9 @@ pipeline {
     kubernetes {
       cloud 'kubernetes-int'
       namespace 'jenkins-int-pipeline'
-      label "ci-pt-backend-${UUID.randomUUID().toString()}"
+      label "ci-pt-frontend-${UUID.randomUUID().toString()}"
       yamlFile "jenkins/agents/unit.yaml"
-      defaultContainer 'ds-ubuntu'
+      defaultContainer 'pt-ubuntu'
     }
   }
   environment{
@@ -16,16 +16,14 @@ pipeline {
   stages {
     stage('Test and Build') {
       steps {
-        // container(name: 'ds-ubuntu', shell: '/bin/bash') {
-        //   dir('ds-dev-ops') {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'PYPI_SERVER_USERNAME_PASSWORD', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD']]) {
-              checkout scm
-              sh '''
-                cd docker
-                chmod +x build-stage2.sh
-                ./build-stage2.sh
-              '''
-            }
+        // container(name: 'pt-ubuntu', shell: '/bin/bash') {
+        //   dir('pt-dev-ops') {
+            checkout scm
+            sh '''
+              cd docker
+              chmod +x build-stage2.sh
+              ./build-stage2.sh
+            '''
         //   }
         // }
       }
@@ -38,8 +36,8 @@ pipeline {
       stages {
         stage('Deploy') {
           steps {
-            // container(name: 'ds-ubuntu', shell: '/bin/bash') {
-            //   dir('ds-dev-ops') {
+            // container(name: 'pt-ubuntu', shell: '/bin/bash') {
+            //   dir('pt-dev-ops') {
                 checkout scm
                 sh """
                   export env=int
