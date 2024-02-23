@@ -2,8 +2,10 @@ import Head from 'next/head';
 import Header from '../components/Header';
 import { ChangeEvent, useState } from 'react';
 import { authenticateUser } from '../utils/authenticateUser';
-import { useAuth } from '../components/AuthContext';
+import { useAuth } from '../utils/AuthContext';
 import Link from 'next/link';
+import { Button, Modal } from 'flowbite-react';
+import { useRouter } from 'next/router';
 
 // The Authenticate component is used for handling the user authentication process.
 export default function Authenticate() {
@@ -12,20 +14,23 @@ export default function Authenticate() {
         email: '',
         password: '',
     });
+    const router = useRouter();
 
     // Using the useAuth hook to access the login function
     const { login } = useAuth();
 
     // State for storing the authentication token received from the server
     const [token, setToken] = useState<string>();
-
+    const [modal, setModal] = useState<boolean>(false);
     // Function to handle the authentication process
     const authUser = async () => {
         const response = await authenticateUser(formData.email, formData.password);
         const newToken = response ? (response.result ? response.result.token : '') : '';
+
         setToken(newToken === '' ? 'NULL' : newToken);
         if (newToken && newToken !== 'NULL') {
             login(newToken);
+            setModal(true);
         }
     }
 
@@ -73,8 +78,21 @@ export default function Authenticate() {
                     <span className="underline">Or create an account here</span>
                 </Link>
                 {/* Display login status messages */}
-                <p className="mt-4">{token && token !== 'NULL' && 'Welcome back!'}</p>
-                <p className="mt-4">{token === 'NULL' && 'Your credentials are not correct'}</p>
+                <p className="mt-4 text-xl text-red-500">{token === 'NULL' && 'Your credentials are not correct'}</p>
+                <Modal show={modal} onClose={() => setModal(false)}>
+                    <Modal.Body>
+                        <div className="space-y-6">
+                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                You are logged in!
+                            </p>
+
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={() => { setModal(false); router.push('/'); }}>Close</Button>
+
+                    </Modal.Footer>
+                </Modal>
             </main>
         </div>
     );
