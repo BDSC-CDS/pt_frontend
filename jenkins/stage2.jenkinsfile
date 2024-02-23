@@ -23,7 +23,6 @@ pipeline {
               pnpm install --frozen-lockfile
               pnpm test
             '''
-            stash includes: 'node_modules/**', name: 'node_modules_stash'
         //   }
         // }
       }
@@ -32,7 +31,6 @@ pipeline {
       steps {
         // container(name: 'pt-ubuntu', shell: '/bin/bash') {
         //   dir('pt-dev-ops') {
-            unstash 'node_modules_stash'
             checkout scm
             sh '''
               cd docker
