@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: pt-ubuntu
-    image: registry.rdeid.unil.ch/pt-ubuntu
+    image: registry.rdeid.unil.ch/pt-frontend-stage1
     imagePullPolicy: Always
     tty: true
     volumeMounts:
