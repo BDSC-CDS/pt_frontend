@@ -1,84 +1,123 @@
+
+import { Table } from 'flowbite-react';
 import Head from 'next/head';
-import Header from '../components/Header';
-import React, { ChangeEvent, FormEvent, useState } from 'react';
-import apiClient from '../utils/apiClientIndex';
-import { TemplatebackendCreateHelloReply } from '~/internal/client';
+import SideMenu from '~/components/SideMenu';
 
-// Contact component for the 'Contact Us' page
 export default function RiskAssess() {
-    // State for managing form data
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        message: '',
-    });
-
-    // State to store the response from the backend
-    const [response, setResponse] = useState<TemplatebackendCreateHelloReply>();
-
-    // Function to fetch a response from the backend API
-    const fetchHello = async () => {
-        try {
-            const response = await apiClient.indexServiceGetHello();
-            console.log(response); // Log the response for debugging
-            setResponse(response); // Update the state with the response
-        } catch (error) {
-            console.error("Error fetching hello:", error);
-            // Handle any errors that occur during the fetch
-        }
-    };
-
-    // Function to handle changes in form inputs
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value, // Update the form data state
-        }));
-    };
-
-    // Function to handle form submission
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent the default form submission behavior
-        console.log(formData); // Log the form data for debugging
-        // Optionally call fetchHello here if needed
-    };
-
     return (
-        <div className='bg-gradient-to-b from-[#05514d] to-[#15162c]'>
+        <div className='bg-white text-[#306278]'>
             <Head>
-                <title>Contact Us | My T3 App</title>
-                <meta name="description" content="Contact us page" />
+                <title>Risk assessment</title>
             </Head>
-            <Header />
-            <main className="flex min-h-screen flex-col items-center justify-center text-white">
-                <h1 className="text-4xl font-bold">Contact Us</h1>
-                {/* Form for submitting contact information */}
-                <form onSubmit={handleSubmit} className='w-1/3 mt-8 pb-6'>
-                    {/* Input fields for name, email, and message */}
-                    <div className="mb-4">
-                        <label htmlFor="name" className="block mb-2">Name:</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} className="border rounded p-2 w-full text-black" />
+            <div className="flex min-h-screen">
+                <SideMenu />
+
+                <main className="ml-64 flex-1 flex flex-col items-center justify-center">
+
+                    <div className="overflow-x-auto w-3/4 outline outline-offset-2 outline-gray-300 rounded">
+                        <Table hoverable>
+                            <Table.Head>
+                                <Table.HeadCell>Project name</Table.HeadCell>
+                                <Table.HeadCell>Date created</Table.HeadCell>
+                                <Table.HeadCell>Last modified</Table.HeadCell>
+                                <Table.HeadCell>Status</Table.HeadCell>
+                                <Table.HeadCell>
+                                    <span className="sr-only">Edit</span>
+                                </Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body className="divide-y">
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        {'Project 1'}
+                                    </Table.Cell>
+                                    <Table.Cell>01.01.2024</Table.Cell>
+                                    <Table.Cell>18.02.2024</Table.Cell>
+                                    <Table.Cell>Finished</Table.Cell>
+                                    <Table.Cell>
+                                        <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                                            Edit
+                                        </a>
+                                    </Table.Cell>
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        Project 2
+                                    </Table.Cell>
+                                    <Table.Cell>05.12.2023</Table.Cell>
+                                    <Table.Cell>01.03.2024</Table.Cell>
+                                    <Table.Cell>In progress</Table.Cell>
+                                    <Table.Cell>
+                                        <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                                            Edit
+                                        </a>
+                                    </Table.Cell>
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        Project 3
+                                    </Table.Cell>
+                                    <Table.Cell>23.01.2024</Table.Cell>
+                                    <Table.Cell>04.02.2024</Table.Cell>
+                                    <Table.Cell>In progress</Table.Cell>
+                                    <Table.Cell>
+                                        <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                                            Edit
+                                        </a>
+                                    </Table.Cell>
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                    </Table.Cell>
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                    <Table.Cell />
+                                </Table.Row>
+                            </Table.Body>
+                        </Table>
                     </div>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block mb-2">Email:</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="border rounded p-2 w-full text-black" />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="message" className="block mb-2">Message:</label>
-                        <textarea id="message" name="message" value={formData.message} onChange={handleChange} className="border rounded p-2 w-full text-black" rows={3}></textarea>
-                    </div>
-                    {/* Submit button */}
-                    <button type="submit" className="bg-[#05514d] text-white px-4 py-2 rounded">Send</button>
-                </form>
-                {/* Uncomment below to display response from the server */}
-                {/* <div className='text-black bg-white w-60 h-50 rounded-md'>
-                    <div className='p-3'>
-                        <p className='font-bold'>Response:</p>
-                        <p>{response ? response.content : "No response"}</p>
-                    </div>
-                </div> */}
-            </main>
-        </div >
+                </main>
+            </div>
+        </div>
     );
 }

@@ -57,17 +57,17 @@ export default function Home() {
       <div className="flex min-h-screen">
         <SideMenu />
 
-        <main className="ml-64 mt-20 flex-1 flex flex-col items-center justify-start text-[#306278]">
+        <main className="ml-64 mt-10 flex-1 flex flex-col items-center justify-start text-[#306278]">
 
           <div className="text-center">
             <div className="flex justify-center">
 
               <h2 className="mb-4 text-4xl font-extrabold w-3/4 ">
-                Welcome to the SPHN RDeiD platform!          </h2>
+                Welcome to the SPHN RDeID platform!          </h2>
             </div>
             <div className="flex justify-center">
 
-              <p className="  mb-8 text-lg w-3/4 center">
+              <p className="  mb-8 text-md w-3/4 center">
                 Our mission is to advance the field of biomedical data research by harnessing the expertise of the SPHN DeID task force and translating their recommendations into a dynamic, adaptable platform. Our goal is to revolutionize the process of risk assessment and de-identification for biomedical datasets, streamlining it for research purposes.
 
                 In pursuit of this objective, we are committed to developing an automated de-identification tool that not only ensures transparency but also provides a clear understanding of risk levels. This innovation promises to be a valuable asset for researchers, regulatory authorities, and Data Protection Officers (DPOs) alike.
