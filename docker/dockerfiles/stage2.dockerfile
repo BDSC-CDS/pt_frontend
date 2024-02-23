@@ -1,7 +1,8 @@
 FROM registry.rdeid.unil.ch/pt-frontend-stage1:latest AS build
 
 COPY . .
-RUN pnpm test
+RUN rm -rf node_modules
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 FROM nginx:alpine AS deploy

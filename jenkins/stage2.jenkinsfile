@@ -14,7 +14,20 @@ pipeline {
         componentName = 'pt-frontend'
   }
   stages {
-    stage('Test and Build') {
+    stage('Test') {
+      steps {
+        // container(name: 'pt-ubuntu', shell: '/bin/bash') {
+        //   dir('pt-dev-ops') {
+            checkout scm
+            sh '''
+              pnpm install
+              pnpm test
+            '''
+        //   }
+        // }
+      }
+    }
+    stage('Build') {
       steps {
         // container(name: 'pt-ubuntu', shell: '/bin/bash') {
         //   dir('pt-dev-ops') {
