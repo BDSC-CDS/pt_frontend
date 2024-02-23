@@ -5,14 +5,14 @@ metadata:
 spec:
   containers:
   - name: ds-ubuntu
-    image: registry.itrcs3-app.intranet.chuv/ds-ubuntu
+    image: registry.rdeid.unil.ch/ds-ubuntu
     imagePullPolicy: Always
     tty: true
     volumeMounts:
     - name: docker
       mountPath: /run/docker.sock
     - name: docker-config
-      mountPath: /ds/ds-deployer/.docker/secret
+      mountPath: /pt/pt-deployer/.docker/secret
     env:
       - name: CONFIG_AES_PASSPHRASE_ci
         valueFrom:
@@ -27,10 +27,10 @@ spec:
     lifecycle:
       postStart:
         exec:
-          command: ['sh', '-c', "cp /ds/ds-deployer/.docker/secret/config.json /ds/ds-deployer/.docker/config.json"]
-  - name: jnlp
-    image: registry.itrcs3-app.intranet.chuv/ds-jnlp/jenkins/inbound-agent:3107.v665000b_51092-15
-    imagePullPolicy: Always
+          command: ['sh', '-c', "cp /pt/pt-deployer/.docker/secret/config.json /pt/pt-deployer/.docker/config.json"]
+  # - name: jnlp
+  #   image: registry.rdeid.unil.ch/ds-jnlp/jenkins/inbound-agent:3107.v665000b_51092-15
+  #   imagePullPolicy: Always
   imagePullSecrets:
   - name: registry-auth
   volumes:

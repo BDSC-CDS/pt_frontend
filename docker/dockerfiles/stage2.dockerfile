@@ -1,4 +1,4 @@
-FROM registry.itrcs3-app.intranet.chuv/ds-cicd-template-frontend-stage1:latest AS build
+FROM registry.rdeid.unil.ch/pt-frontend-stage1:latest AS build
 
 COPY . .
 RUN pnpm test

@@ -1,7 +1,7 @@
 import { Configuration, AuthenticationApi } from '../internal/client/index';
 
 // URL for the API
-const apiURL = "https://template-backend.horus-graph.intranet.chuv/";  // Replace "url" with the actual URL of your API
+const apiURL = "https://pt-backend.rdeid.unil.ch/";  // Replace "url" with the actual URL of your API
 
 // Creating a new Configuration object for the API client
 const apiConfig = new Configuration({ basePath: apiURL });

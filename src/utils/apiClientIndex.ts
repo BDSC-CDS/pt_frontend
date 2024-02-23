@@ -1,7 +1,7 @@
 import { IndexApi, Configuration } from '../internal/client/index';
 
 // The base URL for the API. This should be the root URL where your API is hosted.
-const apiURL = "https://template-backend.horus-graph.intranet.chuv/";
+const apiURL = "https://pt-backend.rdeid.unil.ch/";
 
 // Creating a Configuration object for the API client.
 const apiConfig = new Configuration({ basePath: apiURL });
