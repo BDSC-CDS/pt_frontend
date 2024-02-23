@@ -1,4 +1,4 @@
-FROM registry.itrcs3-app.intranet.chuv/ds-ubuntu:latest
+FROM registry.rdeid.unil.ch/pt-ubuntu:latest
 
 USER root
 

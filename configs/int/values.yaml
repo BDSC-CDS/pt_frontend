@@ -1,6 +1,6 @@
 ingress:
   enabled: true
-  host: "template-frontend.horus-graph.intranet.chuv"
+  host: "pt-frontend.rdeid.unil.ch"
 
 service:
   port: 16080

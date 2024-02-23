@@ -2,9 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: "template-frontend"
+nameOverride: "pt-frontend"
 
-image: registry.itrcs3-app.intranet.chuv/ds-cicd-template-frontend:latest
+image: registry.rdeid.unil.ch/pt-frontend:latest
 
 version: master
 
@@ -46,7 +46,7 @@ ingress:
   enabled: true
   className: ""
   annotations: {}
-  host: "template-frontend.horus-graph.intranet.chuv"
+  host: "pt-frontend.rdeid.unil.ch"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:

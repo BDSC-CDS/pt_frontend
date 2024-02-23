@@ -77,7 +77,7 @@ cd your-repository-name
    - Create a new folder in Jenkins and configure two stages:
      - The first stage builds the base image (jenkins/stage1.jenkinsfile).
      - The second stage is a Multibranch Pipeline that builds, tests, and deploys your site (jenkins/stage2.jenkinsfile).
-   - View the original pipeline configuration [here](https://jenkins.horus-graph.intranet.chuv/jenkins/job/100-DS/job/Template%20frontend/).
+   - View the original pipeline configuration [here](https://jenkins.rdeid.unil.ch/jenkins/job/100-DS/job/Template%20frontend/).
    - Every push to GitLab will trigger this pipeline, automating the testing and deployment process.
 
 4. **Local Production Testing**

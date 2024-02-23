@@ -4,7 +4,7 @@ info:
   version: "1.0"
   contact:
     name: template backend authentication service
-    url: https://template-backend.horus-graph.intranet.chuv
+    url: https://pt-backend.rdeid.unil.ch
     email: development.bdsc@chuv.ch
 tags:
   - name: AuthenticationService

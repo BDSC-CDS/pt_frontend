@@ -1,7 +1,8 @@
-FROM registry.itrcs3-app.intranet.chuv/ds-cicd-template-frontend-stage1:latest AS build
+FROM registry.rdeid.unil.ch/pt-frontend-stage1:latest AS build
 
 COPY . .
-RUN pnpm test
+# TODO: make a common step with stage1 to avoid reinstalling twice
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 FROM nginx:alpine AS deploy
