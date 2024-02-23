@@ -22,10 +22,8 @@ pipeline {
             sh '''
               pnpm install --frozen-lockfile
               pnpm test
-              ls -lah
-              ls -lah node_modules
             '''
-            stash includes: 'node_modules', name: 'node_modules_stash'
+            stash includes: 'node_modules/**', name: 'node_modules_stash'
         //   }
         // }
       }
