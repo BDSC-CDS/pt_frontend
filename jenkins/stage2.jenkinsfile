@@ -20,7 +20,7 @@ pipeline {
         //   dir('pt-dev-ops') {
             checkout scm
             sh '''
-              pnpm install
+              pnpm install --frozen-lockfile
               pnpm test
             '''
         //   }
