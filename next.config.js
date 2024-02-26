@@ -8,7 +8,7 @@ await import("./src/env.js");
 const config = {
   reactStrictMode: true,
   output: 'export',
-
+  images: { unoptimized: true }
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *

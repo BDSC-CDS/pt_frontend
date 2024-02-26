@@ -24,26 +24,26 @@ export default function Header() {
     return (
         <>
             {/* Header section with navigation */}
-            <header className="text-white ">
+            <header className="text-[#306278] bg-[#e2ebf5] ">
                 <nav className="container mx-auto flex items-center justify-between py-4 px-6">
                     {/* Logo and title */}
                     <div className="flex items-center">
                         <img src="/favicon.ico" alt="Icon" className="mr-5 h-6 w-6" />
-                        <h1 className="text-2xl font-bold">My Frontend</h1>
+                        <h1 className="text-2xl font-bold ml-4">My Frontend</h1>
                     </div>
                     {/* Navigation links */}
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 ">
                         {/* Home link */}
                         <Link href="/" passHref>
-                            <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Home</span>
+                            <span className="px-3 py-2 hover:bg-gray-500 hover:bg-opacity-20 rounded cursor-pointer">Home</span>
                         </Link>
                         {/* About link */}
                         <Link href="/about" passHref>
-                            <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">About</span>
+                            <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">About</span>
                         </Link>
                         {/* Contact link */}
                         <Link href="/contact" passHref>
-                            <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Contact</span>
+                            <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Contact</span>
                         </Link>
                         {/* Register link */}
                         {/* <Link href="/user" passHref>
@@ -51,10 +51,10 @@ export default function Header() {
                         </Link> */}
                         {/* Conditional rendering based on login status */}
                         {isLoggedIn ?
-                            <button onClick={handleLogout} className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded underline cursor-pointer">Log out</button>
+                            <button onClick={handleLogout} className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded underline cursor-pointer">Log out</button>
                             :
                             <Link href="/authenticate" passHref>
-                                <span className="px-3 py-1 hover:bg-white hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
+                                <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
                             </Link>}
 
                     </div>
