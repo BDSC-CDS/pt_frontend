@@ -1,14 +1,11 @@
 // Importing necessary modules and components.
 import Head from "next/head";
-import Header from "../components/Header";
 import apiClientIndex from '../utils/apiClientIndex';
 import { useState } from "react";
 import { TemplatebackendCreateHelloReply } from "~/internal/client";
-import SideMenu from "../components/SideMenu";
 import { BiCalculator, BiMessageSquareDetail, BiLayer } from 'react-icons/bi';
 import { IconContext } from "react-icons";
 import Link from "next/link";
-import FooterMenu from "../components/Footer";
 
 /**
  * Home component that represents the main page of the application.
@@ -55,7 +52,6 @@ export default function Home() {
       {/* Header component */}
       {/* <Header /> */}
       <div className="flex min-h-screen">
-        <SideMenu />
 
         <main className="ml-64 mt-10 flex-1 flex flex-col items-center justify-center text-[#306278]">
 
@@ -116,7 +112,6 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <FooterMenu />
         </main>
 
       </div>

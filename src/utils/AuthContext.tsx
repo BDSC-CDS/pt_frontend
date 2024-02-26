@@ -41,10 +41,9 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
 
 // Custom hook to use the auth context
 export const useAuth = (): AuthContextType => {
-    const context = useContext(AuthContext); // Access the context
+    const context = useContext(AuthContext); 
     if (!context) {
-        // Throw an error if the hook is used outside of the AuthProvider
         throw new Error('useAuth must be used within an AuthProvider');
     }
-    return context; // Return the auth context
+    return context; 
 };

@@ -12,12 +12,6 @@ export default function SideMenu() {
         <div className="fixed top-0 left-0 h-full z-10">
             <Sidebar aria-label="Sidebar with content separator example" className="w-70">
                 <div>
-                    <Sidebar.Logo href="/" img="sphn-logo.png" className="mb-17">
-                        {/* <Image src="sphn-logo.png" alt="Logo" width={180} height={180} layout="fixed" /> */}
-                        <span className="my-5">RDeID Platform </span>
-                    </Sidebar.Logo>
-                </div>
-                <div>
                     <Sidebar.Items>
                         <Sidebar.ItemGroup />
                         <Sidebar.ItemGroup>
@@ -45,13 +39,6 @@ export default function SideMenu() {
                             <Sidebar.Item href="#" icon={BiBuoy}>
                                 Settings
                             </Sidebar.Item>
-                        </Sidebar.ItemGroup>
-
-                        <Sidebar.ItemGroup className=" absolute bottom-1.5 ">
-                            <Sidebar.Item href="/authenticate" icon={HiUser}>
-                                User
-                            </Sidebar.Item>
-
                         </Sidebar.ItemGroup>
 
                     </Sidebar.Items>

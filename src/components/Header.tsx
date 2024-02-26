@@ -21,27 +21,26 @@ export default function Header() {
         setVisible(false); // Hide logout notification
     }
 
+    const logoStyle = {
+        backgroundImage: `url('sphn-logo.png')`,
+        backgroundSize: "cover",
+        width:"100%",
+        height:"100%",
+    };
+
     return (
         <>
-            {/* Header section with navigation */}
-            <header className="text-[#306278] bg-[#e2ebf5] ">
+            <header className="text-[#306278] bg-[#e2ebf5] fixed top-0 left-0 right-0 z-20">
+                <div style={logoStyle}>
+                </div>
                 <nav className="container mx-auto flex items-center justify-between py-4 px-6">
-                    {/* Logo and title */}
-                    <div className="flex items-center">
-                        <img src="/favicon.ico" alt="Icon" className="mr-5 h-6 w-6" />
-                        <h1 className="text-2xl font-bold ml-4">My Frontend</h1>
-                    </div>
-                    {/* Navigation links */}
                     <div className="flex items-center gap-6 ">
-                        {/* Home link */}
                         <Link href="/" passHref>
                             <span className="px-3 py-2 hover:bg-gray-500 hover:bg-opacity-20 rounded cursor-pointer">Home</span>
                         </Link>
-                        {/* About link */}
                         <Link href="/about" passHref>
                             <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">About</span>
                         </Link>
-                        {/* Contact link */}
                         <Link href="/contact" passHref>
                             <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Contact</span>
                         </Link>
@@ -61,9 +60,7 @@ export default function Header() {
                 </nav>
             </header>
 
-            {/* Main content */}
             <main>
-                {/* Logout notification */}
                 <Modal show={visible} onClose={() => setVisible(false)}>
                     <Modal.Body>
                         <div className="space-y-6">
