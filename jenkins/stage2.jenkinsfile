@@ -21,6 +21,8 @@ pipeline {
             checkout scm
             sh '''
               pnpm install --frozen-lockfile
+              ls -lah
+              ls -lah public
               pnpm test
             '''
         //   }
