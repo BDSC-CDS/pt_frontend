@@ -15,28 +15,28 @@ export default function SideMenu() {
                     <Sidebar.Items>
                         <Sidebar.ItemGroup />
                         <Sidebar.ItemGroup>
-                            <Sidebar.Item href="/risk_assess" icon={HiPresentationChartBar}>
+                            <Sidebar.Item href="/risk_assess" passHref icon={HiPresentationChartBar}>
                                 Risk Assessment
                             </Sidebar.Item>
-                            <Sidebar.Item href="#" icon={HiQuestionMarkCircle}>
+                            <Sidebar.Item href="/about" passHref icon={HiQuestionMarkCircle}>
                                 About us
                             </Sidebar.Item>
 
-                            <Sidebar.Item href="#" icon={HiDatabase}>
+                            <Sidebar.Item href="#" passHref icon={HiDatabase}>
                                 Datasets
                             </Sidebar.Item>
-                            <Sidebar.Item href="#" icon={HiShoppingBag}>
+                            {/* <Sidebar.Item href="#" passHref icon={HiShoppingBag}>
                                 Synthetic Data Generation
                             </Sidebar.Item>
-                            <Sidebar.Item href="#" icon={HiArrowSmRight}>
+                            <Sidebar.Item href="#" passHref icon={HiArrowSmRight}>
                                 Text DeID
-                            </Sidebar.Item>
+                            </Sidebar.Item> */}
                         </Sidebar.ItemGroup>
                         <Sidebar.ItemGroup className="mt-20">
-                            <Sidebar.Item href="#" icon={HiInbox}>
+                            <Sidebar.Item href="#" passHref icon={HiInbox}>
                                 Documentation
                             </Sidebar.Item>
-                            <Sidebar.Item href="#" icon={BiBuoy}>
+                            <Sidebar.Item href="#" passHref icon={BiBuoy}>
                                 Settings
                             </Sidebar.Item>
                         </Sidebar.ItemGroup>
