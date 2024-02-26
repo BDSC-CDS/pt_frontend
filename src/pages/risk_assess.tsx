@@ -2,7 +2,7 @@
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import SideMenu from '~/components/SideMenu';
-import { MdOutlineAdd } from "react-icons/md";
+import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -17,7 +17,7 @@ export default function RiskAssess() {
     const router = useRouter();
 
     const handleRowClick = (id: number) => {
-        router.push(`/questionnaire-${id}`);
+        router.push(`/questionnaire/${id}`);
     };
 
     return (
@@ -26,7 +26,6 @@ export default function RiskAssess() {
                 <title>Risk assessment</title>
             </Head>
             <div className="flex min-h-screen">
-                <SideMenu />
 
                 <main className="ml-64 flex-1 flex flex-col items-center justify-center">
                     <div className="w-3/4 flex flex-col items-end ">
@@ -56,8 +55,8 @@ export default function RiskAssess() {
                                             <Table.Cell>{project.lastModified}</Table.Cell>
                                             <Table.Cell>{project.status}</Table.Cell>
                                             <Table.Cell>
-                                                <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500" onClick={(e) => e.stopPropagation()}>
-                                                    Edit
+                                                <a href="#" onClick={(e) => e.stopPropagation()}>
+                                                    <MdMoreHoriz size={20} />
                                                 </a>
                                             </Table.Cell>
                                         </Table.Row>
