@@ -3,7 +3,7 @@ import chuv_svg from '../../public/chuv_svg.svg'
 
 export default function FooterMenu() {
     return (
-        <div className="w-full mt-10">
+        <div className="fixed bottom-0 left-64 right-0 mt-10">
             <Footer container>
                 <div className="w-full text-center">
                     <div className="w-full justify-between  sm:flex sm:items-center sm:justify-between">

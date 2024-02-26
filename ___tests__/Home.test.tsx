@@ -15,7 +15,7 @@ jest.mock('../src/utils/AuthContext', () => ({
 describe('Home', () => {
   it('heading', () => {
     render(<Home />)
-    const heading = screen.getByRole('heading', { level: 2, name: /Welcome to The Frontend App/i });
+    const heading = screen.getByRole('heading', { level: 2, name: /Welcome to the SPHN RDeID platform!/i });
     expect(heading).toBeTruthy();
   })
 })
