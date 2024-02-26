@@ -45,13 +45,13 @@ export default function Contact() {
     };
 
     return (
-        <div className='bg-gradient-to-b from-[#05514d] to-[#15162c]'>
+        <>
             <Head>
-                <title>Contact Us | My T3 App</title>
+                <title>Contact Us</title>
                 <meta name="description" content="Contact us page" />
             </Head>
             <Header />
-            <main className="flex min-h-screen flex-col items-center justify-center text-white">
+            <main className="flex min-h-screen flex-col items-center justify-center">
                 <h1 className="text-4xl font-bold">Contact Us</h1>
                 {/* Form for submitting contact information */}
                 <form onSubmit={handleSubmit} className='w-1/3 mt-8 pb-6'>
@@ -79,6 +79,6 @@ export default function Contact() {
                     </div>
                 </div> */}
             </main>
-        </div >
+        </>
     );
 }
