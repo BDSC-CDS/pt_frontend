@@ -24,8 +24,8 @@ export default function Header() {
     const logoStyle = {
         backgroundImage: `url('sphn-logo.png')`,
         backgroundSize: "cover",
-        width:"100%",
-        height:"100%",
+        width: "100%",
+        height: "100%",
     };
 
     return (
@@ -34,7 +34,7 @@ export default function Header() {
                 <div style={logoStyle}>
                 </div>
                 <nav className="container mx-auto flex items-center justify-between py-4 px-6">
-                    <div className="flex items-center gap-6 ">
+                    <div className="flex items-center gap-6">
                         <Link href="/" passHref>
                             <span className="px-3 py-2 hover:bg-gray-500 hover:bg-opacity-20 rounded cursor-pointer">Home</span>
                         </Link>
