@@ -28,7 +28,7 @@ export default function Header() {
     return (
         <>
             <header className="text-[#306278] bg-[#e2ebf5] fixed top-0 left-0 right-0 z-20">
-                <nav className="container flex h-14">
+                <nav className="flex h-14">
                     <div style={logoStyle} className="w-14 h-12 my-auto ml-10 m-2 bg-no-repeat bg-contain bg-center">
                     </div>
                     <div className="container ml-[116px] mr-auto flex justify-between py-4 px-6 text-right gap-6 align-middle">

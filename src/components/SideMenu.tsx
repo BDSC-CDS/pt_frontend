@@ -14,8 +14,9 @@ export default function SideMenu() {
                 <div>
                     <Sidebar.Items>
                         <Sidebar.ItemGroup />
+                        <br />
                         <Sidebar.ItemGroup>
-                            <Sidebar.Item href="/risk_assess" passHref icon={HiPresentationChartBar}>
+                            <Sidebar.Item href="/risk_assessment" passHref icon={HiPresentationChartBar}>
                                 Risk Assessment
                             </Sidebar.Item>
                             <Sidebar.Item href="/about" passHref icon={HiQuestionMarkCircle}>

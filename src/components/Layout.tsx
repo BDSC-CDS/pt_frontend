@@ -19,7 +19,10 @@ export const Layout: FunctionComponent<Props> = ({ children }) => {
         <AuthProvider>
             <Header/>
             <SideMenu />
-                <main>{children}</main>
+                <div className='h-14'></div>
+                <main className="ml-64 mt-10 flex-1 flex flex-col container mr-auto">
+                    {children}
+                </main>
             <FooterMenu />
         </AuthProvider>
 
