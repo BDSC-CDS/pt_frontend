@@ -82,7 +82,7 @@ const TabsComponent = () => {
     ];
 
     return (
-        <div className="flex flex-col w-full ml-80 mt-20 mb-20">
+        <>
             <ul className="flex items-stretch w-full">
                 {tabs.map((tab) => (
                     <li
@@ -92,7 +92,7 @@ const TabsComponent = () => {
                         onClick={() => setActiveTab(tab.id)}
                     >
                         <div className='flex items-center pl-2'>
-                            <span className="flex items-center justify-center w-6 h-6 border border-gray-600 rounded-full shrink-0 ">
+                            <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
                                 {tab.id}
                             </span>
                             <span>
@@ -111,7 +111,7 @@ const TabsComponent = () => {
             <div className='fixed bottom-0 right-0 h-3/4 w-1/6 bg-white  '>
 
             </div>
-        </div>
+        </>
 
     );
 };

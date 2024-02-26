@@ -12,6 +12,11 @@ export default {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
     },
+    container: {
+      screens: {
+        'max-width': '1200px',
+      }
+    },
   },
   plugins: [
     require('flowbite/plugin')

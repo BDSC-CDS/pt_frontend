@@ -22,7 +22,7 @@ export default function Header() {
     }
 
     const logoStyle = {
-        backgroundImage: `url('sphn-logo.png')`
+        backgroundImage: `url('/sphn-logo.png')`
     };
 
     return (

@@ -21,53 +21,48 @@ export default function RiskAssess() {
     };
 
     return (
-        <div className='bg-white text-[#306278]'>
+        <>
             <Head>
                 <title>Risk assessment</title>
             </Head>
-            <div className="flex min-h-screen">
+            <div className="flex flex-col items-end p-5">
+                <Link href='/new-project' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                    <MdOutlineAdd size={30} />
+                    <p className='ml-2 text-sm'> New project</p>
+                </Link>
+                <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
+                    <Table hoverable>
+                        <Table.Head>
+                            <Table.HeadCell>Project name</Table.HeadCell>
+                            <Table.HeadCell>Date created</Table.HeadCell>
+                            <Table.HeadCell>Last modified</Table.HeadCell>
+                            <Table.HeadCell>Status</Table.HeadCell>
+                            <Table.HeadCell>
+                                <span className="sr-only">Edit</span>
+                            </Table.HeadCell>
+                        </Table.Head>
+                        <Table.Body className="divide-y">
+                            {projects.map((project) => (
+                                <Table.Row key={project.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleRowClick(project.id)}>
+                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        {project.name}
+                                    </Table.Cell>
+                                    <Table.Cell>{project.dateCreated}</Table.Cell>
+                                    <Table.Cell>{project.lastModified}</Table.Cell>
+                                    <Table.Cell>{project.status}</Table.Cell>
+                                    <Table.Cell>
+                                        <a href="#" onClick={(e) => e.stopPropagation()}>
+                                            <MdMoreHoriz size={20} />
+                                        </a>
+                                    </Table.Cell>
+                                </Table.Row>
+                            ))}
 
-                <main className="ml-64 flex-1 flex flex-col items-center justify-center">
-                    <div className="w-3/4 flex flex-col items-end ">
-                        <Link href='/new-project' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                            <MdOutlineAdd size={30} />
-                            <p className='ml-2 text-sm'> New project</p>
-                        </Link>
-                        <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-                            <Table hoverable>
-                                <Table.Head>
-                                    <Table.HeadCell>Project name</Table.HeadCell>
-                                    <Table.HeadCell>Date created</Table.HeadCell>
-                                    <Table.HeadCell>Last modified</Table.HeadCell>
-                                    <Table.HeadCell>Status</Table.HeadCell>
-                                    <Table.HeadCell>
-                                        <span className="sr-only">Edit</span>
-                                    </Table.HeadCell>
-                                </Table.Head>
-                                <Table.Body className="divide-y">
-                                    {projects.map((project) => (
-                                        <Table.Row key={project.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                            onClick={() => handleRowClick(project.id)}>
-                                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                {project.name}
-                                            </Table.Cell>
-                                            <Table.Cell>{project.dateCreated}</Table.Cell>
-                                            <Table.Cell>{project.lastModified}</Table.Cell>
-                                            <Table.Cell>{project.status}</Table.Cell>
-                                            <Table.Cell>
-                                                <a href="#" onClick={(e) => e.stopPropagation()}>
-                                                    <MdMoreHoriz size={20} />
-                                                </a>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-
-                                </Table.Body>
-                            </Table>
-                        </div>
-                    </div>
-                </main>
+                        </Table.Body>
+                    </Table>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

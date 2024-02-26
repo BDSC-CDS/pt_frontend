@@ -49,7 +49,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="text-center">
+      <div className="text-center mt-5">
         <div className="flex justify-center">
 
           <h2 className="mb-4 text-4xl font-extrabold w-3/4 ">
