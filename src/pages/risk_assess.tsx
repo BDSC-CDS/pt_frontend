@@ -30,8 +30,8 @@ export default function RiskAssess() {
                 <main className="ml-64 flex-1 flex flex-col items-center justify-center">
                     <div className="w-3/4 flex flex-col items-end ">
                         <Link href='/new-project' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                            <MdOutlineAdd size={40} />
-                            <p className='ml-2'> New project</p>
+                            <MdOutlineAdd size={30} />
+                            <p className='ml-2 text-sm'> New project</p>
                         </Link>
                         <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
                             <Table hoverable>
@@ -61,93 +61,7 @@ export default function RiskAssess() {
                                             </Table.Cell>
                                         </Table.Row>
                                     ))}
-                                    {/* <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {'Project 1'}
-                                        </Table.Cell>
-                                        <Table.Cell>01.01.2024</Table.Cell>
-                                        <Table.Cell>18.02.2024</Table.Cell>
-                                        <Table.Cell>Finished</Table.Cell>
-                                        <Table.Cell>
-                                            <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                                                Edit
-                                            </a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            Project 2
-                                        </Table.Cell>
-                                        <Table.Cell>05.12.2023</Table.Cell>
-                                        <Table.Cell>01.03.2024</Table.Cell>
-                                        <Table.Cell>In progress</Table.Cell>
-                                        <Table.Cell>
-                                            <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                                                Edit
-                                            </a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            Project 3
-                                        </Table.Cell>
-                                        <Table.Cell>23.01.2024</Table.Cell>
-                                        <Table.Cell>04.02.2024</Table.Cell>
-                                        <Table.Cell>In progress</Table.Cell>
-                                        <Table.Cell>
-                                            <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                                                Edit
-                                            </a>
-                                        </Table.Cell>
-                                    </Table.Row> */}
-                                    {/* <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row>
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row>
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row>
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row>
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row>
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                    </Table.Cell>
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                    <Table.Cell />
-                                </Table.Row> */}
+
                                 </Table.Body>
                             </Table>
                         </div>
