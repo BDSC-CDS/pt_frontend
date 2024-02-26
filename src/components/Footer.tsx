@@ -19,8 +19,6 @@ export default function FooterMenu() {
                     <Footer.LinkGroup>
                         <Footer.Link href="/">Home</Footer.Link>
                         <Footer.Link href="/about">About</Footer.Link>
-                        <Footer.Link href="#">Privacy Policy</Footer.Link>
-                        <Footer.Link href="#">Licensing</Footer.Link>
                         <Footer.Link href="/contact">Contact</Footer.Link>
                     </Footer.LinkGroup>
                     <div className='flex'>

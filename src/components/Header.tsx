@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from '../utils/AuthContext';
 import { Button, Modal } from 'flowbite-react';
+import { HiUser } from 'react-icons/hi';
 
 
 export default function Header() {
@@ -48,7 +49,7 @@ export default function Header() {
                             </Link> */}
                             {/* Conditional rendering based on login status */}
                             {isLoggedIn ?
-                                <span onClick={handleLogout} className="ml-4 px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded underline cursor-pointer">Log out</span>
+                                <span onClick={handleLogout} className="ml-4 px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer"><HiUser className="inline-block"/> Log out</span>
                                 :
                                 <Link href="/authenticate" passHref className="ml-4">
                                     <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
