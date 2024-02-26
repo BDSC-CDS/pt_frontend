@@ -1,5 +1,4 @@
 import { Footer } from 'flowbite-react';
-import chuv_svg from '../../public/chuv_svg.svg'
 
 export default function FooterMenu() {
     return (
