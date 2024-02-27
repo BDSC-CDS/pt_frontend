@@ -23,7 +23,7 @@ const QuestionnairePage = () => {
     return (
         <>
             {project ? (
-                <div className='p-5'>
+                <div className='p-5 mx-20'>
                     <TabsComponent />
 
                 </div>
