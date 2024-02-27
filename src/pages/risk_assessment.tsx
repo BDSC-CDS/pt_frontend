@@ -25,7 +25,7 @@ export default function RiskAssess() {
             <Head>
                 <title>Risk assessment</title>
             </Head>
-            <div className="flex flex-col items-end p-5 mx-40">
+            <div className="flex flex-col items-end p-5">
                 <Link href='/new-project' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <MdOutlineAdd size={30} />
                     <p className='ml-2 text-sm'> New project</p>

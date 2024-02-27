@@ -1,10 +1,7 @@
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Sidebar } from 'flowbite-react';
 import { BiBuoy } from 'react-icons/bi';
 import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiQuestionMarkCircle, HiUser, HiViewBoards, HiPresentationChartBar } from 'react-icons/hi';
-import Image from 'next/image';
-import { SidebarItem } from "flowbite-react/lib/esm/components/Sidebar/SidebarItem";
+
 
 export default function SideMenu() {
 

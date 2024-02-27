@@ -20,7 +20,7 @@ export const Layout: FunctionComponent<Props> = ({ children }) => {
                 <Header />
                 <SideMenu />
                 <div className='h-14'></div>
-                <main className="ml-[220px] flex-1 flex flex-col container mr-auto">
+                <main className="ml-[280px] flex-1 flex flex-col container mr-auto">
                     {children}
                 </main>
                 <div className='h-14'></div>

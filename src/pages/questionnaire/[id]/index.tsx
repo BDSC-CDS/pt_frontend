@@ -23,24 +23,25 @@ const QuestionnairePage = () => {
     return (
         <>
             {project ? (
-                <div className='p-5 mx-20'>
-                    <TabsComponent />
+                <div className='p-5'>
+                    <div className='absolute top-36 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
+                        <h1 className='mb-10 mt-4 text-md font-semibold'>Current score</h1>
+                        <GaugeChart id="gauge-chart2"
+                            nrOfLevels={20}
+                            percent={0.86}
+                            textColor='black'
+                            animate={false}
+                        />
+                    </div>
 
+                    <TabsComponent />
                 </div>
             ) : (
                 <div>
                     <p>Loading or project not found...</p>
                 </div>
             )}
-            <div className='fixed bottom-0 right-0 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                <h1 className='mb-10 mt-4 text-md font-semibold'>Current score</h1>
-                <GaugeChart id="gauge-chart2"
-                    nrOfLevels={20}
-                    percent={0.86}
-                    textColor='black'
-                    animate={false}
-                />
-            </div>
+            
         </>
     );
 };
