@@ -25,7 +25,7 @@ export default function Home() {
       <div className="text-left mt-5 mr-40 ml-[120px]">
 
         <h2 className=" mt-2 text-3xl font-bold">
-          Welcome to the SPHN RDeID platform!
+          Welcome to the SPHN Privacy Toolbox platform!
         </h2>
 
         <div className="flex items-center ">
