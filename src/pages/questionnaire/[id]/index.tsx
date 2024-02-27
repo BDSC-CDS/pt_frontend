@@ -16,6 +16,7 @@ const QuestionnairePage = () => {
     const projectData = [
         { id: 1, name: 'Project 1', description: 'Description of Project 1', dateCreated: '2024-01-01', status: 'Active' },
         { id: 2, name: 'Project 2', description: 'Description of Project 2', dateCreated: '2024-02-01', status: 'Completed' },
+        { id: 3, name: 'Project 3', description: 'Description of Project 3', dateCreated: '2024-02-01', status: 'Completed' },
     ];
     const project = projectData.find(project => project.id === questId)
 
