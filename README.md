@@ -111,11 +111,11 @@ To generate the client-side code for your API:
 }
 ```
 
-  <img src="http://gitlab.itrcs3-app.intranet.chuv/privacy-toolbox/template_frontend/-/raw/medication-tracker/images/devcontainer.gif" width="900"  />
+  <img src="images/devcontainer.gif" width="900"  />
 
 - Reopen the project in a DevContainer (ensure the DevContainer VSCode extension is installed).
 
-  <img src="http://gitlab.itrcs3-app.intranet.chuv/privacy-toolbox/template_frontend/-/raw/medication-tracker/images/reopen.gif" width="900"  />
+  <img src="images/reopen.gif" width="900"  />
 
 - In the container's terminal, run the script to generate client-side code:
 
@@ -132,7 +132,7 @@ To start UI development:
 
 - Exit the Java container and revert the `.devcontainer.json` to use the standard development Dockerfile:
 
-  <img src="http://gitlab.itrcs3-app.intranet.chuv/privacy-toolbox/template_frontend/-/raw/medication-tracker/images/open-ssh.gif" width="900"  />
+  <img src="images/open-ssh.gif" width="900"  />
 
 ```json
 {
