@@ -32,7 +32,7 @@ const QuestionnairePage = () => {
                     <p>Loading or project not found...</p>
                 </div>
             )}
-            <div className='fixed bottom-0 right-0 h-3/4 w-1/6 bg-white text-black flex flex-col items-center justify-start'>
+            <div className='fixed bottom-0 right-0 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                 <h1 className='mb-10 mt-4 text-md font-semibold'>Current score</h1>
                 <GaugeChart id="gauge-chart2"
                     nrOfLevels={20}
