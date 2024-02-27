@@ -108,9 +108,7 @@ const TabsComponent = () => {
             <div className="p-10">
                 {tabs.find((tab) => tab.id === activeTab)?.content}
             </div>
-            <div className='fixed bottom-0 right-0 h-3/4 w-1/6 bg-white  '>
 
-            </div>
         </>
 
     );
