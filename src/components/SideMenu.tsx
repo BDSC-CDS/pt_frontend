@@ -13,7 +13,7 @@ export default function SideMenu() {
                     <Sidebar.Items>
                         <Sidebar.ItemGroup >
                             <Sidebar.Item href="/" passHref className="text-semibold">
-                                <p className="font-bold text-lg"> RDeID Platform</p>
+                                <p className="font-bold text-lg"> Privacy Toolbox</p>
                             </Sidebar.Item>
                         </Sidebar.ItemGroup >
                         <Sidebar.ItemGroup>
