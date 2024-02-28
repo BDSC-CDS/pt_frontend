@@ -33,7 +33,7 @@ export default function Header() {
                     <div className="flex items-center">
                         <div style={logoStyle} className="w-16 h-14 my-auto ml-10 m-2 bg-no-repeat bg-contain bg-center">
                         </div>
-                        <p className="font-bold text-lg w-full">Privacy Toolbox</p>
+                        <p className="font-bold text-lg w-40">Privacy Toolbox</p>
                     </div>
                     <div className="container ml-[116px] mr-auto flex justify-between py-4 px-6 text-right gap-6 align-middle">
                         <div className="w-full gap-6 align-top text-sm">

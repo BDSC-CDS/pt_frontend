@@ -30,18 +30,16 @@ export default function Home() {
 
         <div className="flex items-center ">
 
-          <p className="  mb-8 text-md w-1/2">
+          <p className="  mb-8 text-md w-1/2 mt-2" >
             Our mission is to advance the field of biomedical data research by harnessing the expertise of the SPHN DeID task force and translating their recommendations into a dynamic, adaptable platform. Our goal is to revolutionize the process of risk assessment and de-identification for biomedical datasets, streamlining it for research purposes.
 
             In pursuit of this objective, we are committed to developing an automated de-identification tool that not only ensures transparency but also provides a clear understanding of risk levels. This innovation promises to be a valuable asset for researchers, regulatory authorities, and Data Protection Officers (DPOs) alike.
 
             Join us on this exciting journey towards enhanced biomedical data privacy and research efficiency.
           </p>
-          <IconContext.Provider value={{ size: "8em" }}>
-            <div className="ml-20">
-              <GrDocumentLocked />
-            </div>
-          </IconContext.Provider>
+          <div className="ml-20">
+            <GrDocumentLocked size={"8em"} />
+          </div>
         </div>
         <div className="flex flex-wrap justify-left text-center">
           {/* Button to link to T3 information */}
@@ -49,11 +47,7 @@ export default function Home() {
             href="/risk_assessment" passHref
             className=" flex flex-col justify-center items-center  rounded-lg bg-[#A1C6D9] py-2 px-6 text-lg mx-2 font-medium hover:bg-opacity-50 cursor-pointer w-3/12 h-40"
           >
-            <IconContext.Provider value={{ size: "3em" }}>
-              <div>
-                <BiCalculator />
-              </div>
-            </IconContext.Provider>
+            <BiCalculator size={"4em"} />
             <p className="mt-2 text-base"> Risk Assessment</p>
           </Link>
           <a
@@ -62,11 +56,9 @@ export default function Home() {
             rel="noopener noreferrer"
             className="flex flex-col justify-center items-center  rounded-lg bg-[#A1C6D9] py-2 px-6 text-lg mx-2 font-medium hover:bg-opacity-50 cursor-pointer w-3/12 h-40"
           >
-            <IconContext.Provider value={{ size: "3em" }}>
-              <div>
-                <BiMessageSquareDetail />
-              </div>
-            </IconContext.Provider>
+
+            <BiMessageSquareDetail size={"4em"} />
+
             <p className="mt-2 text-base"> Text DeID</p>
           </a>
           <a
@@ -75,11 +67,9 @@ export default function Home() {
             rel="noopener noreferrer"
             className="flex flex-col justify-center items-center  rounded-lg bg-[#A1C6D9] py-2 px-6 text-lg mx-2 font-medium hover:bg-opacity-50 cursor-pointer w-3/12 h-40"
           >
-            <IconContext.Provider value={{ size: "3em" }}>
-              <div>
-                <BiLayer />
-              </div>
-            </IconContext.Provider>
+
+            <BiLayer size={"4em"} />
+
             <p className="mt-2 text-base"> Synthetic Data Generation</p>
           </a>
         </div>
