@@ -1,4 +1,5 @@
 import { Sidebar } from 'flowbite-react';
+import Link from 'next/link';
 import { BiBuoy } from 'react-icons/bi';
 import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiQuestionMarkCircle, HiUser, HiViewBoards, HiPresentationChartBar } from 'react-icons/hi';
 
@@ -17,9 +18,12 @@ export default function SideMenu() {
                             </Sidebar.Item>
                         </Sidebar.ItemGroup >
                         <Sidebar.ItemGroup>
-                            <Sidebar.Item href="/risk_assessment" passHref icon={HiPresentationChartBar}>
-                                Risk Assessment
-                            </Sidebar.Item>
+                            <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                {/* <Sidebar.Item icon={HiPresentationChartBar}> */}
+                                <HiPresentationChartBar size={'2em'} color='gray' />
+                                <p className='ml-1'> Risk Assessment</p>
+                                {/* </Sidebar.Item> */}
+                            </Link>
                             {/* <Sidebar.Item href="/about" passHref icon={HiQuestionMarkCircle}>
                                 About us
                             </Sidebar.Item> */}
