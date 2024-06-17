@@ -45,14 +45,14 @@ export default function User() {
 
 
   return (
-    <div className=' bg-gradient-to-b from-[#19126c] to-[#15162c] '>
+    <div className=' '>
 
       <Head>
         <title>User registration</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className="flex min-h-screen flex-col items-center justify-center text-white">
+      <main className="flex min-h-screen flex-col items-center justify-center ">
         <div className="text-center">
           <h2 className="mb-4 text-4xl font-extrabold">
             User registration
@@ -81,7 +81,7 @@ export default function User() {
         </form>
         {/* Button to submit the registration form */}
         <button onClick={registerUser}
-          className="rounded-lg bg-white bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
+          className="rounded-lg bg-gray-500 bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
         >
           Register user
         </button>

@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendCreateUserResult
+ * @interface TemplatebackendStoreDatasetResult
  */
-export interface TemplatebackendCreateUserResult {
+export interface TemplatebackendStoreDatasetResult {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendCreateUserResult
+     * @memberof TemplatebackendStoreDatasetResult
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendCreateUserResult interface.
+ * Check if a given object implements the TemplatebackendStoreDatasetResult interface.
  */
-export function instanceOfTemplatebackendCreateUserResult(value: object): boolean {
+export function instanceOfTemplatebackendStoreDatasetResult(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendCreateUserResultFromJSON(json: any): TemplatebackendCreateUserResult {
-    return TemplatebackendCreateUserResultFromJSONTyped(json, false);
+export function TemplatebackendStoreDatasetResultFromJSON(json: any): TemplatebackendStoreDatasetResult {
+    return TemplatebackendStoreDatasetResultFromJSONTyped(json, false);
 }
 
-export function TemplatebackendCreateUserResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendCreateUserResult {
+export function TemplatebackendStoreDatasetResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendStoreDatasetResult {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendCreateUserResultFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function TemplatebackendCreateUserResultToJSON(value?: TemplatebackendCreateUserResult | null): any {
+export function TemplatebackendStoreDatasetResultToJSON(value?: TemplatebackendStoreDatasetResult | null): any {
     if (value === undefined) {
         return undefined;
     }
