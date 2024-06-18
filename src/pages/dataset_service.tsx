@@ -1,9 +1,7 @@
 
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
-import SideMenu from '~/components/SideMenu';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { store_dataset, list_datasets } from "../utils/dataset"
 import { useEffect, useState } from 'react';
@@ -111,10 +109,12 @@ export default function DatasetService() {
         setFileName('');
         getListDatasets();
     };
-    //const router = useRouter();
-    // const handleRowClick = (id: number) => {
-    //     router.push(`/questionnaire/${id}`);
-    // };
+    const router = useRouter();
+    const handleRowClick = (id: number | undefined) => {
+        if (id) {
+            router.push(`/dataset/${id}`);
+        }
+    };
 
     return (
         <>
@@ -131,7 +131,7 @@ export default function DatasetService() {
                 <Modal show={isUploadModalOpen} onClose={() => closeUploadModal()}>
                     <Modal.Body>
                         <div className="space-y-6">
-                            <h2 className="text-lg font-bold mb-2">Upload CSV File</h2>
+                            <h2 className="text-lg  mb-2">Upload CSV File</h2>
                             <input
                                 type="text"
                                 placeholder="Enter filename"
@@ -142,7 +142,7 @@ export default function DatasetService() {
                             <input type="file" accept=".csv" onChange={handleFileUpload} />
 
                         </div>
-                        <button className='mt-4 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
+                        <button className='mt-4 bg-gray-400 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
                             onClick={() => submitCSVToBackend()}
                         >
                             Submit
@@ -151,7 +151,7 @@ export default function DatasetService() {
                     <Modal.Footer>
                         <Button onClick={() => {
                             closeUploadModal();
-                            //router.push('/');
+                            router.push('/');
                         }}>
                             Close
                         </Button>
@@ -170,7 +170,7 @@ export default function DatasetService() {
                         <Table.Body className="divide-y">
                             {listDatasets.map((dataset) => (
                                 < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                // onClick={() => handleRowClick(project.id)}>
+                                    onClick={() => handleRowClick(dataset.id)}
                                 >
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                         {dataset.id}

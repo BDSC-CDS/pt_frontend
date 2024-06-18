@@ -41,17 +41,17 @@ import {
 } from '../models/index';
 
 export interface DatasetServiceDeleteDatasetRequest {
-    name: string;
+    id: number;
 }
 
 export interface DatasetServiceGetDatasetContentRequest {
-    name: string;
+    id: number;
     offset?: number;
     limit?: number;
 }
 
 export interface DatasetServiceGetDatasetMetadataRequest {
-    name: string;
+    id: number;
 }
 
 export interface DatasetServiceListDatasetsRequest {
@@ -73,8 +73,8 @@ export class DatasetApi extends runtime.BaseAPI {
      * Deletes a dataset
      */
     async datasetServiceDeleteDatasetRaw(requestParameters: DatasetServiceDeleteDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteDatasetReply>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling datasetServiceDeleteDataset.');
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceDeleteDataset.');
         }
 
         const queryParameters: any = {};
@@ -86,7 +86,7 @@ export class DatasetApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/dataset/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/v1/dataset/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -109,8 +109,8 @@ export class DatasetApi extends runtime.BaseAPI {
      * Get Dataset Content
      */
     async datasetServiceGetDatasetContentRaw(requestParameters: DatasetServiceGetDatasetContentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetDatasetContentReply>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling datasetServiceGetDatasetContent.');
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetContent.');
         }
 
         const queryParameters: any = {};
@@ -130,7 +130,7 @@ export class DatasetApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/dataset/content/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/v1/dataset/content/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -153,8 +153,8 @@ export class DatasetApi extends runtime.BaseAPI {
      * Get Dataset Metadata
      */
     async datasetServiceGetDatasetMetadataRaw(requestParameters: DatasetServiceGetDatasetMetadataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetDatasetMetadataReply>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling datasetServiceGetDatasetMetadata.');
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetMetadata.');
         }
 
         const queryParameters: any = {};
@@ -166,7 +166,7 @@ export class DatasetApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/dataset/metadata/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/v1/dataset/metadata/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
