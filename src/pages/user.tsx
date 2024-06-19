@@ -25,10 +25,13 @@ export default function User() {
       formData.email,
       formData.password
     );
-
+    // Check response and extract the result
+    const resultId = response && response.result ? response.result.id : null;
+    // Convert resultId to a string, handle null or undefined cases explicitly
+    const resultString = resultId ? String(resultId) : 'NULL';
     // Extract the result from the response
-    const result = response ? (response.result ? response.result.id : '') : '';
-    setResponse(result === '' ? 'NULL' : result); // Set response to display
+    // const result = response ? (response.result ? response.result.id : '') : '';
+    setResponse(resultString); // Set response to display
   }
 
   // Function to handle form input changes
@@ -45,14 +48,14 @@ export default function User() {
 
 
   return (
-    <div className=' bg-gradient-to-b from-[#19126c] to-[#15162c] '>
+    <div className=' '>
 
       <Head>
         <title>User registration</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className="flex min-h-screen flex-col items-center justify-center text-white">
+      <main className="flex min-h-screen flex-col items-center justify-center ">
         <div className="text-center">
           <h2 className="mb-4 text-4xl font-extrabold">
             User registration
@@ -81,7 +84,7 @@ export default function User() {
         </form>
         {/* Button to submit the registration form */}
         <button onClick={registerUser}
-          className="rounded-lg bg-white bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
+          className="rounded-lg bg-gray-500 bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
         >
           Register user
         </button>

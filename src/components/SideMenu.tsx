@@ -28,7 +28,7 @@ export default function SideMenu() {
                                 About us
                             </Sidebar.Item> */}
 
-                            <Sidebar.Item href="#" passHref icon={HiDatabase}>
+                            <Sidebar.Item href="/dataset_service" passHref icon={HiDatabase}>
                                 Datasets
                             </Sidebar.Item>
                             <Sidebar.Item href="#" passHref icon={HiShoppingBag}>

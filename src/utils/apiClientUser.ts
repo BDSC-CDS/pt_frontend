@@ -1,7 +1,7 @@
 import { Configuration, UsersApi } from '../internal/client/index';
-
+import { apiURL } from './apiurl';
 // The base URL for the API. This should be the root URL where your API is hosted.
-const apiURL = "https://pt-backend.rdeid.unil.ch/"
+// const apiURL = "https://pt-backend.rdeid.unil.ch/"
 
 // Creating a Configuration object for the API client.
 const apiConfig = new Configuration({ basePath: apiURL });

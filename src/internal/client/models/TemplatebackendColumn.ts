@@ -16,43 +16,41 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ProtobufAny
+ * @interface TemplatebackendColumn
  */
-export interface ProtobufAny {
-    [key: string]: object | any;
+export interface TemplatebackendColumn {
     /**
      * 
-     * @type {string}
-     * @memberof ProtobufAny
+     * @type {Array<string>}
+     * @memberof TemplatebackendColumn
      */
-    type?: string;
+    value?: Array<string>;
 }
 
 /**
- * Check if a given object implements the ProtobufAny interface.
+ * Check if a given object implements the TemplatebackendColumn interface.
  */
-export function instanceOfProtobufAny(value: object): boolean {
+export function instanceOfTemplatebackendColumn(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ProtobufAnyFromJSON(json: any): ProtobufAny {
-    return ProtobufAnyFromJSONTyped(json, false);
+export function TemplatebackendColumnFromJSON(json: any): TemplatebackendColumn {
+    return TemplatebackendColumnFromJSONTyped(json, false);
 }
 
-export function ProtobufAnyFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProtobufAny {
+export function TemplatebackendColumnFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendColumn {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-            ...json,
-        'type': !exists(json, '@type') ? undefined : json['@type'],
+        'value': !exists(json, 'value') ? undefined : json['value'],
     };
 }
 
-export function ProtobufAnyToJSON(value?: ProtobufAny | null): any {
+export function TemplatebackendColumnToJSON(value?: TemplatebackendColumn | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -61,8 +59,7 @@ export function ProtobufAnyToJSON(value?: ProtobufAny | null): any {
     }
     return {
         
-            ...value,
-        '@type': value.type,
+        'value': value.value,
     };
 }
 

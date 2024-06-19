@@ -73,7 +73,7 @@ export default function Authenticate() {
                     Log in
                 </button>
                 <Link href="/user" passHref className='mt-4'>
-                    <span>Or create an account here</span>
+                    <span>Or create an account <span className="text-blue-900 underline">here</span></span>
                 </Link>
                 <p className="mt-4 text-xl text-red-500">{token === 'NULL' && 'Your credentials are not correct'}</p>
                 <Modal show={modal} onClose={() => setModal(false)}>
