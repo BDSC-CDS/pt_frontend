@@ -57,9 +57,9 @@ const DatasetPage = () => {
                         {metadata?.map((meta) =>
                             <Table.HeadCell>{meta.columnName}</Table.HeadCell>
                         )}
-                        <Table.HeadCell>
+                        {/* <Table.HeadCell>
                             <span className="sr-only">Edit</span>
-                        </Table.HeadCell>
+                        </Table.HeadCell> */}
                     </Table.Head>
                     <Table.Body className="divide-y">
 
@@ -75,11 +75,11 @@ const DatasetPage = () => {
                                         {col?.at(index)}
                                     </Table.Cell>
                                 ))}
-                                < Table.Cell >
+                                {/* < Table.Cell >
                                     <a href="#" onClick={(e) => e.stopPropagation()}>
                                         <MdMoreHoriz size={20} />
                                     </a>
-                                </Table.Cell>
+                                </Table.Cell> */}
                             </Table.Row>
                         ))}
                     </Table.Body>
