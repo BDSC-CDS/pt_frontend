@@ -1,4 +1,5 @@
 apis/AuthenticationApi.ts
+apis/ConfigurationApi.ts
 apis/DatasetApi.ts
 apis/IndexApi.ts
 apis/UsersApi.ts
@@ -10,6 +11,7 @@ models/RpcStatus.ts
 models/TemplatebackendAuthenticationReply.ts
 models/TemplatebackendAuthenticationResult.ts
 models/TemplatebackendColumn.ts
+models/TemplatebackendConfig.ts
 models/TemplatebackendCreateHelloReply.ts
 models/TemplatebackendCreateUserReply.ts
 models/TemplatebackendCreateUserResult.ts
@@ -18,6 +20,8 @@ models/TemplatebackendDataset.ts
 models/TemplatebackendDeleteDatasetReply.ts
 models/TemplatebackendDeleteDatasetResult.ts
 models/TemplatebackendDeleteUserReply.ts
+models/TemplatebackendGetConfigReply.ts
+models/TemplatebackendGetConfigResult.ts
 models/TemplatebackendGetDatasetContentReply.ts
 models/TemplatebackendGetDatasetContentResult.ts
 models/TemplatebackendGetDatasetMetadataReply.ts

@@ -31,6 +31,12 @@ export interface TemplatebackendStoreDatasetRequest {
      * @memberof TemplatebackendStoreDatasetRequest
      */
     dataset?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplatebackendStoreDatasetRequest
+     */
+    types?: string;
 }
 
 /**
@@ -54,6 +60,7 @@ export function TemplatebackendStoreDatasetRequestFromJSONTyped(json: any, ignor
         
         'datasetName': !exists(json, 'datasetName') ? undefined : json['datasetName'],
         'dataset': !exists(json, 'dataset') ? undefined : json['dataset'],
+        'types': !exists(json, 'types') ? undefined : json['types'],
     };
 }
 
@@ -68,6 +75,7 @@ export function TemplatebackendStoreDatasetRequestToJSON(value?: Templatebackend
         
         'datasetName': value.datasetName,
         'dataset': value.dataset,
+        'types': value.types,
     };
 }
 
