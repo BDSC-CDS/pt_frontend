@@ -25,10 +25,13 @@ export default function User() {
       formData.email,
       formData.password
     );
-
+    // Check response and extract the result
+    const resultId = response && response.result ? response.result.id : null;
+    // Convert resultId to a string, handle null or undefined cases explicitly
+    const resultString = resultId ? String(resultId) : 'NULL';
     // Extract the result from the response
-    const result = response ? (response.result ? response.result.id : '') : '';
-    setResponse(result === '' ? 'NULL' : result); // Set response to display
+    // const result = response ? (response.result ? response.result.id : '') : '';
+    setResponse(resultString); // Set response to display
   }
 
   // Function to handle form input changes
