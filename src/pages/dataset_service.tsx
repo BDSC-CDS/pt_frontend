@@ -40,11 +40,13 @@ export default function DatasetService() {
         }
     }, []);
 
-
-    const handleFileUpload = async (event) => {
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files) {
+            return;
+        }
         const file = event.target.files[0];
-        if (!file) return;
-        const fileType = file.name.split('.').pop().toLowerCase();
+        if (!file || !file.name) return;
+        const fileType = file.name.split('.').pop()?.toLowerCase();
         if (fileType !== 'csv') {
             alert('Please upload a CSV file.');
             event.target.value = '';
@@ -52,6 +54,7 @@ export default function DatasetService() {
         }
         Papa.parse(file, {
             complete: (result) => {
+                // const data = result.data as Record<string, any>[];
                 if (result.data.length === 0) {
                     alert("No data found in the CSV.");
                     event.target.value = '';
@@ -60,14 +63,20 @@ export default function DatasetService() {
                 // setCsvData(result.data);
                 console.log(result.data)
                 // Get headers (column names)
+                if (!result.data[0]) {
+                    console.log("First item is undefined, which shouldn't happen.");
+                    return;
+                }
+
                 const headers = Object.keys(result.data[0]);
                 console.log("headers: ", headers)
                 const csvString = [
                     headers.join(",") // Header row
                 ].concat(
-                    result.data.map(row =>
-                        headers.map(fieldName => `"${String(row[fieldName] || '').replace(/"/g, '""')}"`).join(',')
-                    )
+                    result.data.map(row => {
+                        const record = row as Record<string, any>;
+                        return headers.map(fieldName => `"${String(record[fieldName] || '').replace(/"/g, '""')}"`).join(',')
+                    })
                 ).join('\\n');
                 console.log("CSV Format String: ", csvString);
                 // set variable
