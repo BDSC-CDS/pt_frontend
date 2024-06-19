@@ -8,12 +8,15 @@ import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
+import { useAuth } from '~/utils/AuthContext';
 
 export default function DatasetService() {
     const [listDatasets, setListDatasets] = useState<Array<TemplatebackendDataset>>([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [csvString, setCsvString] = useState('');
+    const { isLoggedIn } = useAuth();
+
 
     const getListDatasets = async (offset?: number, limit?: number) => {
         // Call API
@@ -130,75 +133,80 @@ export default function DatasetService() {
             <Head>
                 <title>Datasets</title>
             </Head>
-            <div className="flex flex-col items-end p-5">
-                <button
-                    onClick={() => setIsUploadModalOpen(true)}
-                    className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <MdOutlineAdd size={30} />
-                    <p className='ml-2 text-sm'> Upload</p>
-                </button>
-                <Modal show={isUploadModalOpen} onClose={() => closeUploadModal()}>
-                    <Modal.Body>
-                        <div className="space-y-6">
-                            <h2 className="text-lg  mb-2">Upload CSV File</h2>
-                            <input
-                                type="text"
-                                placeholder="Enter filename"
-                                value={fileName}
-                                onChange={(e) => setFileName(e.target.value)}
-                                className="input input-bordered w-full max-w-xs"
-                            />
-                            <input type="file" accept=".csv" onChange={handleFileUpload} />
+            {!isLoggedIn &&
+                <p className='m-8'> Please log in to consult your datasets.</p>
+            }
+            {isLoggedIn &&
+                <div className="flex flex-col items-end p-5">
+                    <button
+                        onClick={() => setIsUploadModalOpen(true)}
+                        className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                        <MdOutlineAdd size={30} />
+                        <p className='ml-2 text-sm'> Upload</p>
+                    </button>
+                    <Modal show={isUploadModalOpen} onClose={() => closeUploadModal()}>
+                        <Modal.Body>
+                            <div className="space-y-6">
+                                <h2 className="text-lg  mb-2">Upload CSV File</h2>
+                                <input
+                                    type="text"
+                                    placeholder="Enter filename"
+                                    value={fileName}
+                                    onChange={(e) => setFileName(e.target.value)}
+                                    className="input input-bordered w-full max-w-xs"
+                                />
+                                <input type="file" accept=".csv" onChange={handleFileUpload} />
 
-                        </div>
-                        <button className='mt-4 bg-gray-400 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
-                            onClick={() => submitCSVToBackend()}
-                        >
-                            Submit
-                        </button>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={() => {
-                            closeUploadModal();
-                            router.push('/');
-                        }}>
-                            Close
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-                <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-                    <Table hoverable>
-                        <Table.Head>
-                            <Table.HeadCell>Dataset ID</Table.HeadCell>
-                            <Table.HeadCell>Dataset name</Table.HeadCell>
-                            <Table.HeadCell>Date created</Table.HeadCell>
-                            <Table.HeadCell>
-                                <span className="sr-only">Edit</span>
-                            </Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                            {listDatasets.map((dataset) => (
-                                < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => handleRowClick(dataset.id)}
-                                >
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                        {dataset.id}
-                                    </Table.Cell>
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                        {dataset.datasetName}
-                                    </Table.Cell>
-                                    <Table.Cell> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
-                                    < Table.Cell >
-                                        <a href="#" onClick={(e) => e.stopPropagation()}>
-                                            <MdMoreHoriz size={20} />
-                                        </a>
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
+                            </div>
+                            <button className='mt-4 bg-gray-400 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
+                                onClick={() => submitCSVToBackend()}
+                            >
+                                Submit
+                            </button>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button onClick={() => {
+                                closeUploadModal();
+                                router.push('/');
+                            }}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                    <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
+                        <Table hoverable>
+                            <Table.Head>
+                                <Table.HeadCell>Dataset ID</Table.HeadCell>
+                                <Table.HeadCell>Dataset name</Table.HeadCell>
+                                <Table.HeadCell>Date created</Table.HeadCell>
+                                <Table.HeadCell>
+                                    <span className="sr-only">Edit</span>
+                                </Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body className="divide-y">
+                                {listDatasets.map((dataset) => (
+                                    < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => handleRowClick(dataset.id)}
+                                    >
+                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                            {dataset.id}
+                                        </Table.Cell>
+                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                            {dataset.datasetName}
+                                        </Table.Cell>
+                                        <Table.Cell> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
+                                        < Table.Cell >
+                                            <a href="#" onClick={(e) => e.stopPropagation()}>
+                                                <MdMoreHoriz size={20} />
+                                            </a>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table>
+                    </div >
                 </div >
-            </div >
+            }
         </>
     );
 }

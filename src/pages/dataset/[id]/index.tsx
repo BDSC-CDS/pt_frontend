@@ -8,6 +8,7 @@ import { get_metadata, get_dataset_content } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
+import { useAuth } from '~/utils/AuthContext';
 
 const DatasetPage = () => {
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
@@ -16,7 +17,7 @@ const DatasetPage = () => {
     const router = useRouter();
     const { id } = router.query; // Get the dynamic part of the URL
     const datasetId = Number(id);
-
+    const { isLoggedIn } = useAuth();
     const getDatasetMetadata = async () => {
         const response = await get_metadata(datasetId);
         if (response) {
@@ -51,40 +52,45 @@ const DatasetPage = () => {
 
     return (
         <>
-            <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded ml-3">
-                <Table hoverable>
-                    <Table.Head>
-                        {metadata?.map((meta) =>
-                            <Table.HeadCell>{meta.columnName}</Table.HeadCell>
-                        )}
-                        {/* <Table.HeadCell>
+            {!isLoggedIn &&
+                <p className='m-8'> Please log in to consult your datasets.</p>
+            }
+            {isLoggedIn &&
+                <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded ml-3">
+                    <Table hoverable>
+                        <Table.Head>
+                            {metadata?.map((meta) =>
+                                <Table.HeadCell>{meta.columnName}</Table.HeadCell>
+                            )}
+                            {/* <Table.HeadCell>
                             <span className="sr-only">Edit</span>
                         </Table.HeadCell> */}
-                    </Table.Head>
-                    <Table.Body className="divide-y">
+                        </Table.Head>
+                        <Table.Body className="divide-y">
 
-                        {/* {columns?.map((element) => ( */}
-                        {Array.from({ length: nRows }, (_, index) => (
-                            < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                            // onClick={() => handleRowClick(dataset.id)}
-                            >
-                                {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                {columns?.map((col, colIndex) => (
+                            {/* {columns?.map((element) => ( */}
+                            {Array.from({ length: nRows }, (_, index) => (
+                                < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                // onClick={() => handleRowClick(dataset.id)}
+                                >
+                                    {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
+                                    {columns?.map((col, colIndex) => (
 
-                                    <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                        {col?.at(index)}
-                                    </Table.Cell>
-                                ))}
-                                {/* < Table.Cell >
+                                        <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                            {col?.at(index)}
+                                        </Table.Cell>
+                                    ))}
+                                    {/* < Table.Cell >
                                     <a href="#" onClick={(e) => e.stopPropagation()}>
                                         <MdMoreHoriz size={20} />
                                     </a>
                                 </Table.Cell> */}
-                            </Table.Row>
-                        ))}
-                    </Table.Body>
-                </Table>
-            </div >
+                                </Table.Row>
+                            ))}
+                        </Table.Body>
+                    </Table>
+                </div >
+            }
         </>
     );
 };

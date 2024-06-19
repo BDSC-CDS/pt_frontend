@@ -8,8 +8,23 @@ import { HiUser } from 'react-icons/hi';
 export default function Header() {
     // State to control visibility of the logout notification
     const [visible, setVisible] = useState<boolean>(false);
+    //const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
     // Extract isLoggedIn and logout function from useAuth hook
     const { isLoggedIn, logout } = useAuth();
+    // useEffect(() => {
+    //     // Check login status when component mounts
+    //     let token = null;
+    //     if (typeof window !== 'undefined') {
+    //         token = localStorage.getItem('token');
+    //     }
+    //     if (token) {
+    //         setIsLoggedIn(true);
+    //     } else {
+    //         setIsLoggedIn(false);
+
+    //     }
+    // }, []);
 
     // Handler for the logout process
     const handleLogout = () => {
