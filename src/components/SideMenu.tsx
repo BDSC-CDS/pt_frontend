@@ -28,9 +28,10 @@ export default function SideMenu() {
                                 About us
                             </Sidebar.Item> */}
 
-                            <Sidebar.Item href="/dataset_service" passHref icon={HiDatabase}>
-                                Datasets
-                            </Sidebar.Item>
+                            <Link href="/dataset_service" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                <HiDatabase size={'2em'} color='gray' />
+                                <p className='ml-1'> Datasets</p>
+                            </Link>
                             <Sidebar.Item href="#" passHref icon={HiShoppingBag}>
                                 Synthetic Data Generation
                             </Sidebar.Item>
