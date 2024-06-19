@@ -11,10 +11,15 @@ import Papa from "papaparse";
 import { useAuth } from '~/utils/AuthContext';
 
 export default function DatasetService() {
+    interface ColumnTypes {
+        [key: string]: string;
+    }
     const [listDatasets, setListDatasets] = useState<Array<TemplatebackendDataset>>([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [csvString, setCsvString] = useState('');
+    const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
 
 
@@ -71,6 +76,10 @@ export default function DatasetService() {
                     return;
                 }
 
+                //detect types
+                const initialTypes = detectColumnTypes(result.data as Record<string, any>[]);
+                setColumnTypes(initialTypes);
+                // read data
                 const headers = Object.keys(result.data[0]);
                 console.log("headers: ", headers)
                 const csvString = [
@@ -88,12 +97,31 @@ export default function DatasetService() {
             header: true,
         });
     };
-    const submitCSVToBackend = async () => {
-        //send CSV to API
+
+    const detectColumnTypes = (data: Record<string, any>[]): ColumnTypes => {
+        const types: ColumnTypes = {};
+        const sampleData = data[0];
+        for (const key in sampleData) {
+            const value = sampleData[key];
+            types[key] = typeof value;
+            if (!isNaN(Date.parse(value)) && value.includes('-')) {
+                types[key] = 'date';
+            } else if (!isNaN(parseFloat(value))) {
+                types[key] = Number.isInteger(parseFloat(value)) ? 'int' : 'float';
+            }
+        }
+        return types;
+    };
+    const setColumnType = (column: string, type: string) => {
+        setColumnTypes(prev => ({ ...prev, [column]: type }));
+    };
+
+    const processCSV = async () => {
         if (fileName == '') {
             alert("You must input a name for the dataset.")
             return;
         }
+        // check that there is not already a dataset with same name
         const all_names = listDatasets.map((dataset) => dataset.datasetName);
         console.log(all_names.indexOf(fileName) > -1)
         if (all_names.indexOf(fileName) > -1) {
@@ -104,9 +132,14 @@ export default function DatasetService() {
             alert("You must upload a file.")
             return;
         }
+        //open type detection window
+        setIsTypeModalOpen(true);
+    }
 
+    const submitCSVToBackend = async () => {
         try {
-            const response = await store_dataset(fileName, csvString);
+            const types = JSON.stringify(columnTypes)
+            const response = await store_dataset(fileName, csvString, types);
             if (!response) {
                 alert('Failed to upload CSV');
             }
@@ -114,10 +147,12 @@ export default function DatasetService() {
             alert("Error uploading the CSV.");
         }
         setCsvString('');
-        closeUploadModal();
+        closeUploadModals();
     }
-    const closeUploadModal = () => {
+
+    const closeUploadModals = () => {
         setIsUploadModalOpen(false);
+        setIsTypeModalOpen(false)
         setFileName('');
         getListDatasets();
     };
@@ -144,7 +179,7 @@ export default function DatasetService() {
                         <MdOutlineAdd size={30} />
                         <p className='ml-2 text-sm'> Upload</p>
                     </button>
-                    <Modal show={isUploadModalOpen} onClose={() => closeUploadModal()}>
+                    <Modal show={isUploadModalOpen} onClose={() => closeUploadModals()}>
                         <Modal.Body>
                             <div className="space-y-6">
                                 <h2 className="text-lg  mb-2">Upload CSV File</h2>
@@ -159,20 +194,45 @@ export default function DatasetService() {
 
                             </div>
                             <button className='mt-4 bg-gray-400 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
-                                onClick={() => submitCSVToBackend()}
+                                onClick={() => processCSV()}
                             >
                                 Submit
                             </button>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button onClick={() => {
-                                closeUploadModal();
-                                router.push('/');
+                                closeUploadModals();
+                                router.push('dataset_service');
                             }}>
-                                Close
+                                Cancel
                             </Button>
                         </Modal.Footer>
                     </Modal>
+
+                    <Modal show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
+                        <Modal.Header>
+                            Edit Column Types
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="space-y-4">
+                                {Object.keys(columnTypes).map((column, index) => (
+                                    <div key={index} className="flex items-center justify-between">
+                                        <span>{column}:</span>
+                                        <select value={columnTypes[column]} onChange={(e) => setColumnType(column, e.target.value)} className="select select-bordered">
+                                            <option value="string">String</option>
+                                            <option value="int">Integer</option>
+                                            <option value="float">Float</option>
+                                            <option value="date">Date</option>
+                                        </select>
+                                    </div>
+                                ))}
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button onClick={() => submitCSVToBackend()}>Save</Button>
+                        </Modal.Footer>
+                    </Modal>
+
                     <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
                         <Table hoverable>
                             <Table.Head>
