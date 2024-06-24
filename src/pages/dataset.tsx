@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
-import { useAuth } from '~/utils/AuthContext';
+import { useAuth } from '~/utils/authContext';
 
 export default function Dataset() {
     interface ColumnTypes {

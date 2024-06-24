@@ -1,10 +1,6 @@
 // Importing necessary modules and components.
 import Head from "next/head";
-import apiClientIndex from '../utils/apiClientIndex';
-import { useState } from "react";
-import { TemplatebackendCreateHelloReply } from "~/internal/client";
 import { BiCalculator, BiMessageSquareDetail, BiLayer } from 'react-icons/bi';
-import { IconContext } from "react-icons";
 import Link from "next/link";
 import { GrDocumentLocked } from "react-icons/gr";
 

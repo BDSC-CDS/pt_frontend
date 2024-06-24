@@ -8,7 +8,7 @@ import { getMetadata, getDatasetContent } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
-import { useAuth } from '~/utils/AuthContext';
+import { useAuth } from '~/utils/authContext';
 
 const DatasetPage = () => {
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();

@@ -1,7 +1,6 @@
 
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
-import SideMenu from '~/components/SideMenu';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
