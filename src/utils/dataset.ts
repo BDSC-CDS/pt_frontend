@@ -1,5 +1,5 @@
 import apiClientDataset from './apiClientDataset';
-import {getAuthInitOverrides} from './AuthContext'
+import {getAuthInitOverrides} from './authContext'
 
 import { DatasetServiceStoreDatasetRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
@@ -41,7 +41,7 @@ export const listDatasets = async (offset?: number, limit?: number) => {
     }
     try {
         const response = await apiClientDataset.datasetServiceListDatasets(request, getAuthInitOverrides());
-        return response; 
+        return response;
     } catch (error) {
         console.log("Error listing datasets:" + error);
     }
@@ -54,7 +54,7 @@ export const getMetadata = async (id: number) => {
 
     try {
         const response = await apiClientDataset.datasetServiceGetDatasetMetadata(request, getAuthInitOverrides());
-        return response; 
+        return response;
     } catch (error) {
         console.log("Error getting metadata:" + error);
     }
@@ -72,7 +72,7 @@ export const getDatasetContent = async (id: number, offset?: number, limit?: num
     }
     try {
         const response = await apiClientDataset.datasetServiceGetDatasetContent(request, getAuthInitOverrides());
-        return response; 
+        return response;
     } catch (error) {
         console.log("Error getting the dataset content:" + error);
     }

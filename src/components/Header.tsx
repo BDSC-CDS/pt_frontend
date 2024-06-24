@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useAuth } from '../utils/AuthContext';
+import { useAuth } from '../utils/authContext';
 import { Button, Modal } from 'flowbite-react';
 import { HiUser } from 'react-icons/hi';
 

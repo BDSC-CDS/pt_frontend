@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import Home from '../src/pages/index'
-import { useAuth } from '../src/utils/AuthContext';
+import { useAuth } from '../src/utils/authContext';
 
 jest.mock('../src/utils/AuthContext', () => ({
   useAuth: jest.fn(),

@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import FooterMenu from "../components/Footer";
 import SideMenu from "../components/SideMenu";
 
-import { AuthProvider } from '../utils/AuthContext';
+import { AuthProvider } from '../utils/authContext';
 
 
 type Props = {

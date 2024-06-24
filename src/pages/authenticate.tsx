@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import Header from '../components/Header';
 import { ChangeEvent, useState } from 'react';
-import { authenticateUser } from '../utils/authentiation';
-import { useAuth } from '../utils/AuthContext';
+import { authenticateUser } from '../utils/authentication';
+import { useAuth } from '../utils/authContext';
 import Link from 'next/link';
 import { Button, Modal } from 'flowbite-react';
 import { useRouter } from 'next/router';

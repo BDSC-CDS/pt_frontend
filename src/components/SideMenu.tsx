@@ -2,7 +2,7 @@ import { Sidebar } from 'flowbite-react';
 import Link from 'next/link';
 import { BiBuoy } from 'react-icons/bi';
 import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiQuestionMarkCircle, HiUser, HiViewBoards, HiPresentationChartBar, HiOutlineCog } from 'react-icons/hi';
-import { useAuth } from '~/utils/AuthContext';
+import { useAuth } from '~/utils/authContext';
 
 export default function SideMenu() {
     const { isAdmin } = useAuth();
