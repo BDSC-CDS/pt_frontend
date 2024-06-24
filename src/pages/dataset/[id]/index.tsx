@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import TabsComponent from '../../../components/Tabs';
 import dynamic from "next/dynamic";
 import { Table } from 'flowbite-react';
-import { get_metadata, get_dataset_content } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
@@ -19,13 +19,13 @@ const DatasetPage = () => {
     const datasetId = Number(id);
     const { isLoggedIn } = useAuth();
     const getDatasetMetadata = async () => {
-        const response = await get_metadata(datasetId);
+        const response = await getMetadata(datasetId);
         if (response) {
             setMetadata(response.metadata?.metadata)
         }
     }
-    const getDatasetContent = async () => {
-        const response = await get_dataset_content(datasetId);
+    const getAndProcessDatasetContent = async () => {
+        const response = await getDatasetContent(datasetId);
         if (response && response.result?.columns) {
             const result = response.result?.columns.map((col) => {
                 return col.value;
@@ -43,7 +43,7 @@ const DatasetPage = () => {
         if (id) {
             try {
                 getDatasetMetadata();
-                getDatasetContent();
+                getAndProcessDatasetContent();
             } catch (error) {
                 alert("Error getting the data");
             }

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Header from '../components/Header';
 import { ChangeEvent, useState } from 'react';
-import { authenticateUser } from '../utils/authenticateUser';
+import { authenticateUser } from '../utils/authentiation';
 import { useAuth } from '../utils/AuthContext';
 import Link from 'next/link';
 import { Button, Modal } from 'flowbite-react';
@@ -9,22 +9,17 @@ import { useRouter } from 'next/router';
 import SideMenu from '~/components/SideMenu';
 import FooterMenu from '~/components/Footer';
 
-// The Authenticate component is used for handling the user authentication process.
 export default function Authenticate() {
-    // State for managing user input data
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
     const router = useRouter();
 
-    // Using the useAuth hook to access the login function
     const { login } = useAuth();
 
-    // State for storing the authentication token received from the server
     const [token, setToken] = useState<string>();
     const [modal, setModal] = useState<boolean>(false);
-    // Function to handle the authentication process
     const authUser = async () => {
         const response = await authenticateUser(formData.email, formData.password);
         const newToken = response ? (response.result ? response.result.token : '') : '';
@@ -36,7 +31,6 @@ export default function Authenticate() {
         }
     }
 
-    // Function to handle changes in the form inputs
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prevState => ({

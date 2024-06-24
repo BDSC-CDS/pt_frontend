@@ -3,18 +3,18 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { store_dataset, list_datasets } from "../utils/dataset"
+import { storeDataset, listDatasets } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
 import { useAuth } from '~/utils/AuthContext';
 
-export default function DatasetService() {
+export default function Dataset() {
     interface ColumnTypes {
         [key: string]: string;
     }
-    const [listDatasets, setListDatasets] = useState<Array<TemplatebackendDataset>>([]);
+    const [datasetsList, setDatasetsList] = useState<Array<TemplatebackendDataset>>([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -27,9 +27,9 @@ export default function DatasetService() {
         // Call API
         let response;
         if (!offset && !limit) {
-            response = await list_datasets();
+            response = await listDatasets();
         } else if (offset && limit) {
-            response = await list_datasets(
+            response = await listDatasets(
             );
         } else {
             console.log("ERROR You have to define both the offset and the limit") // TODO
@@ -37,7 +37,7 @@ export default function DatasetService() {
         }
         const result = response?.result?.datasets
         if (result) {
-            setListDatasets(result);
+            setDatasetsList(result);
         }
     }
     useEffect(() => {
@@ -122,7 +122,7 @@ export default function DatasetService() {
             return;
         }
         // check that there is not already a dataset with same name
-        const all_names = listDatasets.map((dataset) => dataset.datasetName);
+        const all_names = datasetsList.map((dataset) => dataset.datasetName);
         console.log(all_names.indexOf(fileName) > -1)
         if (all_names.indexOf(fileName) > -1) {
             alert("There already is a dataset with this name.")
@@ -139,7 +139,7 @@ export default function DatasetService() {
     const submitCSVToBackend = async () => {
         try {
             const types = JSON.stringify(columnTypes)
-            const response = await store_dataset(fileName, csvString, types);
+            const response = await storeDataset(fileName, csvString, types);
             if (!response) {
                 alert('Failed to upload CSV');
             }
@@ -202,7 +202,7 @@ export default function DatasetService() {
                         <Modal.Footer>
                             <Button onClick={() => {
                                 closeUploadModals();
-                                router.push('dataset_service');
+                                router.push('dataset');
                             }}>
                                 Cancel
                             </Button>
@@ -244,7 +244,7 @@ export default function DatasetService() {
                                 </Table.HeadCell>
                             </Table.Head>
                             <Table.Body className="divide-y">
-                                {listDatasets.map((dataset) => (
+                                {datasetsList.map((dataset) => (
                                     < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
                                         onClick={() => handleRowClick(dataset.id)}
                                     >
