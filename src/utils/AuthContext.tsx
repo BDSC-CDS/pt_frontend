@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode, FunctionComponent } from 'react';
+import { getMyUser } from "./user";
 
 // Define the type for the context value
 type AuthContextType = {
     isLoggedIn: boolean;
+    isAdmin: boolean;
     login: (token: string) => void;
     logout: () => void;
 };
 
-// Create the context with an initial undefined value
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Type for AuthProvider component props
@@ -17,12 +18,17 @@ type AuthProviderProps = {
 
 // AuthProvider component: provides authentication context to child components
 export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
-    const [isLoggedIn, setLoggedIn] = useState<boolean>(false); // State to track login status
+    const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
+    const [isAdmin, setAdmin] = useState<boolean>(false);
 
     // Login function to set the user's token and update login status
-    const login = (token: string) => {
+    const login = async (token: string) => {
         localStorage.setItem('token', token); // Store the user token in localStorage
         setLoggedIn(true); // Update login status to true
+        const response = await getMyUser();
+        const roles = response?.result?.me?.roles || [];
+        const isAdmin = roles.includes('admin');
+        setAdmin(isAdmin); // Update login status to true
     };
 
     // Logout function to remove the user's token and update login status
@@ -33,7 +39,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
 
     // Render the AuthContext.Provider with the current state and functions
     return (
-        <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, isAdmin, login, logout }}>
             {children} {/* Render children components passed to this provider */}
         </AuthContext.Provider>
     );
@@ -47,3 +53,14 @@ export const useAuth = (): AuthContextType => {
     }
     return context; 
 };
+
+export const getAuthInitOverrides = (): RequestInit => {
+    let headers: HeadersInit = [];
+    if (typeof window !== 'undefined' && window.localStorage) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            headers = [['Authorization', 'Bearer ' + token]];
+        }
+    }
+    return {headers};
+}

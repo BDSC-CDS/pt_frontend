@@ -6,7 +6,7 @@ import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-export default function RiskAssess() {
+export default function RiskAssessment() {
 
     const projects = [
         { id: 1, name: 'Project 1', dateCreated: '01.01.2024', lastModified: '18.02.2024', status: 'Finished' },

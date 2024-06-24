@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Header from "../components/Header";
 import { ChangeEvent, useState } from "react";
-import { createUser } from "../utils/createUser";
+import { createUser } from "../utils/user";
 
 // User component for user registration
 export default function User() {
