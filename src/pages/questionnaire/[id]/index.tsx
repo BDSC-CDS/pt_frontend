@@ -8,7 +8,7 @@ const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 const QuestionnairePage = () => {
     const router = useRouter();
     const { id } = router.query; // Get the dynamic part of the URL
-    const questId = Number(id);
+    const questionnaireId = Number(id);
 
     // const projectData = fetchProjectData(projectId); // This is a placeholder. You'll need to implement data fetching.
     const projectData = [
@@ -16,7 +16,7 @@ const QuestionnairePage = () => {
         { id: 2, name: 'Project 2', description: 'Description of Project 2', dateCreated: '2024-02-01', status: 'Completed' },
         { id: 3, name: 'Project 3', description: 'Description of Project 3', dateCreated: '2024-02-01', status: 'Completed' },
     ];
-    const project = projectData.find(project => project.id === questId)
+    const project = projectData.find(project => project.id === questionnaireId)
 
 
 
