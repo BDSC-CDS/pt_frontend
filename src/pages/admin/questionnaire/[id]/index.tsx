@@ -19,18 +19,16 @@ export default function Questionnaire() {
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
 
     const loadQuestionnaire = async () => {
-        let result;
-        result = await getQuestionnaire(questionnaireId);
-        console.log("result", result);
+        const result = await getQuestionnaire(questionnaireId);
         
-        if (result) {
-            console.log(result)
-            setQuestionnaire(result);
+        if (!result) {
+            return
         }
+        
+        setQuestionnaire(result);
     }
 
     useEffect(() => {
-        console.log(questionnaireId)
         if (!questionnaireId) {
             return
         }
@@ -67,81 +65,49 @@ export default function Questionnaire() {
             </div>
             <div className="flex flex-col">
                 <Table >
-                        <Table.Body className="divide-y">
-                    
-                            <Table.Row >
-                                <Table.HeadCell>Name</Table.HeadCell>
-                                <Table.Cell>{questionnaire.name}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row >
-                                <Table.HeadCell>Date created</Table.HeadCell>
-                                <Table.Cell><TimeAgo date={questionnaire.createdAt || ''} /></Table.Cell>
-                            </Table.Row>
-                            <Table.Row >
-                                <Table.HeadCell>Last modified</Table.HeadCell>
-                                <Table.Cell><TimeAgo date={questionnaire.updatedAt || ''} /></Table.Cell>
-                            </Table.Row>
-                            <Table.Row >
-                                <Table.HeadCell>Last version</Table.HeadCell>
-                                <Table.Cell>{questionnaire.lastVersion}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row >
-                                <Table.HeadCell>Versions</Table.HeadCell>
-                                <Table.Cell className="p-0">
-                                    <Table hoverable>
-                                        <Table.Head>
-                                            <Table.HeadCell>Version</Table.HeadCell>
-                                            <Table.HeadCell>Date created</Table.HeadCell>
-                                            <Table.HeadCell></Table.HeadCell>
-                                        </Table.Head>
-                                        <Table.Body className="divide-y">
-                                            {(questionnaire.versions || []).map((version) => (
-                                                <Table.Row key={version.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                                    onClick={() => handleRowClick(version.id || 0)}>
-                                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                        {version.version}
-                                                    </Table.Cell>
-                                                    <Table.Cell><TimeAgo date={version.createdAt || ''} /></Table.Cell>
-                                                    <Table.Cell className="flex flex-col items-end">
-                                                        <a href="#" onClick={(e) => e.stopPropagation()}>
-                                                            <HiPencilAlt size={20} />
-                                                        </a>
-                                                    </Table.Cell>
-                                                </Table.Row>
-                                            ))}
-                                        </Table.Body>
-                                    </Table>
-                                </Table.Cell>
-                            </Table.Row>
-                        </Table.Body>
-                    
-                </Table>
-
-                {/* <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-                    <Table hoverable>
-                        <Table.Head>
-                            <Table.HeadCell>Version</Table.HeadCell>
+                    <Table.Body className="divide-y">
+                        <Table.Row >
+                            <Table.HeadCell>Name</Table.HeadCell>
+                            <Table.Cell>{questionnaire.name}</Table.Cell>
+                        </Table.Row>
+                        <Table.Row >
                             <Table.HeadCell>Date created</Table.HeadCell>
-                            <Table.HeadCell></Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                            {questionnaire.versions.map((version) => (
-                                <Table.Row key={version.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => handleRowClick(version.id)}>
-                                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                        {version.name}
-                                    </Table.Cell>
-                                    <Table.Cell>{version.dateCreated}</Table.Cell>
-                                    <Table.Cell className="flex flex-col items-end">
-                                        <a href="#" onClick={(e) => e.stopPropagation()}>
-                                            <HiPencilAlt size={20} />
-                                        </a>
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
-                </div> */}
+                            <Table.Cell><TimeAgo date={questionnaire.createdAt || ''} /></Table.Cell>
+                        </Table.Row>
+                        <Table.Row >
+                            <Table.HeadCell>Last modified</Table.HeadCell>
+                            <Table.Cell><TimeAgo date={questionnaire.updatedAt || ''} /></Table.Cell>
+                        </Table.Row>
+                        <Table.Row >
+                            <Table.HeadCell>Versions</Table.HeadCell>
+                            <Table.Cell className="p-0">
+                                <Table hoverable>
+                                    <Table.Head>
+                                        <Table.HeadCell>Version</Table.HeadCell>
+                                        <Table.HeadCell>Date created</Table.HeadCell>
+                                        <Table.HeadCell></Table.HeadCell>
+                                    </Table.Head>
+                                    <Table.Body className="divide-y">
+                                        {(questionnaire.versions || []).map((version) => (
+                                            <Table.Row key={version.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => handleRowClick(version.id || 0)}>
+                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                    {version.version}
+                                                </Table.Cell>
+                                                <Table.Cell><TimeAgo date={version.createdAt || ''} /></Table.Cell>
+                                                <Table.Cell className="flex flex-col items-end">
+                                                    <a href="#" onClick={(e) => e.stopPropagation()}>
+                                                        <HiPencilAlt size={20} />
+                                                    </a>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table>
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
             </div>
         </>
     );
