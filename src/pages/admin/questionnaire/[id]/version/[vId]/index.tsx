@@ -2,11 +2,12 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table } from 'flowbite-react';
+import { Table, Button, Modal, TextInput } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
-import { MdSave } from "react-icons/md";
-import { HiPencilAlt } from "react-icons/hi";
+import CounterInput from "../../../../../../components/CounterInput"
+import { MdSave, MdOutlineAdd } from "react-icons/md";
+import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion } from '~/internal/client';
 import Link from 'next/link';
 
@@ -18,16 +19,17 @@ export default function Questionnaire() {
 
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
     const [version, setVersion] = useState<TemplatebackendQuestionnaireVersion>({});
-    type Tabs = {
+    type Tab = {
         tabName: string;
         questions: TemplatebackendQuestionnaireQuestion[];
-    }[];
+    };
+    type Tabs = Tab[];
     const [tabs, setTabs] = useState<Tabs>([]);
     const [activeTab, setActiveTab] = useState<number>(0);
 
     const loadQuestionnaire = async () => {
         const result = await getQuestionnaire(questionnaireId);
-        
+
         if (!result) {
             return
         }
@@ -37,17 +39,22 @@ export default function Questionnaire() {
         if (!v) {
             return
         }
+
+        processQuestionnaireVersion(v);
+    }
+
+    const processQuestionnaireVersion = (v: TemplatebackendQuestionnaireVersion) => {
         setVersion(v);
 
         const tsMap: {
             [key: string]: TemplatebackendQuestionnaireQuestion[];
-          } = {};
-        for (let question of v.questions || []){
+        } = {};
+        for (let question of v.questions || []) {
             if (!question.tab) {
                 continue
             }
 
-            if (!tsMap[question.tab]){
+            if (!tsMap[question.tab]) {
                 tsMap[question.tab] = [];
             }
 
@@ -75,10 +82,72 @@ export default function Questionnaire() {
         }
     }, [id]);
 
-
-    const handleRowClick = (vId: number) => {
-        router.push(`/admin/questionnaire/${id}/version/${vId}`);
+    // Everything to remove a tab ans it's questions
+    const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
+    const [tabToRemove, setTabToRemove] = useState<Tab>();
+    const removeTabConfirmation = (n: number) => {
+        setOpenRemoveTabModal(true);
+        setTabToRemove(tabs[n])
     };
+    const removeTab = () => {
+        setOpenRemoveTabModal(false);
+
+        version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
+        processQuestionnaireVersion(version);
+    }
+    
+    // Everything to add a tab
+    const [openCreateTabModal, setOpenCreateTabModal] = useState(false);
+    const [createTabName, setCreateTabName] = useState('');
+    const handleCreateTabNameChange = (name: string) => {
+        setCreateTabName(name);
+    };
+    const createTab = () => {
+        // version.
+        // setOpenRemoveTabModal(false);
+
+        // version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
+        // processQuestionnaireVersion(version);
+    }
+
+    // Everything to remove a question
+    const [openRemoveQuestionModal, setOpenRemoveQuestionModal] = useState(false);
+    const [questionToRemove, setQuestionToRemove] = useState<TemplatebackendQuestionnaireQuestion>();
+    const removeQuestionConfirmation = (q: TemplatebackendQuestionnaireQuestion) => {
+        setOpenRemoveQuestionModal(true);
+        setQuestionToRemove(q)
+    };
+    const removeQuestion = () => {
+        setOpenRemoveQuestionModal(false);
+
+        version.questions = version.questions?.filter(q => q.id != questionToRemove?.id);
+        processQuestionnaireVersion(version);
+    }
+
+    // Everything to edit a question
+    const [openEditQuestionModal, setOpenEditQuestionModal] = useState(false);
+    const [questionToEdit, setQuestionToEdit] = useState<TemplatebackendQuestionnaireQuestion>();
+    const editQuestion = (q: TemplatebackendQuestionnaireQuestion) => {
+        setOpenEditQuestionModal(true);
+        setQuestionToEdit(q);
+    };
+    const handleInputChange = (updatedValue: any, fieldName: keyof TemplatebackendQuestionnaireQuestion) => {
+        setQuestionToEdit((prevQuestion) => ({
+            ...prevQuestion,
+            [fieldName]: updatedValue
+        }));
+    };
+    const saveEditedQuestion = () => {
+        setOpenEditQuestionModal(false);
+
+        const i = version.questions?.findIndex(q => q.id == questionToEdit?.id);
+        if (version.questions && questionToEdit && i !== undefined) {
+            version.questions[i] = questionToEdit;
+        }
+
+        processQuestionnaireVersion(version);
+    }
+
 
     if (!questionnaire) {
         return (
@@ -88,21 +157,18 @@ export default function Questionnaire() {
         )
     }
 
-    
-
-
     return (
         <>
             <Head>
                 <title>Questionnaire {questionnaire.name}</title>
             </Head>
             <div className="flex flex-row items-end p-5">
-                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 mr-5 ml-auto rounded cursor-pointer">
+                {/* <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 mr-5 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save draft</p>
-                </Link>
+                </Link> */}
 
-                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save</p>
                 </Link>
@@ -143,15 +209,29 @@ export default function Questionnaire() {
                                     {n + 1}
                                 </span>
                                 <span>
-                                    <h3 className="font-medium leading-tight pl-2">{tab.tabName}</h3>
+                                    <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
+                                </span>
+                                <span className="p-2 hover:bg-gray-500  hover:bg-opacity-20" onClick={() => removeTabConfirmation(n)}>
+                                    <HiTrash />
                                 </span>
                             </div>
                         </li>
                     ))}
+                    <li
+                        className={`flex-grow text-center py-2 px-0`}
+                        onClick={() => createTab()}
+                    >
+                            <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
+                            <MdOutlineAdd />
+                            New Tab
+                            </Button>
+                        
+                    </li>
                 </ul>
                 <hr className="h-px bg-gray-500 border-0 " />
 
             </div>
+
             <div className="flex flex-col mb-8">
                 <Table >
                     <Table.Head>
@@ -167,18 +247,22 @@ export default function Questionnaire() {
                     </Table.Head>
                     <Table.Body className="divide-y">
                         {((tabs[activeTab] || {}).questions || []).map((question) => (
-                            <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleRowClick(question.id || 0)}>
+                            <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                 <Table.Cell>{question.question}</Table.Cell>
                                 <Table.Cell>{question.riskWeight}</Table.Cell>
                                 <Table.Cell>{question.answerType}</Table.Cell>
-                                <Table.Cell className="whitespace-pre-line">{question.answers?.map(a=>"• " + a.text).join('\n')}</Table.Cell>
+                                <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
                                 <Table.Cell>{question.flag}</Table.Cell>
                                 <Table.Cell>{question.tooltip}</Table.Cell>
                                 <Table.Cell>
-                                    <a href="#" onClick={(e) => e.stopPropagation()}>
-                                        <HiPencilAlt size={20} />
-                                    </a>
+                                    <div className="flex flex-row">
+                                        <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
+                                            <HiPencilAlt size={20} />
+                                        </span>
+                                        <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => removeQuestionConfirmation(question)}>
+                                            <HiTrash size={20} />
+                                        </span>
+                                    </div>
                                 </Table.Cell>
                             </Table.Row>
                         ))}
@@ -186,6 +270,125 @@ export default function Questionnaire() {
                     </Table.Body>
                 </Table>
             </div>
+
+            <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                            Are you sure you want to delete the tab <b>{tabToRemove?.tabName} </b>
+                            and the <b>{tabToRemove?.questions.length} question(s)</b> it contains?
+                        </h3>
+                        <div className="flex justify-center gap-4">
+                            <Button color="failure" onClick={() => removeTab()}>
+                                Yes, I'm sure
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenRemoveTabModal(false)}>
+                                No, cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={openCreateTabModal} size="md" onClose={() => setOpenCreateTabModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <div className="flex flex-col mb-8">
+                            <TextInput
+                                placeholder="Tab name"
+                                required
+                                onChange={(event) => handleCreateTabNameChange(event.target.value)}
+                            />
+                        </div>
+
+                        <hr />
+
+                        <div className="flex justify-center gap-4 mt-5">
+                            <Button color="success" onClick={() => createTab()}>
+                                Save
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={openRemoveQuestionModal} size="md" onClose={() => setOpenRemoveQuestionModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                            Are you sure you want to delete the question <b>{questionToRemove?.question} </b>?
+                        </h3>
+                        <div className="flex justify-center gap-4">
+                            <Button color="failure" onClick={() => removeQuestion()}>
+                                Yes, I'm sure
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenRemoveQuestionModal(false)}>
+                                No, cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={openEditQuestionModal} size="5xl" onClose={() => setOpenEditQuestionModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <div className="flex flex-col mb-8">
+                            <Table >
+                                <Table.Body className="divide-y">
+                                    <Table.Row >
+                                        <Table.HeadCell>Question</Table.HeadCell>
+                                        <Table.Cell>
+                                            <TextInput
+                                                id="question"
+                                                name="question"
+                                                placeholder="Question text?"
+                                                required
+                                                value={questionToEdit?.question}
+                                                onChange={(event) => handleInputChange(event.target.value, 'question')}
+                                            />
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row >
+                                        <Table.HeadCell>Risk weight</Table.HeadCell>
+                                        <Table.Cell>
+
+                                            <CounterInput
+                                                // name="riskWeight"
+                                                // required
+                                                placeholder="10"
+                                                initValue={questionToEdit?.riskWeight || 0}
+                                                onChange={(event) => handleInputChange(event, 'riskWeight')}
+                                            />
+                                        </Table.Cell>
+                                    </Table.Row>
+
+                                </Table.Body>
+                            </Table>
+                        </div>
+
+                        <hr />
+
+                        <div className="flex justify-center gap-4 mt-5">
+                            <Button color="success" onClick={() => saveEditedQuestion()}>
+                                Save
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenEditQuestionModal(false)}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
             
         </>
     );

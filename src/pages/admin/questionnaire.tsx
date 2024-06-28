@@ -50,7 +50,7 @@ export default function Questionnaire() {
             </Head>
             <div className="flex flex-col items-end p-5">
                 <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <MdOutlineAdd size={30} />
+                    <MdOutlineAdd />
                     <p className='ml-2 text-sm'> New questionnaire</p>
                 </Link>
                 <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
