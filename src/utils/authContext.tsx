@@ -1,51 +1,76 @@
-import React, { createContext, useContext, useState, ReactNode, FunctionComponent } from 'react';
+
+import { InitOverrideFunction, HTTPRequestInit,  RequestOpts } from '../internal/client/index';
+import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent } from 'react';
 import { getMyUser } from "./user";
 
-// Define the type for the context value
 type AuthContextType = {
     isLoggedIn: boolean;
     isAdmin: boolean;
     login: (token: string) => void;
     logout: () => void;
+    token: string;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Type for AuthProvider component props
 type AuthProviderProps = {
-    children: ReactNode; // ReactNode allows any valid React child (element, string, etc.)
+    children: ReactNode; 
 };
 
-// AuthProvider component: provides authentication context to child components
+import dynamic from 'next/dynamic';
+
+type ClientOnlyProps = { children: JSX.Element };
+const ClientOnly = (props: ClientOnlyProps) => {
+  const { children } = props;
+
+  return children;
+};
+
+export default dynamic(() => Promise.resolve(ClientOnly), {
+  ssr: false,
+});
+
 export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
+    const [token, setToken] = useState<string>("");
     const [isAdmin, setAdmin] = useState<boolean>(false);
 
-    // Login function to set the user's token and update login status
-    const login = async (token: string) => {
-        localStorage.setItem('token', token); // Store the user token in localStorage
-        setLoggedIn(true); // Update login status to true
-        const response = await getMyUser();
+    useEffect(() => {
+        const t = localStorage.getItem('token');
+        if (t) {
+            login(t)
+        } else {
+            logout();
+        }
+    }, []);
+
+    const checkAdminStatus = async () => {
+        const r = getMyUser();
+        const response = await r;
         const roles = response?.result?.me?.roles || [];
-        const isAdmin = roles.includes('admin');
-        setAdmin(isAdmin); // Update login status to true
+        setAdmin(roles.includes('admin'));
     };
 
-    // Logout function to remove the user's token and update login status
+    const login = async (t: string) => {
+        localStorage.setItem('token', t); 
+        setLoggedIn(true);
+        setToken(t); 
+        checkAdminStatus();
+    };
+    
     const logout = () => {
-        localStorage.removeItem('token'); // Remove the user token from localStorage
-        setLoggedIn(false); // Update login status to false
+        localStorage.removeItem('token'); 
+        setLoggedIn(false); 
+        setToken(''); 
     };
 
-    // Render the AuthContext.Provider with the current state and functions
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isAdmin, login, logout }}>
-            {children} {/* Render children components passed to this provider */}
+        <AuthContext.Provider value={{ isLoggedIn, isAdmin, login, logout, token }}>
+            {children} 
         </AuthContext.Provider>
     );
 };
 
-// Custom hook to use the auth context
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext); 
     if (!context) {
@@ -54,13 +79,19 @@ export const useAuth = (): AuthContextType => {
     return context; 
 };
 
-export const getAuthInitOverrides = (): RequestInit => {
-    let headers: HeadersInit = [];
-    if (typeof window !== 'undefined' && window.localStorage) {
-        const token = localStorage.getItem('token');
-        if (token) {
-            headers = [['Authorization', 'Bearer ' + token]];
+export const getAuthInitOverrides = (): InitOverrideFunction  => {
+    return async (requestContext: { init: HTTPRequestInit, context: RequestOpts }) => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                if (!requestContext.init.headers) {
+                    requestContext.init.headers = {};
+                }
+                requestContext.init.headers['Authorization'] = 'Bearer ' + token;
+            }
         }
+        return requestContext.init;
     }
-    return {headers};
 }
+
+
