@@ -29,40 +29,56 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendAuthenticationReply'
+            $ref: "#/definitions/templatebackendAuthenticationReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/templatebackendCredentials'
+            $ref: "#/definitions/templatebackendCredentials"
       tags:
         - Authentication
       x-openapi-router-controller: authentication_controller
-  /api/rest/v1/configs/{id}:
+  /api/rest/v1/configs:
     get:
-      summary: Get a configuration file
-      description: This endpoint returns a configuration file for a given user
-      operationId: ConfigService_GetConfig
+      summary: Get configuration files
+      description: This endpoint returns the configuration files for a given user
+      operationId: ConfigService_GetConfigs
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetConfigReply'
+            $ref: "#/definitions/templatebackendGetConfigsReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
+      tags:
+        - Configuration
+      x-openapi-router-controller: config_generator_controller
+    post:
+      summary: Create a configuration
+      description: This endpoint creates a usconfigurationer
+      operationId: ConfigService_CreateConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendCreateConfigReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
       parameters:
-        - name: id
-          in: path
+        - name: body
+          in: body
           required: true
-          type: integer
-          format: int64
+          schema:
+            $ref: "#/definitions/templatebackendConfig"
       tags:
         - Configuration
       x-openapi-router-controller: config_generator_controller
@@ -75,17 +91,17 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendCreateUserReply'
+            $ref: "#/definitions/templatebackendCreateUserReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/templatebackendUser'
+            $ref: "#/definitions/templatebackendUser"
       tags:
         - Users
       x-openapi-router-controller: user_controller
@@ -98,11 +114,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetUserMeReply'
+            $ref: "#/definitions/templatebackendGetUserMeReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       tags:
         - Users
       x-openapi-router-controller: user_controller
@@ -115,17 +131,17 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendUpdatePasswordReply'
+            $ref: "#/definitions/templatebackendUpdatePasswordReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/templatebackendUpdatePasswordRequest'
+            $ref: "#/definitions/templatebackendUpdatePasswordRequest"
       tags:
         - Users
       x-openapi-router-controller: user_controller
@@ -138,11 +154,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetUserReply'
+            $ref: "#/definitions/templatebackendGetUserReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -160,11 +176,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendDeleteUserReply'
+            $ref: "#/definitions/templatebackendDeleteUserReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -183,11 +199,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendResetPasswordReply'
+            $ref: "#/definitions/templatebackendResetPasswordReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -211,11 +227,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendListDatasetsReply'
+            $ref: "#/definitions/templatebackendListDatasetsReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: offset
           in: query
@@ -238,17 +254,17 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendStoreDatasetReply'
+            $ref: "#/definitions/templatebackendStoreDatasetReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/templatebackendStoreDatasetRequest'
+            $ref: "#/definitions/templatebackendStoreDatasetRequest"
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
@@ -261,11 +277,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetDatasetContentReply'
+            $ref: "#/definitions/templatebackendGetDatasetContentReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -294,17 +310,40 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetDatasetMetadataReply'
+            $ref: "#/definitions/templatebackendGetDatasetMetadataReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
           required: true
           type: integer
           format: int64
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/transform:
+    post:
+      summary: Transform a dataset
+      description: This endpoint transforms a dataset
+      operationId: DatasetService_TransformDataset
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendTransformDatasetReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/templatebackendTransformDatasetRequest"
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
@@ -317,11 +356,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendDeleteDatasetReply'
+            $ref: "#/definitions/templatebackendDeleteDatasetReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -340,11 +379,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetHelloReply'
+            $ref: "#/definitions/templatebackendGetHelloReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       tags:
         - Index
       x-openapi-router-controller: index_controller
@@ -357,11 +396,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendCreateHelloReply'
+            $ref: "#/definitions/templatebackendCreateHelloReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: identifier
           in: path
@@ -390,11 +429,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendListQuestionnaireReply'
+            $ref: "#/definitions/templatebackendListQuestionnaireReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: offset
           in: query
@@ -417,17 +456,17 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendCreateQuestionnaireReply'
+            $ref: "#/definitions/templatebackendCreateQuestionnaireReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/templatebackendCreateQuestionnaireRequest'
+            $ref: "#/definitions/templatebackendCreateQuestionnaireRequest"
       tags:
         - Questionnaire
       x-openapi-router-controller: questionnaire_controller
@@ -440,11 +479,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetQuestionnaireReply'
+            $ref: "#/definitions/templatebackendGetQuestionnaireReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -462,11 +501,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendDeleteQuestionnaireReply'
+            $ref: "#/definitions/templatebackendDeleteQuestionnaireReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: id
           in: path
@@ -484,11 +523,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendListRepliesReply'
+            $ref: "#/definitions/templatebackendListRepliesReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: questionnaireVersionId
           in: path
@@ -517,11 +556,11 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/templatebackendGetReplyReply'
+            $ref: "#/definitions/templatebackendGetReplyReply"
         default:
           description: An unexpected error response.
           schema:
-            $ref: '#/definitions/rpcStatus'
+            $ref: "#/definitions/rpcStatus"
       parameters:
         - name: questionnaireVersionId
           in: path
@@ -540,7 +579,7 @@ definitions:
   protobufAny:
     type: object
     properties:
-      '@type':
+      "@type":
         type: string
     additionalProperties: {}
   rpcStatus:
@@ -555,12 +594,12 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/protobufAny'
+          $ref: "#/definitions/protobufAny"
   templatebackendAuthenticationReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendAuthenticationResult'
+        $ref: "#/definitions/templatebackendAuthenticationResult"
   templatebackendAuthenticationResult:
     type: object
     properties:
@@ -577,6 +616,12 @@ definitions:
     type: object
     properties:
       id:
+        type: integer
+        format: int64
+      userid:
+        type: integer
+        format: int64
+      tenantid:
         type: integer
         format: int64
       questionnaireid:
@@ -621,6 +666,17 @@ definitions:
       createdAt:
         type: string
         format: date-time
+  templatebackendCreateConfigReply:
+    type: object
+    properties:
+      result:
+        $ref: "#/definitions/templatebackendCreateConfigResult"
+  templatebackendCreateConfigResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
   templatebackendCreateHelloReply:
     type: object
     properties:
@@ -635,12 +691,12 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendCreateQuestionnaireResult'
+        $ref: "#/definitions/templatebackendCreateQuestionnaireResult"
   templatebackendCreateQuestionnaireRequest:
     type: object
     properties:
       questionnaire:
-        $ref: '#/definitions/templatebackendQuestionnaire'
+        $ref: "#/definitions/templatebackendQuestionnaire"
     title: Message definitions for requests and responses
   templatebackendCreateQuestionnaireResult:
     type: object
@@ -652,7 +708,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendCreateUserResult'
+        $ref: "#/definitions/templatebackendCreateUserResult"
     title: Create Users
   templatebackendCreateUserResult:
     type: object
@@ -693,7 +749,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendDeleteDatasetResult'
+        $ref: "#/definitions/templatebackendDeleteDatasetResult"
   templatebackendDeleteDatasetResult:
     type: object
     properties:
@@ -703,7 +759,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendDeleteQuestionnaireResult'
+        $ref: "#/definitions/templatebackendDeleteQuestionnaireResult"
   templatebackendDeleteQuestionnaireResult:
     type: object
     properties:
@@ -713,24 +769,27 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendDeleteUserResult'
+        $ref: "#/definitions/templatebackendDeleteUserResult"
   templatebackendDeleteUserResult:
     type: object
-  templatebackendGetConfigReply:
+  templatebackendGetConfigsReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetConfigResult'
-  templatebackendGetConfigResult:
+        $ref: "#/definitions/templatebackendGetConfigsResult"
+  templatebackendGetConfigsResult:
     type: object
     properties:
       config:
-        $ref: '#/definitions/templatebackendConfig'
+        type: array
+        items:
+          type: object
+          $ref: "#/definitions/templatebackendConfig"
   templatebackendGetDatasetContentReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetDatasetContentResult'
+        $ref: "#/definitions/templatebackendGetDatasetContentResult"
   templatebackendGetDatasetContentResult:
     type: object
     properties:
@@ -738,12 +797,12 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendColumn'
+          $ref: "#/definitions/templatebackendColumn"
   templatebackendGetDatasetMetadataReply:
     type: object
     properties:
       metadata:
-        $ref: '#/definitions/templatebackendGetDatasetMetadataResult'
+        $ref: "#/definitions/templatebackendGetDatasetMetadataResult"
   templatebackendGetDatasetMetadataResult:
     type: object
     properties:
@@ -751,7 +810,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendMetadata'
+          $ref: "#/definitions/templatebackendMetadata"
   templatebackendGetHelloReply:
     type: object
     properties:
@@ -761,48 +820,48 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetQuestionnaireResult'
+        $ref: "#/definitions/templatebackendGetQuestionnaireResult"
   templatebackendGetQuestionnaireResult:
     type: object
     properties:
       questionnaire:
-        $ref: '#/definitions/templatebackendQuestionnaire'
+        $ref: "#/definitions/templatebackendQuestionnaire"
   templatebackendGetReplyReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetReplyResult'
+        $ref: "#/definitions/templatebackendGetReplyResult"
   templatebackendGetReplyResult:
     type: object
     properties:
       reply:
-        $ref: '#/definitions/templatebackendQuestionnaireReply'
+        $ref: "#/definitions/templatebackendQuestionnaireReply"
   templatebackendGetUserMeReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetUserMeResult'
+        $ref: "#/definitions/templatebackendGetUserMeResult"
   templatebackendGetUserMeResult:
     type: object
     properties:
       me:
-        $ref: '#/definitions/templatebackendUser'
+        $ref: "#/definitions/templatebackendUser"
     title: Get User (me)
   templatebackendGetUserReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendGetUserResult'
+        $ref: "#/definitions/templatebackendGetUserResult"
   templatebackendGetUserResult:
     type: object
     properties:
       user:
-        $ref: '#/definitions/templatebackendUser'
+        $ref: "#/definitions/templatebackendUser"
   templatebackendListDatasetsReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendListDatasetsResult'
+        $ref: "#/definitions/templatebackendListDatasetsResult"
   templatebackendListDatasetsResult:
     type: object
     properties:
@@ -810,12 +869,12 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendDataset'
+          $ref: "#/definitions/templatebackendDataset"
   templatebackendListQuestionnaireReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendListQuestionnaireResult'
+        $ref: "#/definitions/templatebackendListQuestionnaireResult"
   templatebackendListQuestionnaireResult:
     type: object
     properties:
@@ -823,12 +882,12 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaire'
+          $ref: "#/definitions/templatebackendQuestionnaire"
   templatebackendListRepliesReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendListRepliesResult'
+        $ref: "#/definitions/templatebackendListRepliesResult"
   templatebackendListRepliesResult:
     type: object
     properties:
@@ -836,7 +895,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireReply'
+          $ref: "#/definitions/templatebackendQuestionnaireReply"
   templatebackendMetadata:
     type: object
     properties:
@@ -872,7 +931,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireVersion'
+          $ref: "#/definitions/templatebackendQuestionnaireVersion"
       createdAt:
         type: string
         format: date-time
@@ -903,7 +962,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireQuestionAnswer'
+          $ref: "#/definitions/templatebackendQuestionnaireQuestionAnswer"
       createdAt:
         type: string
         format: date-time
@@ -926,7 +985,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireQuestionAnswerRulePrefill'
+          $ref: "#/definitions/templatebackendQuestionnaireQuestionAnswerRulePrefill"
       createdAt:
         type: string
         format: date-time
@@ -986,7 +1045,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireQuestionReply'
+          $ref: "#/definitions/templatebackendQuestionnaireQuestionReply"
       createdAt:
         type: string
         format: date-time
@@ -1006,7 +1065,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: '#/definitions/templatebackendQuestionnaireQuestion'
+          $ref: "#/definitions/templatebackendQuestionnaireQuestion"
       createdAt:
         type: string
         format: date-time
@@ -1018,14 +1077,14 @@ definitions:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendResetPasswordResult'
+        $ref: "#/definitions/templatebackendResetPasswordResult"
   templatebackendResetPasswordResult:
     type: object
   templatebackendStoreDatasetReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendStoreDatasetResult'
+        $ref: "#/definitions/templatebackendStoreDatasetResult"
   templatebackendStoreDatasetRequest:
     type: object
     properties:
@@ -1042,11 +1101,33 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendTransformDatasetReply:
+    type: object
+    properties:
+      result:
+        $ref: "#/definitions/templatebackendTransformDatasetResult"
+  templatebackendTransformDatasetRequest:
+    type: object
+    properties:
+      datasetId:
+        type: integer
+        format: int64
+      configId:
+        type: integer
+        format: int64
+  templatebackendTransformDatasetResult:
+    type: object
+    properties:
+      columns:
+        type: array
+        items:
+          type: object
+          $ref: "#/definitions/templatebackendColumn"
   templatebackendUpdatePasswordReply:
     type: object
     properties:
       result:
-        $ref: '#/definitions/templatebackendUpdateUserResult'
+        $ref: "#/definitions/templatebackendUpdateUserResult"
   templatebackendUpdatePasswordRequest:
     type: object
     properties:
