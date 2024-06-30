@@ -55,7 +55,7 @@ export default function Questionnaire() {
     return (
         <>
             <Head>
-                <title>Questionnaire {questionnaire.name}</title>
+                <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
             <div className="flex flex-col items-end p-5">
                 <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">

@@ -2,7 +2,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, TextInput } from 'flowbite-react';
+import { Table, Button, Modal, TextInput, Accordion } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
@@ -17,8 +17,12 @@ export default function Questionnaire() {
     const questionnaireId = Number(id);
     const versionId = Number(vId);
 
+    interface Version extends TemplatebackendQuestionnaireVersion {
+        tabs?: string[]
+    }
+
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
-    const [version, setVersion] = useState<TemplatebackendQuestionnaireVersion>({});
+    const [version, setVersion] = useState<Version>({});
     type Tab = {
         tabName: string;
         questions: TemplatebackendQuestionnaireQuestion[];
@@ -43,31 +47,55 @@ export default function Questionnaire() {
         processQuestionnaireVersion(v);
     }
 
-    const processQuestionnaireVersion = (v: TemplatebackendQuestionnaireVersion) => {
+    const processQuestionnaireVersion = (v: Version) => {
+        if (!v.tabs) {
+            const tabMap: any = {};
+            v.questions?.forEach(q => {
+                if (!q.tab) return;
+                tabMap[q.tab] = true;
+            });
+            v.tabs = Object.keys(tabMap);
+        }
+
         setVersion(v);
 
-        const tsMap: {
-            [key: string]: TemplatebackendQuestionnaireQuestion[];
-        } = {};
+        const ts: Tabs = [];
+        for (let tabName of v.tabs) {
+            ts.push({
+                tabName,
+                questions: [],
+            })
+        }
+
         for (let question of v.questions || []) {
             if (!question.tab) {
                 continue
             }
 
-            if (!tsMap[question.tab]) {
-                tsMap[question.tab] = [];
+            const t = ts.find(t => t.tabName == question.tab);
+            if (!t) {
+                continue
             }
 
-            tsMap[question.tab]?.push(question);
+            t.questions.push(question);
         }
-        console.log("tabs", Object.keys(tsMap))
-        const ts: Tabs = [];
-        for (let tabName of Object.keys(tsMap)) {
-            ts.push({
-                tabName,
-                questions: tsMap[tabName] || [],
-            })
-        }
+
+
+        // for (let tabName of Object.keys(tsMap)) {
+        //     ts.push({
+        //         tabName,
+        //         questions: tsMap[tabName] || [],
+        //     })
+        // }
+        // for (let tabName of v.tabs) {
+        //     if (!tsMap[tabName]) {
+        //         ts.push({
+        //             tabName,
+        //             questions: [],
+        //         })
+        //     }
+        // }
+
         setTabs(ts);
     }
 
@@ -93,9 +121,10 @@ export default function Questionnaire() {
         setOpenRemoveTabModal(false);
 
         version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
+        version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
         processQuestionnaireVersion(version);
     }
-    
+
     // Everything to add a tab
     const [openCreateTabModal, setOpenCreateTabModal] = useState(false);
     const [createTabName, setCreateTabName] = useState('');
@@ -103,11 +132,14 @@ export default function Questionnaire() {
         setCreateTabName(name);
     };
     const createTab = () => {
-        // version.
-        // setOpenRemoveTabModal(false);
+        if (version.tabs) {
+            version.tabs.push(createTabName);
+        }
+
+        setOpenCreateTabModal(false)
 
         // version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
-        // processQuestionnaireVersion(version);
+        processQuestionnaireVersion(version);
     }
 
     // Everything to remove a question
@@ -129,7 +161,7 @@ export default function Questionnaire() {
     const [questionToEdit, setQuestionToEdit] = useState<TemplatebackendQuestionnaireQuestion>();
     const editQuestion = (q: TemplatebackendQuestionnaireQuestion) => {
         setOpenEditQuestionModal(true);
-        setQuestionToEdit(q);
+        setQuestionToEdit({ ...q });
     };
     const handleInputChange = (updatedValue: any, fieldName: keyof TemplatebackendQuestionnaireQuestion) => {
         setQuestionToEdit((prevQuestion) => ({
@@ -148,6 +180,42 @@ export default function Questionnaire() {
         processQuestionnaireVersion(version);
     }
 
+    const [editAnswerText, setEditAnswerText] = useState("");
+    const [editAnswerRiskLevel, setEditAnswerRiskLevel] = useState(0);
+    const saveEditAnswer = (answerIndex: number) => {
+        setQuestionToEdit(prevQuestion => {
+            if (!prevQuestion || !prevQuestion.answers) return;
+
+            prevQuestion.answers[answerIndex] = {
+                text: editAnswerText,
+                riskLevel: editAnswerRiskLevel,
+            };
+
+            return prevQuestion;
+        })
+    };
+
+    const [addAnswerText, setAddAnswerText] = useState("");
+    const [addAnswerRiskLevel, setAddAnswerRiskLevel] = useState(0);
+    const addAnswer = () => {
+        console.log("saving new question", addAnswerText, addAnswerRiskLevel);
+        setQuestionToEdit(prevQuestion => {
+            if (!prevQuestion) return;
+
+            if (!prevQuestion.answers) {
+                prevQuestion.answers = [];
+            }
+            prevQuestion.answers.push({
+                text: addAnswerText,
+                riskLevel: addAnswerRiskLevel,
+            });
+
+            console.log("question updated", prevQuestion);
+
+            return prevQuestion;
+        })
+    };
+
 
     if (!questionnaire) {
         return (
@@ -160,14 +228,9 @@ export default function Questionnaire() {
     return (
         <>
             <Head>
-                <title>Questionnaire {questionnaire.name}</title>
+                <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
             <div className="flex flex-row items-end p-5">
-                {/* <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 mr-5 ml-auto rounded cursor-pointer">
-                    <MdSave />
-                    <p className='ml-2 text-sm'> Save draft</p>
-                </Link> */}
-
                 <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save</p>
@@ -200,7 +263,6 @@ export default function Questionnaire() {
                     {tabs.map((tab, n) => (
                         <li
                             key={tab.tabName}
-                            //lg:px-11
                             className={`flex-grow text-center hover:bg-gray-500  hover:bg-opacity-20 py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-b-2 border-gray-600 bg-gray-100'}`}
                             onClick={() => setActiveTab(n)}
                         >
@@ -219,13 +281,12 @@ export default function Questionnaire() {
                     ))}
                     <li
                         className={`flex-grow text-center py-2 px-0`}
-                        onClick={() => createTab()}
                     >
-                            <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
+                        <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
                             <MdOutlineAdd />
                             New Tab
-                            </Button>
-                        
+                        </Button>
+
                     </li>
                 </ul>
                 <hr className="h-px bg-gray-500 border-0 " />
@@ -359,16 +420,109 @@ export default function Questionnaire() {
                                         </Table.Cell>
                                     </Table.Row>
                                     <Table.Row >
+                                        <Table.HeadCell>Tooltip</Table.HeadCell>
+                                        <Table.Cell>
+                                            <TextInput
+                                                id="tooltip"
+                                                name="tooltip"
+                                                placeholder="Tooltip"
+                                                required
+                                                value={questionToEdit?.tooltip}
+                                                onChange={(event) => handleInputChange(event.target.value, 'tooltip')}
+                                            />
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row >
                                         <Table.HeadCell>Risk weight</Table.HeadCell>
                                         <Table.Cell>
 
                                             <CounterInput
-                                                // name="riskWeight"
-                                                // required
                                                 placeholder="10"
                                                 initValue={questionToEdit?.riskWeight || 0}
                                                 onChange={(event) => handleInputChange(event, 'riskWeight')}
                                             />
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row >
+                                        <Table.HeadCell>Questions</Table.HeadCell>
+                                        <Table.Cell>
+                                            <Accordion collapseAll>
+
+                                                {(questionToEdit?.answers || []).map((answer, n) => (
+                                                    <Accordion.Panel key={n}>
+                                                        <Accordion.Title>{answer.text}</Accordion.Title>
+                                                        <Accordion.Content>
+                                                            <Table >
+                                                                <Table.Body className="divide-y">
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>Answer</Table.HeadCell>
+                                                                        <Table.Cell>
+                                                                            <TextInput
+                                                                                id={"text-" + { n }}
+                                                                                name={"text-" + { n }}
+                                                                                placeholder="Answer"
+                                                                                required
+                                                                                value={answer?.text}
+                                                                                onChange={(event) => setEditAnswerText(event.target.value)}
+                                                                            />
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>Risk level</Table.HeadCell>
+                                                                        <Table.Cell>
+
+                                                                            <CounterInput
+                                                                                placeholder="10"
+                                                                                initValue={answer.riskLevel || 0}
+                                                                                onChange={(event) => setEditAnswerRiskLevel(event)}
+                                                                            />
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                </Table.Body>
+                                                            </Table>
+                                                            <Button onClick={() => saveEditAnswer(n)}>
+                                                                Save
+                                                            </Button>
+                                                        </Accordion.Content>
+                                                    </Accordion.Panel>
+                                                )).concat(
+                                                    <Accordion.Panel key={"newtab"}>
+                                                        <Accordion.Title><MdOutlineAdd className='inline' /><b> Add answer</b></Accordion.Title>
+                                                        <Accordion.Content>
+                                                            <Table >
+                                                                <Table.Body className="divide-y">
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>Answer</Table.HeadCell>
+                                                                        <Table.Cell>
+                                                                            <TextInput
+                                                                                id="text"
+                                                                                name="text"
+                                                                                placeholder="Answer"
+                                                                                required
+                                                                                onChange={(event) => setAddAnswerText(event.target.value)}
+                                                                            />
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>Risk level</Table.HeadCell>
+                                                                        <Table.Cell>
+
+                                                                            <CounterInput
+                                                                                placeholder="10"
+                                                                                initValue={0}
+                                                                                onChange={(event) => setAddAnswerRiskLevel(event)}
+                                                                            />
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                </Table.Body>
+                                                            </Table>
+                                                            <Button color="success" onClick={() => addAnswer()}>
+                                                                Add
+                                                            </Button>
+                                                        </Accordion.Content>
+                                                    </Accordion.Panel>
+                                                )}
+                                            </Accordion>
                                         </Table.Cell>
                                     </Table.Row>
 
@@ -389,7 +543,7 @@ export default function Questionnaire() {
                     </div>
                 </Modal.Body>
             </Modal>
-            
+
         </>
     );
 }
