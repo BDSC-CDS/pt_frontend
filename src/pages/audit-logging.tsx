@@ -31,7 +31,12 @@ export default function AuditLogging() {
         getListAuditLogs();
     }, []);
 
-    const handleLogClick = async (id: number | undefined) => {
+    const handleLogClick = (log:TemplatebackendAuditLog | undefined) => {
+        if (!log) {
+            return 
+        }
+        setLogDetails(JSON.stringify(log, null, 2));
+        setIsDetailModalOpen(true);
         // if (id) {
         //     try {
         //         const response = await getAuditLogDetails(id);
@@ -91,7 +96,7 @@ export default function AuditLogging() {
                     <h1 className="text-4xl font-bold mb-5">Activity log</h1>
                     <div className="mt-5 w-full max-w-4xl">
                         {auditLogsList.map((log) => (
-                            <div key={log.id} className="flex items-center mb-4" onClick={() => handleLogClick(log.id)}>
+                            <div key={log.id} className="flex items-center mb-4" onClick={() => handleLogClick(log)}>
                                 <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-xl font-bold">
 
                                     <Tooltip content={getUserTooltip(log.user)}>
