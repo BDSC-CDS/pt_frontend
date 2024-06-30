@@ -3,6 +3,7 @@
 export * from './IndexServiceCreateHelloRequest';
 export * from './ProtobufAny';
 export * from './RpcStatus';
+export * from './TemplatebackendAuditLog';
 export * from './TemplatebackendAuthenticationReply';
 export * from './TemplatebackendAuthenticationResult';
 export * from './TemplatebackendColumn';
@@ -29,6 +30,7 @@ export * from './TemplatebackendGetDatasetContentResult';
 export * from './TemplatebackendGetDatasetMetadataReply';
 export * from './TemplatebackendGetDatasetMetadataResult';
 export * from './TemplatebackendGetHelloReply';
+export * from './TemplatebackendGetLogsResponse';
 export * from './TemplatebackendGetQuestionnaireReply';
 export * from './TemplatebackendGetQuestionnaireResult';
 export * from './TemplatebackendGetReplyReply';

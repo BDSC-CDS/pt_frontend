@@ -3,10 +3,11 @@ info:
   title: pt backend
   version: "1.0"
   contact:
-    name: pt backend authentication service
+    name: pt backend audit log service
     url: https://pt-backend.rdeid.unil.ch
     email: development.bdsc@chuv.ch
 tags:
+  - name: AuditLogService
   - name: AuthenticationService
   - name: ConfigService
   - name: DatasetService
@@ -52,7 +53,23 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: "#/definitions/templatebackendGetConfigsReply"
+            $ref: '#/definitions/templatebackendGetConfigsReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      tags:
+        - Configuration
+      x-openapi-router-controller: config_generator_controller
+    post:
+      summary: Create a configuration
+      description: This endpoint creates a usconfigurationer
+      operationId: ConfigService_CreateConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendCreateConfigReply'
         default:
           description: An unexpected error response.
           schema:
@@ -78,7 +95,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: "#/definitions/templatebackendConfig"
+            $ref: '#/definitions/templatebackendConfig'
       tags:
         - Configuration
       x-openapi-router-controller: config_generator_controller
@@ -218,6 +235,67 @@ paths:
       tags:
         - Users
       x-openapi-router-controller: user_controller
+  /api/v1/audit/logs:
+    get:
+      summary: Get logs
+      description: Gets a list of logs.
+      operationId: AuditLogService_GetLogs
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendGetLogsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+      tags:
+        - AuditLog
+      x-openapi-router-controller: audit_log_controller
+  /api/v1/audit/users/{userid}/logs:
+    get:
+      summary: Get logs for a user
+      description: Gets logs for a specific user.
+      operationId: AuditLogService_GetLogsForUser
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendGetLogsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+      tags:
+        - AuditLog
+      x-openapi-router-controller: audit_log_controller
   /api/v1/dataset:
     get:
       summary: List datasets
@@ -333,17 +411,17 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: "#/definitions/templatebackendTransformDatasetReply"
+            $ref: '#/definitions/templatebackendTransformDatasetReply'
         default:
           description: An unexpected error response.
           schema:
-            $ref: "#/definitions/rpcStatus"
+            $ref: '#/definitions/rpcStatus'
       parameters:
         - name: body
           in: body
           required: true
           schema:
-            $ref: "#/definitions/templatebackendTransformDatasetRequest"
+            $ref: '#/definitions/templatebackendTransformDatasetRequest'
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
@@ -594,7 +672,31 @@ definitions:
         type: array
         items:
           type: object
-          $ref: "#/definitions/protobufAny"
+          $ref: '#/definitions/protobufAny'
+  templatebackendAuditLog:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+      userid:
+        type: integer
+        format: int32
+      service:
+        type: string
+      action:
+        type: string
+      body:
+        type: string
+      response:
+        type: string
+      createdAt:
+        type: string
+        format: date-time
+      error:
+        type: boolean
+      user:
+        $ref: '#/definitions/templatebackendUser'
   templatebackendAuthenticationReply:
     type: object
     properties:
@@ -670,7 +772,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: "#/definitions/templatebackendCreateConfigResult"
+        $ref: '#/definitions/templatebackendCreateConfigResult'
   templatebackendCreateConfigResult:
     type: object
     properties:
@@ -776,7 +878,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: "#/definitions/templatebackendGetConfigsResult"
+        $ref: '#/definitions/templatebackendGetConfigsResult'
   templatebackendGetConfigsResult:
     type: object
     properties:
@@ -784,7 +886,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: "#/definitions/templatebackendConfig"
+          $ref: '#/definitions/templatebackendConfig'
   templatebackendGetDatasetContentReply:
     type: object
     properties:
@@ -816,6 +918,14 @@ definitions:
     properties:
       content:
         type: string
+  templatebackendGetLogsResponse:
+    type: object
+    properties:
+      logs:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/templatebackendAuditLog'
   templatebackendGetQuestionnaireReply:
     type: object
     properties:
@@ -1105,7 +1215,7 @@ definitions:
     type: object
     properties:
       result:
-        $ref: "#/definitions/templatebackendTransformDatasetResult"
+        $ref: '#/definitions/templatebackendTransformDatasetResult'
   templatebackendTransformDatasetRequest:
     type: object
     properties:
@@ -1122,7 +1232,7 @@ definitions:
         type: array
         items:
           type: object
-          $ref: "#/definitions/templatebackendColumn"
+          $ref: '#/definitions/templatebackendColumn'
   templatebackendUpdatePasswordReply:
     type: object
     properties:

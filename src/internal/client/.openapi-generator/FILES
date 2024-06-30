@@ -1,3 +1,4 @@
+apis/AuditLogApi.ts
 apis/AuthenticationApi.ts
 apis/ConfigurationApi.ts
 apis/DatasetApi.ts
@@ -9,6 +10,7 @@ index.ts
 models/IndexServiceCreateHelloRequest.ts
 models/ProtobufAny.ts
 models/RpcStatus.ts
+models/TemplatebackendAuditLog.ts
 models/TemplatebackendAuthenticationReply.ts
 models/TemplatebackendAuthenticationResult.ts
 models/TemplatebackendColumn.ts
@@ -35,6 +37,7 @@ models/TemplatebackendGetDatasetContentResult.ts
 models/TemplatebackendGetDatasetMetadataReply.ts
 models/TemplatebackendGetDatasetMetadataResult.ts
 models/TemplatebackendGetHelloReply.ts
+models/TemplatebackendGetLogsResponse.ts
 models/TemplatebackendGetQuestionnaireReply.ts
 models/TemplatebackendGetQuestionnaireResult.ts
 models/TemplatebackendGetReplyReply.ts
