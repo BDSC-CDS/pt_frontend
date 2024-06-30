@@ -5,21 +5,6 @@ import { TemplatebackendAuditLog } from '../internal/client/index';
 import { TemplatebackendGetLogsResponse} from '../internal/client/index';
 
 /**
- * Function to store a new audit log.
- *
- * @param auditLog The audit log to store.
- * @returns The response from the API or undefined in case of an error.
- */
-export const storeAuditLog = async (auditLog: TemplatebackendAuditLog) => {
-    try {
-        const response = await apiClientAuditlog.storeAuditLog({ body: auditLog }, getAuthInitOverrides());
-        return response; // Returning the response from the API.
-    } catch (error) {
-        console.log("Error storing audit log: " + error);
-    }
-};
-
-/**
  * Function to list audit logs.
  *
  * @param offset The offset for pagination.
@@ -35,7 +20,7 @@ export const listAuditLogs = async (offset?: number, limit?: number): Promise<Te
         request.limit = limit;
     }
     try {
-        const response = await apiClientAuditlog.listAuditLogs(request, getAuthInitOverrides());
+        const response = await apiClientAuditlog.auditLogServiceGetLogs(request, getAuthInitOverrides());
         return response as TemplatebackendGetLogsResponse; // Ensure the response is of type TemplatebackendGetLogsResponse
     } catch (error) {
         console.log("Error listing audit logs: " + error);
@@ -48,11 +33,11 @@ export const listAuditLogs = async (offset?: number, limit?: number): Promise<Te
  * @param id The ID of the audit log.
  * @returns The response from the API or undefined in case of an error.
  */
-export const getAuditLogDetails = async (id: number) => {
-    try {
-        const response = await apiClientAuditlog.getAuditLogById({ id: id }, getAuthInitOverrides());
-        return response; // Returning the response from the API.
-    } catch (error) {
-        console.log("Error getting audit log details: " + error);
-    }
-};
+// export const getAuditLogDetails = async (id: number) => {
+//     try {
+//         const response = await apiClientAuditlog.getAuditLogById({ id: id }, getAuthInitOverrides());
+//         return response; // Returning the response from the API.
+//     } catch (error) {
+//         console.log("Error getting audit log details: " + error);
+//     }
+// };

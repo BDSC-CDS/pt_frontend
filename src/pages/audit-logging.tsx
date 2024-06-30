@@ -1,11 +1,13 @@
+import TimeAgo from 'react-timeago'
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { listAuditLogs, getAuditLogDetails, storeAuditLog } from '../utils/auditlog';
-import { TemplatebackendAuditLog } from '../internal/client';
+import { listAuditLogs } from '../utils/auditlog';
+import { TemplatebackendAuditLog, TemplatebackendUser } from '../internal/client';
 import { useAuth } from '~/utils/authContext';
-import { Button, Modal } from 'flowbite-react';
+import { Button, Modal, Tooltip } from 'flowbite-react';
+import { BiSolidMask } from "react-icons/bi";
 
 export default function AuditLogging() {
     const [auditLogsList, setAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
@@ -16,6 +18,7 @@ export default function AuditLogging() {
     const getListAuditLogs = async (offset?: number, limit?: number) => {
         try {
             const response = await listAuditLogs(offset, limit);
+            console.log("logs resp", response)
             if (response?.logs) {
                 setAuditLogsList(response.logs);
             }
@@ -29,17 +32,17 @@ export default function AuditLogging() {
     }, []);
 
     const handleLogClick = async (id: number | undefined) => {
-        if (id) {
-            try {
-                const response = await getAuditLogDetails(id);
-                if (response) {
-                    setLogDetails(JSON.stringify(response, null, 2));
-                    setIsDetailModalOpen(true);
-                }
-            } catch (error) {
-                alert("Error getting audit log details");
-            }
-        }
+        // if (id) {
+        //     try {
+        //         const response = await getAuditLogDetails(id);
+        //         if (response) {
+        //             setLogDetails(JSON.stringify(response, null, 2));
+        //             setIsDetailModalOpen(true);
+        //         }
+        //     } catch (error) {
+        //         alert("Error getting audit log details");
+        //     }
+        // }
     };
 
     const closeDetailModal = () => {
@@ -48,15 +51,38 @@ export default function AuditLogging() {
 
     const router = useRouter();
 
-    const getInitials = (name: string) => {
-        const initials = name.split(' ').map(part => part[0].toUpperCase()).join('');
+    const getInitials = (user: TemplatebackendUser | undefined) => {
+        if (!user || user.id === undefined) {
+            return (
+                <BiSolidMask />
+            )
+        }
+        const first = (user.firstName || " ")[0]?.toUpperCase() || "";
+        const last = (user.lastName || " ")[0]?.toUpperCase() || "";
+        const initials = first + last;
         return initials;
+    };
+    const getUserTooltip = (user: TemplatebackendUser | undefined) => {
+        if (!user || user.id === undefined) {
+            return (
+                <>
+                    Anonymous user
+                </>
+            )
+        }
+
+        return (
+            <>
+                {user.firstName} {user.lastName}<br />
+                {user.username}
+            </>
+        )
     };
 
     return (
         <>
             <Head>
-                <title>Audit Log | My T3 App</title>
+                <title>Audit Log</title>
                 <meta name="description" content="Audit logging page" />
             </Head>
             {!isLoggedIn && <p className='m-8'>Please log in to view the audit logs.</p>}
@@ -67,11 +93,17 @@ export default function AuditLogging() {
                         {auditLogsList.map((log) => (
                             <div key={log.id} className="flex items-center mb-4" onClick={() => handleLogClick(log.id)}>
                                 <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-xl font-bold">
-                                    {getInitials(log.userid || 'User')}
+
+                                    <Tooltip content={getUserTooltip(log.user)}>
+                                        {getInitials(log.user)}
+                                    </Tooltip>
                                 </div>
                                 <div className="ml-4">
-                                    <p className="text-lg font-semibold">{log.userid}</p>
-                                    <p className="text-gray-600">{log.action} - {log.createdAt ? new Date(log.createdAt).toLocaleDateString() : 'Date not available'}</p>
+                                    {/* <p className="text-lg font-semibold">{log.userid}</p> */}
+                                    <p className="text-gray-600">
+                                        {log.action}
+                                        <TimeAgo className="ml-3 text-sm" date={log.createdAt || ''} />
+                                    </p>
                                 </div>
                             </div>
                         ))}

@@ -679,6 +679,8 @@ definitions:
         format: date-time
       error:
         type: boolean
+      user:
+        $ref: '#/definitions/templatebackendUser'
   templatebackendAuthenticationReply:
     type: object
     properties:

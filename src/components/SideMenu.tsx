@@ -42,12 +42,10 @@ export default function SideMenu() {
                                     <HiClipboardDocumentList size={'1.5em'} color='gray' />
                                     <p className='ml-1'> Questionnaires</p>
                                 </Link>
-                                {isAdmin && (
-                                    <Link href="/audit-logging" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                        <HiLockClosed size={'1.5em'} color='gray' />
-                                        <p className='ml-1'> Audit Log</p>
-                                    </Link>
-                                )}
+                                <Link href="/audit-logging" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                    <HiLockClosed size={'1.5em'} color='gray' />
+                                    <p className='ml-1'> Audit Log</p>
+                                </Link>
                             </Sidebar.Collapse>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiInbox size={'1.5em'} color='gray' />

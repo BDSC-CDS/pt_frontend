@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TemplatebackendUser } from './TemplatebackendUser';
+import {
+    TemplatebackendUserFromJSON,
+    TemplatebackendUserFromJSONTyped,
+    TemplatebackendUserToJSON,
+} from './TemplatebackendUser';
+
 /**
  * 
  * @export
@@ -67,6 +74,12 @@ export interface TemplatebackendAuditLog {
      * @memberof TemplatebackendAuditLog
      */
     error?: boolean;
+    /**
+     * 
+     * @type {TemplatebackendUser}
+     * @memberof TemplatebackendAuditLog
+     */
+    user?: TemplatebackendUser;
 }
 
 /**
@@ -96,6 +109,7 @@ export function TemplatebackendAuditLogFromJSONTyped(json: any, ignoreDiscrimina
         'response': !exists(json, 'response') ? undefined : json['response'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'error': !exists(json, 'error') ? undefined : json['error'],
+        'user': !exists(json, 'user') ? undefined : TemplatebackendUserFromJSON(json['user']),
     };
 }
 
@@ -116,6 +130,7 @@ export function TemplatebackendAuditLogToJSON(value?: TemplatebackendAuditLog | 
         'response': value.response,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'error': value.error,
+        'user': TemplatebackendUserToJSON(value.user),
     };
 }
 
