@@ -1,47 +1,74 @@
 "use client";
 
-import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import TabsComponent from '../../../components/Tabs';
-import dynamic from "next/dynamic";
-const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
+import { getQuestionnaire, getReply } from "../../../utils/questionnaire"
+import { useRouter } from 'next/router';
+import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
+import { questionsFromApi, Questions } from "../../../utils/questions"
+
 
 const QuestionnairePage = () => {
-    const router = useRouter();
-    const { id } = router.query; // Get the dynamic part of the URL
-    const questionnaireId = Number(id);
+    let questionnaireId = 1;
 
-    // const projectData = fetchProjectData(projectId); // This is a placeholder. You'll need to implement data fetching.
-    const projectData = [
-        { id: 1, name: 'Project 1', description: 'Description of Project 1', dateCreated: '2024-01-01', status: 'Active' },
-        { id: 2, name: 'Project 2', description: 'Description of Project 2', dateCreated: '2024-02-01', status: 'Completed' },
-        { id: 3, name: 'Project 3', description: 'Description of Project 3', dateCreated: '2024-02-01', status: 'Completed' },
-    ];
-    const project = projectData.find(project => project.id === questionnaireId)
+    const router = useRouter();
+    const { id } = router.query;
+
+
+    const [questions, setQuestions] = useState<Questions>();
+    const [reply, setReply] = useState<TemplatebackendQuestionnaireReply>();
+
+
+    const load = async () => {
+        let replyId;
+        if (id && id != "new") {
+            replyId = Number(id);
+
+            const replyResult = await getReply(replyId);
+
+            if (replyResult) {
+                setReply(replyResult);
+            }
+
+            if (replyResult?.questionnaireVersionId)  {
+                questionnaireId = replyResult?.questionnaireVersionId
+            }
+        }
+
+        const result = await getQuestionnaire(questionnaireId);
+
+        if (!result) {
+            return
+        }
+
+        const v = (result.versions || []).find(v => v.published);
+        if (!v) {
+            return
+        }
+        const q = questionsFromApi(v);
+        setQuestions(q);
+    }
+
+    useEffect(() => {
+        try {
+            load();
+        } catch (error) {
+            alert("Error listing the datasets")
+        }
+    }, []);
 
 
 
     return (
         <>
-            {project ? (
-                <div className='p-5'>
-                    <div className='absolute top-36 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                        <h1 className='mb-10 mt-4 text-md font-semibold'>Current score</h1>
-                        <GaugeChart id="gauge-chart2"
-                            nrOfLevels={20}
-                            percent={0.86}
-                            textColor='black'
-                            animate={false}
-                        />
-                    </div>
-
-                    <TabsComponent />
-                </div>
+            {questions ? (
+                <TabsComponent questions={questions} questionnaireVersionId={questionnaireId} reply={reply} />
             ) : (
                 <div>
                     <p>Loading or project not found...</p>
                 </div>
             )}
-            
+
         </>
     );
 };
