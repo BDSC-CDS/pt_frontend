@@ -6,8 +6,11 @@ import dynamic from "next/dynamic";
 import { MdSave } from "react-icons/md";
 import { FaFilePdf } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
+
 import { Button, Modal, TextInput, ToggleSwitch, Alert } from 'flowbite-react';
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface TabsComponentProps {
     questions: Questions;
@@ -88,7 +91,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             <div>
                 {
                     questions[tab]?.map((question) => (
-                        <div className='flex items-center'>
+                        <div key={question.questionId} className='flex items-center'>
                             <form className="w-1/2 my-4" key={question.questionId}>
                                 <label className="block mb-2 text-sm font-medium text-gray-900">
                                     {question.questionDescription}
@@ -99,7 +102,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                                     value={getSelectedAnswer(question)}
                                     onChange={e => setSelectedAnswer(question, e.target.value)}
                                 >
-                                    <option selected>Select an option</option>
+                                    <option>Select an option</option>
                                     {question.answers.map((answer) => (
                                         <option key={answer.answerId} value={answer.answerId} className='w-1/2'>
                                             {answer.answerDescription}
@@ -234,8 +237,48 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
     }
 
+    const [exportInProgress, setExportInProgress] = useState(false);
+
+    const exportPDF = async () => {
+        setExportInProgress(true);
+    }
+    useEffect(() => {
+        if (!exportInProgress) return;
+        (async () => {
+
+            const input = document.getElementById('all-tabs');
+            if (!input) return;
+
+            const canvas = await html2canvas(input);
+            const imgData = canvas.toDataURL('image/png');
+            // window.open(imgData, '_blank');
+            const pdf = new jsPDF();
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            // pdf.output('dataurlnewwindow');
+            pdf.save("download.pdf");
+            setExportInProgress(false);
+        })();
+    }, [exportInProgress])
+
+    const exportConfig = () => {
+        const txt = `{
+  "hasDateShift": true,
+  "dateShiftLowrange": -30,
+  "dateShiftHighrange": 30
+}`
+        const element = document.createElement("a");
+        const file = new Blob([txt], { type: 'application/json' });
+        element.href = URL.createObjectURL(file);
+        element.download = "connector-config.json";
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    }
+
     const report_tab =
-        <div className="p-4 bg-white shadow rounded-lg">
+        <div key="report" className="p-4 bg-white shadow rounded-lg">
             <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
             <div className="mb-2">
                 <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
@@ -255,7 +298,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     <p className='ml-2 text-sm'> Export PDF</p>
                 </span>
                 <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                <GrDocumentConfig />
+                    <GrDocumentConfig />
                     <p className='ml-2 text-sm'> Export connector configuration</p>
                 </span>
             </div>
@@ -347,7 +390,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     </div>
                 </Modal.Body>
             </Modal>
-            <div className='p-5'>
+            <div id="all-tabs" className='p-5'>
                 <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                     <h1 className='mt-4 text-md font-semibold flex flex-row'>
                         Current score
@@ -407,6 +450,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 <hr className="h-px bg-gray-500 border-0 " />
 
                 <div className="p-10">
+                    {/* {
+                        exportInProgress ?
+                            tabs.map(t => t?.content) :
+                            tabs.find((tab) => tab.id === activeTab)?.content
+                    } */}
                     {tabs.find((tab) => tab.id === activeTab)?.content}
                     {/* {tabs.map(tab => tab.content)} */}
                     <div className="flex items-center mt-4">
