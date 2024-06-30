@@ -76,7 +76,7 @@ export interface QuestionnaireServiceGetQuestionnaireRequest {
 }
 
 export interface QuestionnaireServiceGetReplyRequest {
-    replyId: number;
+    id: number;
 }
 
 export interface QuestionnaireServiceListQuestionnaireRequest {
@@ -288,8 +288,8 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      * Get a questionnaires reply
      */
     async questionnaireServiceGetReplyRaw(requestParameters: QuestionnaireServiceGetReplyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetReplyReply>> {
-        if (requestParameters.replyId === null || requestParameters.replyId === undefined) {
-            throw new runtime.RequiredError('replyId','Required parameter requestParameters.replyId was null or undefined when calling questionnaireServiceGetReply.');
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling questionnaireServiceGetReply.');
         }
 
         const queryParameters: any = {};
@@ -301,7 +301,7 @@ export class QuestionnaireApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/questionnaire/replies/{replyId}`.replace(`{${"replyId"}}`, encodeURIComponent(String(requestParameters.replyId))),
+            path: `/api/v1/questionnaire/replies/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
