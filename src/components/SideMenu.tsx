@@ -4,12 +4,22 @@ import { BiBuoy } from 'react-icons/bi';
 import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiPresentationChartBar, HiOutlineCog, HiLockClosed } from 'react-icons/hi';
 import { HiClipboardDocumentList } from 'react-icons/hi2';
 import { useAuth } from '~/utils/authContext';
+import type { CustomFlowbiteTheme } from "flowbite-react";
 
 export default function SideMenu() {
     const { isAdmin } = useAuth();
 
+    const customTheme: CustomFlowbiteTheme["sidebar"] = {
+        collapse: {
+            "icon": {
+                "base": "h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white",
+            },
+        },
+    };
+
+
     return (
-        <div className="fixed top-20 left-0 h-3/4 z-10">
+        <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
             <Sidebar aria-label="Sidebar with content separator example" className="w-90 border rounded">
                 <div>
                     <Sidebar.Items>
@@ -20,39 +30,39 @@ export default function SideMenu() {
                         </Sidebar.ItemGroup>
                         <Sidebar.ItemGroup>
                             <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiPresentationChartBar size={'1.5em'} color='gray' />
+                                <HiPresentationChartBar />
                                 <p className='ml-1'> Risk Assessment</p>
                             </Link>
                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiDatabase size={'1.5em'} color='gray' />
+                                <HiDatabase />
                                 <p className='ml-1'> Datasets</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiShoppingBag size={'1.5em'} color='gray' />
+                                <HiShoppingBag />
                                 <p className='ml-1'> Synthetic Data Generation</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiArrowSmRight size={'1.5em'} color='gray' />
+                                <HiArrowSmRight />
                                 <p className='ml-1'> Text DeID</p>
                             </Link>
                         </Sidebar.ItemGroup>
                         <Sidebar.ItemGroup className="mt-10">
-                            <Sidebar.Collapse className={`${!isAdmin ? "hidden" : ""}`} icon={HiOutlineCog} label="Admin">
-                                <Link href="/admin/questionnaire" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                    <HiClipboardDocumentList size={'1.5em'} color='gray' />
+                            <Sidebar.Collapse className={`${!isAdmin ? "hidden" : ""}`} icon={HiOutlineCog} theme={customTheme.collapse} label="Admin">
+                                <Link href="/admin/questionnaire" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
+                                    <HiClipboardDocumentList />
                                     <p className='ml-1'> Questionnaires</p>
                                 </Link>
-                                <Link href="/audit-logging" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                    <HiLockClosed size={'1.5em'} color='gray' />
+                                <Link href="/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
+                                    <HiLockClosed />
                                     <p className='ml-1'> Audit Log</p>
                                 </Link>
                             </Sidebar.Collapse>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiInbox size={'1.5em'} color='gray' />
+                                <HiInbox />
                                 <p className='ml-1'> Documentation</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <BiBuoy size={'1.5em'} color='gray' />
+                                <BiBuoy />
                                 <p className='ml-1'> Settings</p>
                             </Link>
                         </Sidebar.ItemGroup>
