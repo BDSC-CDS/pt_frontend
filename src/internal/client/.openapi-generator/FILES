@@ -1,3 +1,4 @@
+apis/AuditLogApi.ts
 apis/AuthenticationApi.ts
 apis/ConfigurationApi.ts
 apis/DatasetApi.ts
@@ -9,10 +10,13 @@ index.ts
 models/IndexServiceCreateHelloRequest.ts
 models/ProtobufAny.ts
 models/RpcStatus.ts
+models/TemplatebackendAuditLog.ts
 models/TemplatebackendAuthenticationReply.ts
 models/TemplatebackendAuthenticationResult.ts
 models/TemplatebackendColumn.ts
 models/TemplatebackendConfig.ts
+models/TemplatebackendCreateConfigReply.ts
+models/TemplatebackendCreateConfigResult.ts
 models/TemplatebackendCreateHelloReply.ts
 models/TemplatebackendCreateQuestionnaireReply.ts
 models/TemplatebackendCreateQuestionnaireRequest.ts
@@ -26,13 +30,14 @@ models/TemplatebackendDeleteDatasetResult.ts
 models/TemplatebackendDeleteQuestionnaireReply.ts
 models/TemplatebackendDeleteQuestionnaireResult.ts
 models/TemplatebackendDeleteUserReply.ts
-models/TemplatebackendGetConfigReply.ts
-models/TemplatebackendGetConfigResult.ts
+models/TemplatebackendGetConfigsReply.ts
+models/TemplatebackendGetConfigsResult.ts
 models/TemplatebackendGetDatasetContentReply.ts
 models/TemplatebackendGetDatasetContentResult.ts
 models/TemplatebackendGetDatasetMetadataReply.ts
 models/TemplatebackendGetDatasetMetadataResult.ts
 models/TemplatebackendGetHelloReply.ts
+models/TemplatebackendGetLogsResponse.ts
 models/TemplatebackendGetQuestionnaireReply.ts
 models/TemplatebackendGetQuestionnaireResult.ts
 models/TemplatebackendGetReplyReply.ts
@@ -59,6 +64,9 @@ models/TemplatebackendResetPasswordReply.ts
 models/TemplatebackendStoreDatasetReply.ts
 models/TemplatebackendStoreDatasetRequest.ts
 models/TemplatebackendStoreDatasetResult.ts
+models/TemplatebackendTransformDatasetReply.ts
+models/TemplatebackendTransformDatasetRequest.ts
+models/TemplatebackendTransformDatasetResult.ts
 models/TemplatebackendUpdatePasswordReply.ts
 models/TemplatebackendUpdatePasswordRequest.ts
 models/TemplatebackendUser.ts
