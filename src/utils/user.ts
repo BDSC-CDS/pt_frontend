@@ -31,7 +31,7 @@ export const createUser = async (firstName: string, lastName: string, email: str
     }
 };
 
-export const getMyUser = async () => {
+export const getMyUser = async (token?: string) => {
     try {
         const response = await apiClientUser.userServiceGetUserMe(getAuthInitOverrides());
         return response;

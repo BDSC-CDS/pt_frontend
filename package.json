@@ -12,11 +12,13 @@
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.7.1",
+    "@types/react-timeago": "^4.1.7",
     "flowbite": "^2.2.1",
     "flowbite-react": "0.6.4",
     "next": "14.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-timeago": "^7.2.0",
     "superjson": "^2.2.1",
     "zod": "^3.22.4"
   },

@@ -40,10 +40,6 @@ export interface AuditLogServiceGetLogsForUserRequest {
  * 
  */
 export class AuditLogApi extends runtime.BaseAPI {
-    storeAuditLog: any;
-    listAuditLogs: any;
-    getAuditLog: any;
-    getAuditLogById: any;
 
     /**
      * Gets a list of logs.

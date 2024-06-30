@@ -386,6 +386,29 @@ paths:
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/transform:
+    post:
+      summary: Transform a dataset
+      description: This endpoint transforms a dataset
+      operationId: DatasetService_TransformDataset
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendTransformDatasetReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendTransformDatasetRequest'
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
   /api/v1/dataset/{id}:
     delete:
       summary: Deletes a dataset
@@ -1170,6 +1193,28 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendTransformDatasetReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendTransformDatasetResult'
+  templatebackendTransformDatasetRequest:
+    type: object
+    properties:
+      datasetId:
+        type: integer
+        format: int64
+      configId:
+        type: integer
+        format: int64
+  templatebackendTransformDatasetResult:
+    type: object
+    properties:
+      columns:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/templatebackendColumn'
   templatebackendUpdatePasswordReply:
     type: object
     properties:

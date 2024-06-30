@@ -64,6 +64,9 @@ models/TemplatebackendResetPasswordReply.ts
 models/TemplatebackendStoreDatasetReply.ts
 models/TemplatebackendStoreDatasetRequest.ts
 models/TemplatebackendStoreDatasetResult.ts
+models/TemplatebackendTransformDatasetReply.ts
+models/TemplatebackendTransformDatasetRequest.ts
+models/TemplatebackendTransformDatasetResult.ts
 models/TemplatebackendUpdatePasswordReply.ts
 models/TemplatebackendUpdatePasswordRequest.ts
 models/TemplatebackendUser.ts

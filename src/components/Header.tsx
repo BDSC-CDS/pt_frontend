@@ -1,28 +1,7 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useAuth } from '../utils/authContext';
-import { Button, Modal } from 'flowbite-react';
-import { HiUser } from 'react-icons/hi';
-
+import AuthWidget from "./AuthWidget";
 
 export default function Header() {
-    // State to control visibility of the logout notification
-    const [visible, setVisible] = useState<boolean>(false);
-    //const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-    // Extract isLoggedIn and logout function from useAuth hook
-    const { isLoggedIn, logout } = useAuth();
-
-    // Handler for the logout process
-    const handleLogout = () => {
-        logout(); // Perform logout
-        setVisible(true); // Show logout notification
-    };
-
-    // Handler to close the logout notification
-    const closePopup = () => {
-        setVisible(false); // Hide logout notification
-    }
 
     const logoStyle = {
         backgroundImage: `url('/sphn-logo-white.png')`
@@ -48,36 +27,11 @@ export default function Header() {
                             <Link href="/contact" passHref className="ml-4">
                                 <span className="px-3 py-2 hover:underline  rounded cursor-pointer">Contact</span>
                             </Link>
-                            {/* Conditional rendering based on login status */}
-                            {isLoggedIn ?
-                                <span onClick={handleLogout} className="ml-4 px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer"><HiUser className="inline-block" /> Log out</span>
-                                :
-                                <Link href="/authenticate" passHref className="ml-4">
-                                    <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
-                                </Link>}
-
+                            <AuthWidget/>
                         </div>
                     </div>
                 </nav>
             </header>
-
-            <main>
-                <Modal show={visible} onClose={() => setVisible(false)}>
-                    <Modal.Body>
-                        <div className="space-y-6">
-                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                You are logged out!
-                            </p>
-
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={() => setVisible(false)}>Close</Button>
-
-                    </Modal.Footer>
-                </Modal>
-
-            </main>
         </>
     )
 };
