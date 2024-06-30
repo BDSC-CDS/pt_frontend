@@ -583,7 +583,7 @@ paths:
       tags:
         - Questionnaire
       x-openapi-router-controller: questionnaire_controller
-  /api/v1/questionnaire/replies/{replyId}:
+  /api/v1/questionnaire/replies/{id}:
     get:
       summary: Get a questionnaires reply
       description: This endpoint allows getting a user's questionnaires reply
@@ -598,7 +598,7 @@ paths:
           schema:
             $ref: '#/definitions/rpcStatus'
       parameters:
-        - name: replyId
+        - name: id
           description: uint32 questionnaire_version_id = 1;
           in: path
           required: true

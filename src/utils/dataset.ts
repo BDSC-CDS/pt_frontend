@@ -1,7 +1,7 @@
 import apiClientDataset from './apiClientDataset';
-import {getAuthInitOverrides} from './authContext'
+import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, TemplatebackendTransformDatasetRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
@@ -77,3 +77,18 @@ export const getDatasetContent = async (id: number, offset?: number, limit?: num
         console.log("Error getting the dataset content:" + error);
     }
 };
+
+export const transformDataset = async (dataset_id: number, config_id: number) => {
+    const request: DatasetServiceTransformDatasetRequest = {
+        body: {
+            datasetId: dataset_id,
+            configId: config_id
+        }
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceTransformDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error transforming the dataset:" + error);
+    }
+}

@@ -38,7 +38,7 @@ export const listReplies = async (offset: number = 0, limit: number|undefined = 
 
 export const getReply = async (replyId: number) => {
     try {
-        const response = await apiClientQuestionnaire.questionnaireServiceGetReply({replyId}, getAuthInitOverrides());
+        const response = await apiClientQuestionnaire.questionnaireServiceGetReply({id:replyId}, getAuthInitOverrides());
         return response?.result?.reply;
     } catch (error) {
         console.log("Error getting reply:" + error);
