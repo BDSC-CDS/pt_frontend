@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Question, Questions } from '../utils/questions';
+import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../internal/client/index';
+import { createReply } from "../utils/questionnaire"
 import dynamic from "next/dynamic";
+import { MdSave } from "react-icons/md";
+import { FaFilePdf } from "react-icons/fa6";
+import { GrDocumentConfig } from "react-icons/gr";
+import { Button, Modal, TextInput, ToggleSwitch, Alert } from 'flowbite-react';
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
 interface TabsComponentProps {
     questions: Questions;
+    questionnaireVersionId?: number;
+    reply?: TemplatebackendQuestionnaireReply;
 }
 
 type Tabs = {
@@ -14,8 +22,29 @@ type Tabs = {
 }[]
 
 
-const TabsComponent: React.FC<TabsComponentProps> = ({ questions }) => {
+const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireVersionId, reply }) => {
     const [activeTab, setActiveTab] = useState<string>('1');
+
+    console.log("tab", questionnaireVersionId, reply);
+
+    if (reply) {
+        interface QuestionMap {
+            [key: string]: Question;
+        }
+        let allQuestions: QuestionMap = {};
+        Object.keys(questions).map((tab) => {
+            const tabQuestions = questions[tab];
+            if (!tabQuestions) return;
+            tabQuestions.forEach(q => { allQuestions[q.questionId] = q; })
+        })
+        reply.replies?.forEach(r => {
+            if (!r.questionnaireQuestionId) return;
+            const q = allQuestions[r.questionnaireQuestionId];
+            if (!q) return;
+            const a = q.answers.find(a => a.answerId == r.answer)
+            if (a) a.selected = true;
+        })
+    }
 
     // Function to go to the previous tab
     const goToPreviousTab = () => {
@@ -149,7 +178,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions }) => {
     useEffect(() => {
         computeCurrentRisk();
         computeCurrentReport();
-    },[])
+    }, [])
 
     const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false)
 
@@ -202,7 +231,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions }) => {
             missingDataSections: sectionsMissing,
             overallCompletionRate: (completionRate * 100).toFixed(2) + "%",
         });
-        
+
     }
 
     const report_tab =
@@ -220,6 +249,16 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions }) => {
             <div className="mb-2">
                 <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
             </div>
+            <div className="flex flex-row">
+                <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                    <FaFilePdf />
+                    <p className='ml-2 text-sm'> Export PDF</p>
+                </span>
+                <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <GrDocumentConfig />
+                    <p className='ml-2 text-sm'> Export connector configuration</p>
+                </span>
+            </div>
         </div>
 
     const tabs: Tabs = Object.keys(questions).map((tab, n) => ({
@@ -232,12 +271,86 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions }) => {
         content: report_tab,
     }])
 
+    // Everything to save
+    const [openSaveModal, setOpenSaveModal] = useState(false);
+    const [openSaveAlert, setOpenSaveAlert] = useState(false);
+    const [saveName, setSaveName] = useState("");
+    const save = async () => {
+        setOpenSaveModal(false);
+
+        let allQuestions: Question[] = [];
+        Object.keys(questions).map((tab) => {
+            const tabQuestions = questions[tab];
+            if (!tabQuestions) return;
+            allQuestions = allQuestions.concat(tabQuestions);
+        })
+
+        const allAnsweredQuestions = allQuestions.filter(q => q.answers?.find(a => a.selected));
+        const replies: Array<TemplatebackendQuestionnaireQuestionReply> = allAnsweredQuestions.map(q => {
+            const reply: TemplatebackendQuestionnaireQuestionReply = {
+                questionnaireQuestionId: Number(q.questionId),
+                answer: q.answers.find(a => a.selected)?.answerId
+            };
+            return reply;
+        })
+
+        const replyToSave: TemplatebackendQuestionnaireReply = {
+            questionnaireVersionId: reply?.questionnaireVersionId ? reply.questionnaireVersionId : questionnaireVersionId,
+            projectName: saveName,
+            replies: replies,
+        }
+
+        const id = await createReply(replyToSave);
+
+        setOpenSaveAlert(true);
+    }
+
     return (
         <>
+            <Alert className={(openSaveAlert ? "" : "hidden") + " mt-5"} color="success" onDismiss={() => setOpenSaveAlert(false)}>
+                <span className="font-bold">Version {saveName} </span>successfuly saved!
+            </Alert>
+            <div className="flex flex-row items-end p-5">
+                <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
+                    <MdSave />
+                    <p className='ml-2 text-sm'> Save</p>
+                </span>
+            </div>
+            <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <div className="flex flex-col mb-8">
+                            <TextInput
+                                placeholder="Project name"
+                                required
+                                // value={"12"}
+                                onChange={(event) => { setSaveName(event.target.value) }}
+                            />
+                        </div>
+
+                        <hr />
+                        {/* <div className="flex flex-col mb-8">
+                            <ToggleSwitch checked={savePublish} label="Publish version" onChange={setSavePublish} />
+                        </div> */}
+
+                        <hr />
+
+                        <div className="flex justify-center gap-4">
+                            <Button color="success" onClick={() => save()}>
+                                Save
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenSaveModal(false)}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
             <div className='p-5'>
-                <div className='fixed top-36 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
+                <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                     <h1 className='mt-4 text-md font-semibold flex flex-row'>
-                        Current score  
+                        Current score
                         <button
                             onMouseEnter={() => setRiskPopoverDisplayed(true)}
                             onMouseLeave={() => setRiskPopoverDisplayed(false)}

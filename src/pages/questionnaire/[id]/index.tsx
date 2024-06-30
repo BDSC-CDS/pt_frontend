@@ -2,24 +2,46 @@
 
 import { useEffect, useState } from 'react';
 import TabsComponent from '../../../components/Tabs';
-import { getQuestionnaire } from "../../../utils/questionnaire"
+import { getQuestionnaire, getReply } from "../../../utils/questionnaire"
+import { useRouter } from 'next/router';
+import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
 import { questionsFromApi, Questions } from "../../../utils/questions"
 
 
 const QuestionnairePage = () => {
-    const questionnaireId = 10;
-    const versionId = 16;
+    let questionnaireId = 1;
+
+    const router = useRouter();
+    const { id } = router.query;
+
+
     const [questions, setQuestions] = useState<Questions>();
+    const [reply, setReply] = useState<TemplatebackendQuestionnaireReply>();
 
 
-    const loadQuestionnaire = async () => {
+    const load = async () => {
+        let replyId;
+        if (id && id != "new") {
+            replyId = Number(id);
+
+            const replyResult = await getReply(replyId);
+
+            if (replyResult) {
+                setReply(replyResult);
+            }
+
+            if (replyResult?.questionnaireVersionId)  {
+                questionnaireId = replyResult?.questionnaireVersionId
+            }
+        }
+
         const result = await getQuestionnaire(questionnaireId);
 
         if (!result) {
             return
         }
 
-        const v = (result.versions || []).find(v => v.id == versionId);
+        const v = (result.versions || []).find(v => v.published);
         if (!v) {
             return
         }
@@ -29,7 +51,7 @@ const QuestionnairePage = () => {
 
     useEffect(() => {
         try {
-            loadQuestionnaire();
+            load();
         } catch (error) {
             alert("Error listing the datasets")
         }
@@ -40,7 +62,7 @@ const QuestionnairePage = () => {
     return (
         <>
             {questions ? (
-                <TabsComponent questions={questions} />
+                <TabsComponent questions={questions} questionnaireVersionId={questionnaireId} reply={reply} />
             ) : (
                 <div>
                     <p>Loading or project not found...</p>
