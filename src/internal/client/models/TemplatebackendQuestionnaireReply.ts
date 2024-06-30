@@ -37,7 +37,7 @@ export interface TemplatebackendQuestionnaireReply {
      * @type {number}
      * @memberof TemplatebackendQuestionnaireReply
      */
-    questionnaireQuestionId?: number;
+    questionnaireVersionId?: number;
     /**
      * 
      * @type {Array<TemplatebackendQuestionnaireQuestionReply>}
@@ -78,7 +78,7 @@ export function TemplatebackendQuestionnaireReplyFromJSONTyped(json: any, ignore
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'questionnaireQuestionId': !exists(json, 'questionnaireQuestionId') ? undefined : json['questionnaireQuestionId'],
+        'questionnaireVersionId': !exists(json, 'questionnaireVersionId') ? undefined : json['questionnaireVersionId'],
         'replies': !exists(json, 'replies') ? undefined : ((json['replies'] as Array<any>).map(TemplatebackendQuestionnaireQuestionReplyFromJSON)),
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
@@ -95,7 +95,7 @@ export function TemplatebackendQuestionnaireReplyToJSON(value?: TemplatebackendQ
     return {
         
         'id': value.id,
-        'questionnaireQuestionId': value.questionnaireQuestionId,
+        'questionnaireVersionId': value.questionnaireVersionId,
         'replies': value.replies === undefined ? undefined : ((value.replies as Array<any>).map(TemplatebackendQuestionnaireQuestionReplyToJSON)),
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),

@@ -532,6 +532,29 @@ paths:
       tags:
         - Questionnaire
       x-openapi-router-controller: questionnaire_controller
+  /api/v1/questionnaire/version:
+    post:
+      summary: Create a questionnaire version
+      description: This endpoint creates a questionnaire version
+      operationId: QuestionnaireService_CreateQuestionnaireVersion
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendCreateQuestionnaireVersionReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendCreateQuestionnaireVersionRequest'
+      tags:
+        - Questionnaire
+      x-openapi-router-controller: questionnaire_controller
   /api/v1/questionnaire/{id}:
     get:
       summary: Get questionnaires
@@ -785,6 +808,26 @@ definitions:
         $ref: '#/definitions/templatebackendQuestionnaire'
     title: Message definitions for requests and responses
   templatebackendCreateQuestionnaireResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+  templatebackendCreateQuestionnaireVersionReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendCreateQuestionnaireVersionResult'
+  templatebackendCreateQuestionnaireVersionRequest:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      version:
+        $ref: '#/definitions/templatebackendQuestionnaireVersion'
+    title: Message definitions for requests and responses
+  templatebackendCreateQuestionnaireVersionResult:
     type: object
     properties:
       id:
@@ -1132,7 +1175,7 @@ definitions:
       id:
         type: integer
         format: int64
-      questionnaireQuestionId:
+      questionnaireVersionId:
         type: integer
         format: int64
       replies:
@@ -1160,6 +1203,8 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/templatebackendQuestionnaireQuestion'
+      published:
+        type: boolean
       createdAt:
         type: string
         format: date-time

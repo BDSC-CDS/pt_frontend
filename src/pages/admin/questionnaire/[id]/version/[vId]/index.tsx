@@ -2,9 +2,9 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, TextInput, Accordion } from 'flowbite-react';
+import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Alert } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
-import { getQuestionnaire } from "../../../../../../utils/questionnaire"
+import { getQuestionnaire, createQuestionnaireVersion } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
@@ -109,6 +109,25 @@ export default function Questionnaire() {
             alert("Error listing the datasets")
         }
     }, [id]);
+
+    // Everything to save
+    const [openSaveModal, setOpenSaveModal] = useState(false);
+    const [openSaveAlert, setOpenSaveAlert] = useState(false);
+    const [saveName, setSaveName] = useState("");
+    const [savePublish, setSavePublish] = useState(false);
+    const save = async () => {
+        setOpenSaveModal(false);
+
+        const versionToSave = {
+            ...version,
+            version: saveName,
+            published: savePublish,
+        }
+
+        const id = await createQuestionnaireVersion(questionnaireId, versionToSave);
+
+        setOpenSaveAlert(true);
+    }
 
     // Everything to remove a tab ans it's questions
     const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
@@ -230,11 +249,14 @@ export default function Questionnaire() {
             <Head>
                 <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
+            <Alert className={(openSaveAlert ? "" : "hidden") + " mt-5"} color="success" onDismiss={() => setOpenSaveAlert(false)}>
+                <span className="font-bold">Version {saveName} </span>successfuly saved!
+            </Alert>
             <div className="flex flex-row items-end p-5">
-                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
+                <span onClick={()=>setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save</p>
-                </Link>
+                </span>
             </div>
             <div className="flex flex-col mb-8">
                 <Table >
@@ -332,6 +354,37 @@ export default function Questionnaire() {
                 </Table>
             </div>
 
+            <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="text-center">
+                        <div className="flex flex-col mb-8">
+                            <TextInput
+                                placeholder="Version"
+                                required
+                                // value={"12"}
+                                onChange={(event) => { setSaveName(event.target.value) }}
+                            />
+                        </div>
+
+                        <hr />
+                        <div className="flex flex-col mb-8">
+                            <ToggleSwitch checked={savePublish} label="Publish version" onChange={setSavePublish} />
+                        </div>
+
+                        <hr />
+
+                        <div className="flex justify-center gap-4">
+                            <Button color="success" onClick={() => save()}>
+                                Save
+                            </Button>
+                            <Button color="gray" onClick={() => setOpenSaveModal(false)}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
                 <Modal.Header />
                 <Modal.Body>

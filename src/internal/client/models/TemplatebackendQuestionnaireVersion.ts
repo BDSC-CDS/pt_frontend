@@ -46,6 +46,12 @@ export interface TemplatebackendQuestionnaireVersion {
     questions?: Array<TemplatebackendQuestionnaireQuestion>;
     /**
      * 
+     * @type {boolean}
+     * @memberof TemplatebackendQuestionnaireVersion
+     */
+    published?: boolean;
+    /**
+     * 
      * @type {Date}
      * @memberof TemplatebackendQuestionnaireVersion
      */
@@ -80,6 +86,7 @@ export function TemplatebackendQuestionnaireVersionFromJSONTyped(json: any, igno
         'id': !exists(json, 'id') ? undefined : json['id'],
         'version': !exists(json, 'version') ? undefined : json['version'],
         'questions': !exists(json, 'questions') ? undefined : ((json['questions'] as Array<any>).map(TemplatebackendQuestionnaireQuestionFromJSON)),
+        'published': !exists(json, 'published') ? undefined : json['published'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
     };
@@ -97,6 +104,7 @@ export function TemplatebackendQuestionnaireVersionToJSON(value?: Templatebacken
         'id': value.id,
         'version': value.version,
         'questions': value.questions === undefined ? undefined : ((value.questions as Array<any>).map(TemplatebackendQuestionnaireQuestionToJSON)),
+        'published': value.published,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),
     };

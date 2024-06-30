@@ -18,6 +18,8 @@ import type {
   RpcStatus,
   TemplatebackendCreateQuestionnaireReply,
   TemplatebackendCreateQuestionnaireRequest,
+  TemplatebackendCreateQuestionnaireVersionReply,
+  TemplatebackendCreateQuestionnaireVersionRequest,
   TemplatebackendDeleteQuestionnaireReply,
   TemplatebackendGetQuestionnaireReply,
   TemplatebackendGetReplyReply,
@@ -31,6 +33,10 @@ import {
     TemplatebackendCreateQuestionnaireReplyToJSON,
     TemplatebackendCreateQuestionnaireRequestFromJSON,
     TemplatebackendCreateQuestionnaireRequestToJSON,
+    TemplatebackendCreateQuestionnaireVersionReplyFromJSON,
+    TemplatebackendCreateQuestionnaireVersionReplyToJSON,
+    TemplatebackendCreateQuestionnaireVersionRequestFromJSON,
+    TemplatebackendCreateQuestionnaireVersionRequestToJSON,
     TemplatebackendDeleteQuestionnaireReplyFromJSON,
     TemplatebackendDeleteQuestionnaireReplyToJSON,
     TemplatebackendGetQuestionnaireReplyFromJSON,
@@ -45,6 +51,10 @@ import {
 
 export interface QuestionnaireServiceCreateQuestionnaireRequest {
     body: TemplatebackendCreateQuestionnaireRequest;
+}
+
+export interface QuestionnaireServiceCreateQuestionnaireVersionRequest {
+    body: TemplatebackendCreateQuestionnaireVersionRequest;
 }
 
 export interface QuestionnaireServiceDeleteQuestionnaireRequest {
@@ -112,6 +122,45 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      */
     async questionnaireServiceCreateQuestionnaire(requestParameters: QuestionnaireServiceCreateQuestionnaireRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateQuestionnaireReply> {
         const response = await this.questionnaireServiceCreateQuestionnaireRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint creates a questionnaire version
+     * Create a questionnaire version
+     */
+    async questionnaireServiceCreateQuestionnaireVersionRaw(requestParameters: QuestionnaireServiceCreateQuestionnaireVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateQuestionnaireVersionReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling questionnaireServiceCreateQuestionnaireVersion.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/questionnaire/version`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendCreateQuestionnaireVersionRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendCreateQuestionnaireVersionReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint creates a questionnaire version
+     * Create a questionnaire version
+     */
+    async questionnaireServiceCreateQuestionnaireVersion(requestParameters: QuestionnaireServiceCreateQuestionnaireVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateQuestionnaireVersionReply> {
+        const response = await this.questionnaireServiceCreateQuestionnaireVersionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
