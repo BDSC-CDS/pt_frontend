@@ -3,7 +3,7 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets } from "../utils/dataset"
+import { storeDataset, listDatasets, transformDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -21,7 +21,19 @@ export default function Dataset() {
     const [csvString, setCsvString] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const handleMenuOpen = (id: number | undefined) => {
 
+        if (id) {
+            setOpenMenuId(id);
+        }
+    };
+
+    const handleMenuClose = () => {
+        setOpenMenuId(null);
+        getListDatasets();
+
+    };
 
     const getListDatasets = async (offset?: number, limit?: number) => {
         // Call API
@@ -163,6 +175,13 @@ export default function Dataset() {
         }
     };
 
+    const handleTransform = async (id: number | undefined) => {
+        if (id) {
+            const config_id = 1;
+            const response = await transformDataset(id, config_id);
+        }
+    };
+
     return (
         <>
             <Head>
@@ -246,20 +265,30 @@ export default function Dataset() {
                             <Table.Body className="divide-y">
                                 {datasetsList.map((dataset) => (
                                     < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => handleRowClick(dataset.id)}
+                                    // onClick={() => handleRowClick(dataset.id)}
                                     >
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
                                             {dataset.id}
                                         </Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                        <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                             {dataset.datasetName}
                                         </Table.Cell>
-                                        <Table.Cell> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
-                                        < Table.Cell >
-                                            <a href="#" onClick={(e) => e.stopPropagation()}>
+                                        <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
+                                        < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
+                                            <a onMouseEnter={() => handleMenuOpen(dataset.id)} className="text-gray-900 hover:text-blue-500">
                                                 <MdMoreHoriz size={20} />
                                             </a>
+                                            {openMenuId === dataset.id && (
+                                                <div className="dropdown-menu">
+                                                    <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
+                                                        <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                            onClick={() => handleTransform(dataset.id)}>Shift Dates</li>
+                                                    </ul>
+                                                </div>
+                                            )}
+
                                         </Table.Cell>
+
                                     </Table.Row>
                                 ))}
                             </Table.Body>
