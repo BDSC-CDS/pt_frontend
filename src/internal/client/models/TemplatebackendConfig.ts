@@ -30,6 +30,18 @@ export interface TemplatebackendConfig {
      * @type {number}
      * @memberof TemplatebackendConfig
      */
+    userid?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TemplatebackendConfig
+     */
+    tenantid?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TemplatebackendConfig
+     */
     questionnaireid?: number;
     /**
      * 
@@ -137,6 +149,8 @@ export function TemplatebackendConfigFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'userid': !exists(json, 'userid') ? undefined : json['userid'],
+        'tenantid': !exists(json, 'tenantid') ? undefined : json['tenantid'],
         'questionnaireid': !exists(json, 'questionnaireid') ? undefined : json['questionnaireid'],
         'hasScrambleField': !exists(json, 'hasScrambleField') ? undefined : json['hasScrambleField'],
         'hasDateShift': !exists(json, 'hasDateShift') ? undefined : json['hasDateShift'],
@@ -165,6 +179,8 @@ export function TemplatebackendConfigToJSON(value?: TemplatebackendConfig | null
     return {
         
         'id': value.id,
+        'userid': value.userid,
+        'tenantid': value.tenantid,
         'questionnaireid': value.questionnaireid,
         'hasScrambleField': value.hasScrambleField,
         'hasDateShift': value.hasDateShift,

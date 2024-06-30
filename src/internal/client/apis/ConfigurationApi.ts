@@ -16,17 +16,23 @@
 import * as runtime from '../runtime';
 import type {
   RpcStatus,
-  TemplatebackendGetConfigReply,
+  TemplatebackendConfig,
+  TemplatebackendCreateConfigReply,
+  TemplatebackendGetConfigsReply,
 } from '../models/index';
 import {
     RpcStatusFromJSON,
     RpcStatusToJSON,
-    TemplatebackendGetConfigReplyFromJSON,
-    TemplatebackendGetConfigReplyToJSON,
+    TemplatebackendConfigFromJSON,
+    TemplatebackendConfigToJSON,
+    TemplatebackendCreateConfigReplyFromJSON,
+    TemplatebackendCreateConfigReplyToJSON,
+    TemplatebackendGetConfigsReplyFromJSON,
+    TemplatebackendGetConfigsReplyToJSON,
 } from '../models/index';
 
-export interface ConfigServiceGetConfigRequest {
-    id: number;
+export interface ConfigServiceCreateConfigRequest {
+    body: TemplatebackendConfig;
 }
 
 /**
@@ -35,14 +41,49 @@ export interface ConfigServiceGetConfigRequest {
 export class ConfigurationApi extends runtime.BaseAPI {
 
     /**
-     * This endpoint returns a configuration file for a given user
-     * Get a configuration file
+     * This endpoint creates a usconfigurationer
+     * Create a configuration
      */
-    async configServiceGetConfigRaw(requestParameters: ConfigServiceGetConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetConfigReply>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configServiceGetConfig.');
+    async configServiceCreateConfigRaw(requestParameters: ConfigServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateConfigReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling configServiceCreateConfig.');
         }
 
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/rest/v1/configs`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendConfigToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendCreateConfigReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint creates a usconfigurationer
+     * Create a configuration
+     */
+    async configServiceCreateConfig(requestParameters: ConfigServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateConfigReply> {
+        const response = await this.configServiceCreateConfigRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint returns the configuration files for a given user
+     * Get configuration files
+     */
+    async configServiceGetConfigsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetConfigsReply>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -52,21 +93,21 @@ export class ConfigurationApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/rest/v1/configs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/api/rest/v1/configs`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendGetConfigReplyFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendGetConfigsReplyFromJSON(jsonValue));
     }
 
     /**
-     * This endpoint returns a configuration file for a given user
-     * Get a configuration file
+     * This endpoint returns the configuration files for a given user
+     * Get configuration files
      */
-    async configServiceGetConfig(requestParameters: ConfigServiceGetConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetConfigReply> {
-        const response = await this.configServiceGetConfigRaw(requestParameters, initOverrides);
+    async configServiceGetConfigs(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetConfigsReply> {
+        const response = await this.configServiceGetConfigsRaw(initOverrides);
         return await response.value();
     }
 

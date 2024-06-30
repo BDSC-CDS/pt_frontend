@@ -22,6 +22,8 @@ import type {
   TemplatebackendListDatasetsReply,
   TemplatebackendStoreDatasetReply,
   TemplatebackendStoreDatasetRequest,
+  TemplatebackendTransformDatasetReply,
+  TemplatebackendTransformDatasetRequest,
 } from '../models/index';
 import {
     RpcStatusFromJSON,
@@ -38,6 +40,10 @@ import {
     TemplatebackendStoreDatasetReplyToJSON,
     TemplatebackendStoreDatasetRequestFromJSON,
     TemplatebackendStoreDatasetRequestToJSON,
+    TemplatebackendTransformDatasetReplyFromJSON,
+    TemplatebackendTransformDatasetReplyToJSON,
+    TemplatebackendTransformDatasetRequestFromJSON,
+    TemplatebackendTransformDatasetRequestToJSON,
 } from '../models/index';
 
 export interface DatasetServiceDeleteDatasetRequest {
@@ -61,6 +67,10 @@ export interface DatasetServiceListDatasetsRequest {
 
 export interface DatasetServiceStoreDatasetRequest {
     body: TemplatebackendStoreDatasetRequest;
+}
+
+export interface DatasetServiceTransformDatasetRequest {
+    body: TemplatebackendTransformDatasetRequest;
 }
 
 /**
@@ -260,6 +270,45 @@ export class DatasetApi extends runtime.BaseAPI {
      */
     async datasetServiceStoreDataset(requestParameters: DatasetServiceStoreDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendStoreDatasetReply> {
         const response = await this.datasetServiceStoreDatasetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint transforms a dataset
+     * Transform a dataset
+     */
+    async datasetServiceTransformDatasetRaw(requestParameters: DatasetServiceTransformDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendTransformDatasetReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceTransformDataset.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/transform`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendTransformDatasetRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendTransformDatasetReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint transforms a dataset
+     * Transform a dataset
+     */
+    async datasetServiceTransformDataset(requestParameters: DatasetServiceTransformDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendTransformDatasetReply> {
+        const response = await this.datasetServiceTransformDatasetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
