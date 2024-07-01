@@ -10,6 +10,8 @@ import { questionsFromApi, Questions } from "../../../utils/questions"
 
 const QuestionnairePage = () => {
     let questionnaireId = 1;
+    const [questionnaireVersionId, setQuestionnaireVersionId] = useState<number>();
+
 
     const router = useRouter();
     const { id } = router.query;
@@ -31,7 +33,7 @@ const QuestionnairePage = () => {
             }
 
             if (replyResult?.questionnaireVersionId)  {
-                questionnaireId = replyResult?.questionnaireVersionId
+                setQuestionnaireVersionId(replyResult?.questionnaireVersionId);
             }
         }
 
@@ -41,7 +43,14 @@ const QuestionnairePage = () => {
             return
         }
 
-        const v = (result.versions || []).find(v => v.published);
+        const v = (result.versions || []).find(v => {
+            if (questionnaireVersionId) {
+                return v.id == questionnaireVersionId;
+            } else {
+                return v.published;
+            }
+        });
+        setQuestionnaireVersionId(v?.id);
         if (!v) {
             return
         }
@@ -62,7 +71,7 @@ const QuestionnairePage = () => {
     return (
         <>
             {questions ? (
-                <TabsComponent questions={questions} questionnaireVersionId={questionnaireId} reply={reply} />
+                <TabsComponent questions={questions} questionnaireVersionId={questionnaireVersionId} reply={reply} />
             ) : (
                 <div>
                     <p>Loading or project not found...</p>
