@@ -170,6 +170,7 @@ export default function Dataset() {
         getListDatasets();
     };
     const router = useRouter();
+
     const handleRowClick = (id: number | undefined) => {
         if (id) {
             router.push(`/dataset/${id}`);
@@ -178,8 +179,9 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
-            const config_id = 1;
-            const response = await transformDataset(id, config_id);
+            // const config_id = 1;
+            // const response = await transformDataset(id, config_id);
+            router.push(`/transform/${id}`);
         }
     };
     const handleDelete = async (id: number | undefined) => {
