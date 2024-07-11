@@ -1,7 +1,7 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, TemplatebackendTransformDatasetRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
@@ -90,5 +90,17 @@ export const transformDataset = async (dataset_id: number, config_id: number) =>
         return response;
     } catch (error) {
         console.log("Error transforming the dataset:" + error);
+    }
+}
+
+export const deleteDataset = async (dataset_id: number) => {
+    const request: DatasetServiceDeleteDatasetRequest = {
+        id: dataset_id
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceDeleteDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error deleting the dataset:" + error);
     }
 }
