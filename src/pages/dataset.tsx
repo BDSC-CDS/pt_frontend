@@ -3,7 +3,7 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets, transformDataset } from "../utils/dataset"
+import { storeDataset, listDatasets, transformDataset, deleteDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -22,8 +22,8 @@ export default function Dataset() {
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-    const handleMenuOpen = (id: number | undefined) => {
 
+    const handleMenuOpen = (id: number | undefined) => {
         if (id) {
             setOpenMenuId(id);
         }
@@ -52,6 +52,7 @@ export default function Dataset() {
             setDatasetsList(result);
         }
     }
+
     useEffect(() => {
         try {
             getListDatasets();
@@ -181,6 +182,12 @@ export default function Dataset() {
             const response = await transformDataset(id, config_id);
         }
     };
+    const handleDelete = async (id: number | undefined) => {
+        if (id) {
+            const response = await deleteDataset(id);
+            getListDatasets();
+        }
+    };
 
     return (
         <>
@@ -265,7 +272,6 @@ export default function Dataset() {
                             <Table.Body className="divide-y">
                                 {datasetsList.map((dataset) => (
                                     < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                    // onClick={() => handleRowClick(dataset.id)}
                                     >
                                         <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
                                             {dataset.id}
@@ -283,6 +289,8 @@ export default function Dataset() {
                                                     <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
                                                         <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                             onClick={() => handleTransform(dataset.id)}>Shift Dates</li>
+                                                        <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                            onClick={() => handleDelete(dataset.id)}>Delete</li>
                                                     </ul>
                                                 </div>
                                             )}

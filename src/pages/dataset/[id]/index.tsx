@@ -62,16 +62,12 @@ const DatasetPage = () => {
                             {metadata?.map((meta) =>
                                 <Table.HeadCell>{meta.columnName}</Table.HeadCell>
                             )}
-                            {/* <Table.HeadCell>
-                            <span className="sr-only">Edit</span>
-                        </Table.HeadCell> */}
+
                         </Table.Head>
                         <Table.Body className="divide-y">
 
-                            {/* {columns?.map((element) => ( */}
                             {Array.from({ length: nRows }, (_, index) => (
                                 < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                // onClick={() => handleRowClick(dataset.id)}
                                 >
                                     {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
                                     {columns?.map((col, colIndex) => (
@@ -80,11 +76,7 @@ const DatasetPage = () => {
                                             {col?.at(index)}
                                         </Table.Cell>
                                     ))}
-                                    {/* < Table.Cell >
-                                    <a href="#" onClick={(e) => e.stopPropagation()}>
-                                        <MdMoreHoriz size={20} />
-                                    </a>
-                                </Table.Cell> */}
+
                                 </Table.Row>
                             ))}
                         </Table.Body>
