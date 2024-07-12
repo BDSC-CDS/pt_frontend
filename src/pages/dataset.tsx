@@ -290,7 +290,7 @@ export default function Dataset() {
                                                 <div className="dropdown-menu">
                                                     <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
                                                         <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                            onClick={() => handleTransform(dataset.id)}>Shift Dates</li>
+                                                            onClick={() => handleTransform(dataset.id)}>Transform</li>
                                                         <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                             onClick={() => handleDelete(dataset.id)}>Delete</li>
                                                     </ul>
