@@ -314,15 +314,15 @@ const TransformPage = () => {
                                 }
                             </div>
                         </div>
-                        {/* <div className="p-4 bg-white w-full fixed bottom-10 right-0"> */}
-                        <button
-                            onClick={() => applyTransformation(selectedConfigId)}
-                            disabled={!selectedConfigId}
-                            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-300 "
-                        >
-                            Apply Transformation
-                        </button>
-                        {/* </div> */}
+                        <div className="p-4 bg-white w-full fixed inset-x-0 bottom-10 flex justify-end">
+                            <button
+                                onClick={() => applyTransformation(selectedConfigId)}
+                                disabled={!selectedConfigId}
+                                className="mt-4  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-300 "
+                            >
+                                Apply Transformation
+                            </button>
+                        </div>
                         <Modal show={showModal} onClose={() => closeCreateConfigModal()}>
                             <Modal.Body>
                                 <div className="space-y-6">
