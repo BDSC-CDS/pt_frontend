@@ -3,7 +3,7 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets, transformDataset, deleteDataset } from "../utils/dataset"
+import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -170,6 +170,7 @@ export default function Dataset() {
         getListDatasets();
     };
     const router = useRouter();
+
     const handleRowClick = (id: number | undefined) => {
         if (id) {
             router.push(`/dataset/${id}`);
@@ -178,8 +179,9 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
-            const config_id = 1;
-            const response = await transformDataset(id, config_id);
+            // const config_id = 1;
+            // const response = await transformDataset(id, config_id);
+            router.push(`/transform/${id}`);
         }
     };
     const handleDelete = async (id: number | undefined) => {
@@ -288,7 +290,7 @@ export default function Dataset() {
                                                 <div className="dropdown-menu">
                                                     <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
                                                         <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                            onClick={() => handleTransform(dataset.id)}>Shift Dates</li>
+                                                            onClick={() => handleTransform(dataset.id)}>Transform</li>
                                                         <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                             onClick={() => handleDelete(dataset.id)}>Delete</li>
                                                     </ul>
