@@ -768,20 +768,16 @@ definitions:
       dateShiftHighrange:
         type: integer
         format: int32
-      subFieldListFields:
-        type: array
-        items:
-          type: string
+      subFieldListField:
+        type: string
       subFieldListSubstitute:
         type: array
         items:
           type: string
       subFieldListReplacement:
         type: string
-      subFieldRegexFields:
-        type: array
-        items:
-          type: string
+      subFieldRegexField:
+        type: string
       subFieldRegexRegex:
         type: string
       subFieldRegexReplacement:
