@@ -3,12 +3,15 @@
 import { useRouter } from 'next/router';
 import { createConfig, getConfigs } from "../../../utils/config"
 import { useEffect, useState } from 'react';
-import { TemplatebackendConfig } from '~/internal/client';
+import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { Button, Modal } from 'flowbite-react';
+import { transformDataset, getMetadata } from "../../../utils/dataset";
 
 const TransformPage = () => {
+
+    // --------------------- variables --------------------------------- //
     const router = useRouter();
     const { id } = router.query; // Get the dynamic part of the URL
     const datasetId = Number(id);
@@ -44,8 +47,12 @@ const TransformPage = () => {
     });
     const [hassubFieldList, setHassubFieldList] = useState(false);
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
+    const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
+    const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
 
 
+    // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
         if (id) {
             setOpenConfigId(openConfigId === id ? null : id);
@@ -102,18 +109,70 @@ const TransformPage = () => {
         setHassubFieldList(false);
         setHassubFieldRegex(false);
     }
+    const handleCheckboxChange = (configId: number | undefined) => {
+        if (configId) {
+            setSelectedConfigId(prev => prev === configId ? null : configId);
+
+        }
+    };
+    const applyTransformation = async (configId: number | null) => {
+        if (!configId) return;
+        console.log('Applying transformation for config ID:', configId);
+        const response = await transformDataset(datasetId, configId);
+        // Implement the transformation logic for selected configurations
+        if (response?.result) {
+            router.push("/dataset");
+        }
+    };
+
+    const getDatasetMetadata = async () => {
+        const response = await getMetadata(datasetId);
+        if (response?.metadata?.metadata) {
+            const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
+            setMetadata(filteredMetadata);
+            console.log("METADATA: ", filteredMetadata);
+        }
+    }
+
+    const handleScrambleFieldChange = (columnName: string) => {
+        setSelectedScrambleFields(prev =>
+            prev.includes(columnName)
+                ? prev.filter(name => name !== columnName)
+                : [...prev, columnName]
+        );
+    };
+    const handleMultiSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const options = event.target.options;
+        const value = [];
+        for (let i = 0, len = options.length; i < len; i++) {
+            const option = options[i] as HTMLOptionElement;
+            if (option && option.selected) {
+                value.push(option.value);
+            }
+        }
+        setSelectedScrambleFields(value);
+    };
+
 
     useEffect(() => {
         if (id) {
             try {
                 handleGetConfigs();
+                getDatasetMetadata();
             } catch (error) {
                 alert("Error getting the data");
             }
         }
     }, [id]);
 
+    useEffect(() => {
+        setConfig(prev => ({
+            ...prev,
+            scrambleFieldFields: selectedScrambleFields
+        }));
+    }, [selectedScrambleFields]);
 
+    // ------------------------------- html -------------------------------------------- //
     return (
         <>
             {!isLoggedIn &&
@@ -128,103 +187,122 @@ const TransformPage = () => {
                             onClick={() => setShowModal(true)}
                             className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                             <MdOutlineAdd size={30} />
-                            <p className='ml-2 text-md'> Create config </p>
+                            <p className='ml-2 text-md'> Add a configuration </p>
                         </button>
                         <div className="mt-5 overflow-x-auto w-full rounded">
                             <div>
                                 {configs.map((config) => (
-                                    <div key={config.id} className="mb-4 border border-gray-300 p-4">
-                                        <button
-                                            onClick={() => toggleConfig(config.id)}
-                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none"
-                                        >
-                                            Configuration {config.id}
-                                            {/* <span className={`ml-2 transform ${openConfigId === config.id ? 'rotate-180' : 'rotate-0'} transition-transform`}> */}
-                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-180' : 'rotate-0'}`}>
-                                                ▼
-                                            </span>
-                                        </button>
-                                        {openConfigId === config.id && (
-                                            <div className="mt-2 bg-white p-2">
-                                                {config.hasScrambleField && (
-                                                    <>
-                                                        <button onClick={() => toggleDetail(`scramble-${config.id}`)}
-                                                            className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
-                                                            Scramble Field
-                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-180' : 'rotate-0'}`}>
-                                                                ▼
-                                                            </span>
-                                                        </button>
-                                                        {openDetailId === `scramble-${config.id}` && (
-                                                            <div className="p-2">
-                                                                <h4 className="font-bold">Scramble Field Parameters:</h4>
-                                                                <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
-                                                            </div>
+                                    <>
+
+
+                                        <div key={config.id} className="mb-4 border border-gray-300 p-4 flex items-start">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedConfigId === config.id}
+                                                onChange={() => handleCheckboxChange(config.id)}
+                                                className="form-checkbox h-5 w-5 mr-4 mt-2"
+                                            />
+                                            <div className='w-full'>
+                                                <button
+                                                    onClick={() => toggleConfig(config.id)}
+                                                    className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none"
+                                                >
+                                                    Configuration {config.id}
+                                                    {/* <span className={`ml-2 transform ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'} transition-transform`}> */}
+                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
+                                                        ▼
+                                                    </span>
+                                                </button>
+                                                {openConfigId === config.id && (
+                                                    <div className="mt-2 bg-white p-2">
+                                                        {config.hasScrambleField && (
+                                                            <>
+                                                                <button onClick={() => toggleDetail(`scramble-${config.id}`)}
+                                                                    className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
+                                                                    Scramble Field
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                {openDetailId === `scramble-${config.id}` && (
+                                                                    <div className="p-2">
+                                                                        <h4 className="font-bold">Scramble Field Parameters:</h4>
+                                                                        <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
-                                                    </>
-                                                )}
-                                                {config.hasDateShift && (
-                                                    <>
-                                                        <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
-                                                            className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
-                                                            Date Shift
-                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-180' : 'rotate-0'}`}>
-                                                                ▼
-                                                            </span>
-                                                        </button>
-                                                        {openDetailId === `dateShift-${config.id}` && (
-                                                            <div className="p-2">
-                                                                <h4 className="font-bold">Date Shift Parameters:</h4>
-                                                                <p>Low Range: {config.dateShiftLowrange}</p>
-                                                                <p>High Range: {config.dateShiftHighrange}</p>
-                                                            </div>
+                                                        {config.hasDateShift && (
+                                                            <>
+                                                                <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
+                                                                    className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
+                                                                    Date Shift
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                {openDetailId === `dateShift-${config.id}` && (
+                                                                    <div className="p-2">
+                                                                        <h4 className="font-bold">Date Shift Parameters:</h4>
+                                                                        <p>Low Range: {config.dateShiftLowrange}</p>
+                                                                        <p>High Range: {config.dateShiftHighrange}</p>
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
-                                                    </>
-                                                )}
-                                                {config.hassubFieldList && (
-                                                    <>
-                                                        <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
-                                                            className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
-                                                            SubField List Replacement
-                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-180' : 'rotate-0'}`}>
-                                                                ▼
-                                                            </span>
-                                                        </button>
-                                                        {openDetailId === `subfieldlist-${config.id}` && (
-                                                            <div className="p-2">
-                                                                <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
-                                                                <p>Fields: {config.subFieldListFields}</p>
-                                                                <p>Substitute: {config.subFieldListSubstitute}</p>
-                                                                <p>Replacement: {config.subFieldListReplacement}</p>
-                                                            </div>
+                                                        {config.hassubFieldList && (
+                                                            <>
+                                                                <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
+                                                                    className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
+                                                                    SubField List Replacement
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                {openDetailId === `subfieldlist-${config.id}` && (
+                                                                    <div className="p-2">
+                                                                        <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
+                                                                        <p>Fields: {config.subFieldListFields}</p>
+                                                                        <p>Substitute: {config.subFieldListSubstitute}</p>
+                                                                        <p>Replacement: {config.subFieldListReplacement}</p>
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
-                                                    </>
-                                                )}
-                                                {config.hassubFieldRegex && (
-                                                    <>
-                                                        <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
-                                                            className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
-                                                            SubField Regex Replacement
-                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-180' : 'rotate-0'}`}>
-                                                                ▼
-                                                            </span>
-                                                        </button>
-                                                        {openDetailId === `subfieldregex-${config.id}` && (
-                                                            <div className="p-2">
-                                                                <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
-                                                                <p>Fields: {config.subFieldRegexFields}</p>
-                                                                <p>Regex: {config.subFieldRegexRegex}</p>
-                                                                <p>Replacement: {config.subFieldRegexReplacement}</p>
-                                                            </div>
+                                                        {config.hassubFieldRegex && (
+                                                            <>
+                                                                <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
+                                                                    className="w-full text-left bg-blue-100 p-2 font-semibold text-md focus:outline-none">
+                                                                    SubField Regex Replacement
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                {openDetailId === `subfieldregex-${config.id}` && (
+                                                                    <div className="p-2">
+                                                                        <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
+                                                                        <p>Fields: {config.subFieldRegexFields}</p>
+                                                                        <p>Regex: {config.subFieldRegexRegex}</p>
+                                                                        <p>Replacement: {config.subFieldRegexReplacement}</p>
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                    </>
                                 ))}
                             </div>
                         </div>
+                        <button
+                            onClick={() => applyTransformation(selectedConfigId)}
+                            disabled={!selectedConfigId}
+                            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-300"
+                        >
+                            Apply Transformation
+                        </button>
 
                         <Modal show={showModal} onClose={() => closeCreateConfigModal()}>
                             <Modal.Body>
@@ -271,6 +349,20 @@ const TransformPage = () => {
                                         </div>
                                         {hasScrambleField && <div>
                                             <label htmlFor="scrambleFieldFields" className="block text-sm font-medium text-gray-700">Scramble Fields (comma-separated)</label>
+                                            <select
+                                                multiple
+                                                id="scrambleFieldFields"
+                                                name="scrambleFieldFields"
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                value={selectedScrambleFields}
+                                                onChange={handleMultiSelectChange}
+                                            >
+                                                {metadata?.map((item, index) => (
+                                                    <option key={index} value={item.columnName}>
+                                                        {item.columnName}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             <textarea name="scrambleFieldFields" id="scrambleFieldFields" value={config.scrambleFieldFields?.join(", ")} onChange={handleChange} className="mt-1 block w-full  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                             </textarea>
                                         </div>
@@ -314,31 +406,13 @@ const TransformPage = () => {
                             <Modal.Footer>
                                 <Button onClick={() => {
                                     closeCreateConfigModal();
-                                    router.push('dataset');
+                                    // router.push('dataset');
                                 }}>
                                     Cancel
                                 </Button>
                             </Modal.Footer>
                         </Modal>
 
-
-                        {/* <form onSubmit={handleCreateConfig} className="space-y-4 p-4">
-                        <div>
-                            <label htmlFor="userid" className="block text-sm font-medium text-gray-700">User ID</label>
-                            <input type="number" name="userid" id="userid" onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                        </div>
-                        <div>
-                            <label htmlFor="hasScrambleField" className="block text-sm font-medium text-gray-700">Has Scramble Field</label>
-                            <input type="checkbox" name="hasScrambleField" id="hasScrambleField" onChange={handleChange} className="mt-1 block" />
-                        </div>
-                        <div>
-                            <label htmlFor="scrambleFieldFields" className="block text-sm font-medium text-gray-700">Scramble Field Fields (comma-separated)</label>
-                            <textarea name="scrambleFieldFields" id="scrambleFieldFields" onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-                        </div>
-                        <button type="submit" className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Submit Configuration
-                        </button>
-                    </form> */}
                     </div>
                 </>}
         </>
