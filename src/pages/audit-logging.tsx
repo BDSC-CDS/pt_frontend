@@ -18,13 +18,10 @@ export default function AuditLogging() {
     const [logDetails, setLogDetails] = useState('');
     const { isLoggedIn } = useAuth();
     const [filters, setFilters] = useState<{ userId?: string; action?: string; createdAtFrom?: string; createdAtTo?: string }>({});
-    const [sortBy, setSortBy] = useState<string>('createdAt');
 
-    const getListAuditLogs = async (offset?: number, limit?: number, filters?: object, sortBy?: string) => {
-        console.log("Fetching logs with params:", { offset, limit, filters, sortBy });
+    const getListAuditLogs = async (offset?: number, limit?: number) => {
         try {
-            const response = await listAuditLogs(offset, limit, filters, sortBy);
-            console.log("Logs response:", response);
+            const response = await listAuditLogs(offset, limit);
             if (response?.logs) {
                 const sortedLogs = response.logs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 setOriginalAuditLogsList(sortedLogs);
@@ -37,19 +34,16 @@ export default function AuditLogging() {
     };
 
     useEffect(() => {
-        getListAuditLogs(undefined, undefined, filters, sortBy);
+        getListAuditLogs(undefined, undefined,);
     }, []);
 
     useEffect(() => {
-        applyFiltersAndSort();
-    }, [filters, sortBy, currentPage]);
+        applyFilters();
+    }, [filters, currentPage]);
 
-    const applyFiltersAndSort = () => {
-        console.log("Applying filters and sort:", { filters, sortBy });
-
+    const applyFilters = () => {
         let filteredLogs = [...originalAuditLogsList];
 
-        // Apply filters
         if (filters.userId) {
             filteredLogs = filteredLogs.filter(log =>
                 `${log.user?.firstName} ${log.user?.lastName}`.toLowerCase().includes(filters.userId!.toLowerCase())
@@ -70,18 +64,6 @@ export default function AuditLogging() {
                 new Date(log.createdAt) <= new Date(filters.createdAtTo!)
             );
         }
-
-        // Apply sorting
-        filteredLogs.sort((a, b) => {
-            if (sortBy === 'createdAt') {
-                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            } else if (sortBy === 'user') {
-                return `${a.user?.firstName} ${a.user?.lastName}`.localeCompare(`${b.user?.firstName} ${b.user?.lastName}`);
-            } else if (sortBy === 'action') {
-                return (a.action || '').localeCompare(b.action || '');
-            }
-            return 0;
-        });
 
         setFilteredAuditLogsList(filteredLogs);
     };
@@ -138,7 +120,6 @@ export default function AuditLogging() {
         }).format(date);
     };
 
-    // Pagination logic
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentLogs = filteredAuditLogsList.slice(indexOfFirstRow, indexOfLastRow);
@@ -186,9 +167,9 @@ export default function AuditLogging() {
                         <table className="min-w-full bg-white border border-gray-300">
                             <thead>
                                 <tr>
-                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('user')}>User</th>
-                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('action')}>Action</th>
-                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('createdAt')}>Date</th>
+                                    <th className="px-4 py-2 border">User</th>
+                                    <th className="px-4 py-2 border">Action</th>
+                                    <th className="px-4 py-2 border">Date</th>
                                 </tr>
                             </thead>
                             <tbody>
