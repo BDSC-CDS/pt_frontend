@@ -1,4 +1,4 @@
-import TimeAgo from 'react-timeago'
+import TimeAgo from 'react-timeago';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -10,70 +10,112 @@ import { Button, Modal, Tooltip } from 'flowbite-react';
 import { BiSolidMask } from "react-icons/bi";
 
 export default function AuditLogging() {
-    const [auditLogsList, setAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
+    const [originalAuditLogsList, setOriginalAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
+    const [filteredAuditLogsList, setFilteredAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage] = useState(20);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [logDetails, setLogDetails] = useState('');
     const { isLoggedIn } = useAuth();
+    const [filters, setFilters] = useState<{ userId?: string; action?: string; createdAtFrom?: string; createdAtTo?: string }>({});
+    const [sortBy, setSortBy] = useState<string>('createdAt');
 
-    const getListAuditLogs = async (offset?: number, limit?: number) => {
+    const getListAuditLogs = async (offset?: number, limit?: number, filters?: object, sortBy?: string) => {
+        console.log("Fetching logs with params:", { offset, limit, filters, sortBy });
         try {
-            const response = await listAuditLogs(offset, limit);
-            console.log("logs resp", response)
+            const response = await listAuditLogs(offset, limit, filters, sortBy);
+            console.log("Logs response:", response);
             if (response?.logs) {
-                setAuditLogsList(response.logs);
+                const sortedLogs = response.logs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                setOriginalAuditLogsList(sortedLogs);
+                setFilteredAuditLogsList(sortedLogs);
             }
         } catch (error) {
+            console.error("Error listing the audit logs:", error);
             alert("Error listing the audit logs");
         }
     };
 
     useEffect(() => {
-        getListAuditLogs();
+        getListAuditLogs(undefined, undefined, filters, sortBy);
     }, []);
 
-    const handleLogClick = (log:TemplatebackendAuditLog | undefined) => {
+    useEffect(() => {
+        applyFiltersAndSort();
+    }, [filters, sortBy, currentPage]);
+
+    const applyFiltersAndSort = () => {
+        console.log("Applying filters and sort:", { filters, sortBy });
+
+        let filteredLogs = [...originalAuditLogsList];
+
+        // Apply filters
+        if (filters.userId) {
+            filteredLogs = filteredLogs.filter(log =>
+                `${log.user?.firstName} ${log.user?.lastName}`.toLowerCase().includes(filters.userId!.toLowerCase())
+            );
+        }
+        if (filters.action) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.action?.toLowerCase().includes(filters.action!.toLowerCase())
+            );
+        }
+        if (filters.createdAtFrom) {
+            filteredLogs = filteredLogs.filter(log =>
+                new Date(log.createdAt) >= new Date(filters.createdAtFrom!)
+            );
+        }
+        if (filters.createdAtTo) {
+            filteredLogs = filteredLogs.filter(log =>
+                new Date(log.createdAt) <= new Date(filters.createdAtTo!)
+            );
+        }
+
+        // Apply sorting
+        filteredLogs.sort((a, b) => {
+            if (sortBy === 'createdAt') {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            } else if (sortBy === 'user') {
+                return `${a.user?.firstName} ${a.user?.lastName}`.localeCompare(`${b.user?.firstName} ${b.user?.lastName}`);
+            } else if (sortBy === 'action') {
+                return (a.action || '').localeCompare(b.action || '');
+            }
+            return 0;
+        });
+
+        setFilteredAuditLogsList(filteredLogs);
+    };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, filterType: string) => {
+        const value = e.target.value || undefined;
+        setFilters({ ...filters, [filterType]: value });
+    };
+
+    const handleLogClick = (log: TemplatebackendAuditLog | undefined) => {
         if (!log) {
-            return 
+            return;
         }
         setLogDetails(JSON.stringify(log, null, 2));
         setIsDetailModalOpen(true);
-        // if (id) {
-        //     try {
-        //         const response = await getAuditLogDetails(id);
-        //         if (response) {
-        //             setLogDetails(JSON.stringify(response, null, 2));
-        //             setIsDetailModalOpen(true);
-        //         }
-        //     } catch (error) {
-        //         alert("Error getting audit log details");
-        //     }
-        // }
     };
 
     const closeDetailModal = () => {
         setIsDetailModalOpen(false);
     };
 
-    const router = useRouter();
-
     const getInitials = (user: TemplatebackendUser | undefined) => {
         if (!user || user.id === undefined) {
-            return (
-                <BiSolidMask />
-            )
+            return <BiSolidMask />;
         }
         const first = (user.firstName || " ")[0]?.toUpperCase() || "";
         const last = (user.lastName || " ")[0]?.toUpperCase() || "";
         const initials = first + last;
         return initials;
     };
+
     const getUserTooltip = (user: TemplatebackendUser | undefined) => {
         if (!user || user.id === undefined) {
-            return (
-                <>
-                    Anonymous user
-                </>
-            )
+            return <>Anonymous user</>;
         }
 
         return (
@@ -81,8 +123,28 @@ export default function AuditLogging() {
                 {user.firstName} {user.lastName}<br />
                 {user.username}
             </>
-        )
+        );
     };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }).format(date);
+    };
+
+    // Pagination logic
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentLogs = filteredAuditLogsList.slice(indexOfFirstRow, indexOfLastRow);
+    const totalPages = Math.ceil(filteredAuditLogsList.length / rowsPerPage);
+
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     return (
         <>
@@ -92,32 +154,104 @@ export default function AuditLogging() {
             </Head>
             {!isLoggedIn && <p className='m-8'>Please log in to view the audit logs.</p>}
             {isLoggedIn && (
-                <div className="flex flex-col items-start p-5">
-                    <h1 className="text-4xl font-bold mb-5">Activity log</h1>
-                    <div className="mt-5 w-full max-w-4xl">
-                        {auditLogsList.map((log) => (
-                            <div key={log.id} className="flex items-center mb-4" onClick={() => handleLogClick(log)}>
-                                <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-xl font-bold">
-
-                                    <Tooltip content={getUserTooltip(log.user)}>
-                                        {getInitials(log.user)}
-                                    </Tooltip>
-                                </div>
-                                <div className="ml-4">
-                                    {/* <p className="text-lg font-semibold">{log.userid}</p> */}
-                                    <p className="text-gray-600">
-                                        {log.action}
-                                        <TimeAgo className="ml-3 text-sm" date={log.createdAt || ''} />
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                <div className="flex flex-col items-start p-5 w-full">
+                    <h1 className="text-4xl font-bold mb-5">Audit Logs</h1>
+                    <div className="w-full mb-4 flex flex-wrap space-y-4">
+                        <div className="flex space-x-2 w-full">
+                            <input
+                                type="text"
+                                placeholder="Filter by user"
+                                onChange={(e) => handleFilterChange(e, 'userId')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Filter by action"
+                                onChange={(e) => handleFilterChange(e, 'action')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="date"
+                                onChange={(e) => handleFilterChange(e, 'createdAtFrom')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="date"
+                                onChange={(e) => handleFilterChange(e, 'createdAtTo')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                        </div>
                     </div>
-                    <div className="flex mt-5 space-x-4">
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded" onClick={() => getListAuditLogs()}>Load more</button>
-                        <Link href="/" passHref>
-                            <button className="px-4 py-2 bg-gray-600 text-white rounded">Go back</button>
-                        </Link>
+                    <div className="w-full overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-300">
+                            <thead>
+                                <tr>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('user')}>User</th>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('action')}>Action</th>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => setSortBy('createdAt')}>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {currentLogs.length === 0 ? (
+                                    <tr>
+                                        <td className="px-4 py-2 border text-center" colSpan={3}>No logs found</td>
+                                    </tr>
+                                ) : (
+                                    currentLogs.map((log) => (
+                                        <tr key={log.id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleLogClick(log)}>
+                                            <td className="px-4 py-2 border">
+                                                <div className="flex items-center">
+                                                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-xl font-bold">
+                                                        <Tooltip content={getUserTooltip(log.user)}>
+                                                            {getInitials(log.user)}
+                                                        </Tooltip>
+                                                    </div>
+                                                    <div className="ml-3">
+                                                        {log.user?.firstName} {log.user?.lastName}<br />
+                                                        <span className="text-sm text-gray-500">{log.user?.role}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-2 border">{log.action}</td>
+                                            <td className="px-4 py-2 border">
+                                                {formatDate(log.createdAt)}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="flex mt-5 justify-center items-center space-x-2">
+                        <button
+                            onClick={() => setCurrentPage(1)}
+                            className={`px-2 py-1 rounded ${currentPage === 1 ? 'bg-gray-300' : 'bg-gray-200'}`}
+                            disabled={currentPage === 1}
+                        >
+                            {'<<'}
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            className={`px-2 py-1 rounded ${currentPage === 1 ? 'bg-gray-300' : 'bg-gray-200'}`}
+                            disabled={currentPage === 1}
+                        >
+                            {'<'}
+                        </button>
+                        <span>Page {currentPage} of {totalPages}</span>
+                        <button
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            className={`px-2 py-1 rounded ${currentPage === totalPages ? 'bg-gray-300' : 'bg-gray-200'}`}
+                            disabled={currentPage === totalPages}
+                        >
+                            {'>'}
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(totalPages)}
+                            className={`px-2 py-1 rounded ${currentPage === totalPages ? 'bg-gray-300' : 'bg-gray-200'}`}
+                            disabled={currentPage === totalPages}
+                        >
+                            {'>>'}
+                        </button>
                     </div>
                 </div>
             )}
