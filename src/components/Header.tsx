@@ -9,8 +9,8 @@ export default function Header() {
 
     return (
         <>
-            <header className="text-white bg-[#306278] fixed top-0 left-0 right-0 z-20">
-                <nav className="flex h-14">
+            <header className="text-white bg-[#306278] h-14 fixed top-0 left-0 right-0 z-20">
+                <nav className="flex">
                     <div className="flex items-center">
                         <div style={logoStyle} className="w-16 h-14 my-auto ml-10 m-2 bg-no-repeat bg-contain bg-center">
                         </div>
@@ -27,7 +27,7 @@ export default function Header() {
                             <Link href="/contact" passHref className="ml-4">
                                 <span className="px-3 py-2 hover:underline  rounded cursor-pointer">Contact</span>
                             </Link>
-                            <AuthWidget/>
+                            <AuthWidget />
                         </div>
                     </div>
                 </nav>
