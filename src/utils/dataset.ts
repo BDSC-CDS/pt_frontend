@@ -85,12 +85,8 @@ export const transformDataset = async (dataset_id: number, config_id: number) =>
             configId: config_id
         }
     }
-    try {
-        const response = await apiClientDataset.datasetServiceTransformDataset(request, getAuthInitOverrides())
-        return response;
-    } catch (error) {
-        console.log("Error transforming the dataset:" + error);
-    }
+    const response = await apiClientDataset.datasetServiceTransformDataset(request, getAuthInitOverrides())
+    return response;
 }
 
 export const deleteDataset = async (dataset_id: number) => {

@@ -57,7 +57,8 @@ const TransformPage = () => {
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
     const [columns, setColumns] = useState<Array<Array<string | undefined> | undefined>>();
     const [nRows, setNRows] = useState<number>(0);
-
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
         if (id) {
@@ -126,10 +127,21 @@ const TransformPage = () => {
     };
     const applyTransformation = async (configId: number | null) => {
         if (!configId) return;
-        const response = await transformDataset(datasetId, configId);
-        // Implement the transformation logic for selected configurations
-        if (response?.result) {
-            router.push("/dataset");
+        try {
+            const response = await transformDataset(datasetId, configId);
+            console.log("RESPONSE: ", response)
+            // Implement the transformation logic for selected configurations
+            if (response?.result) {
+                router.push("/dataset");
+            }
+        } catch (error) {
+            // Safely check if error is an instance of Error
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage('An unexpected error occurred');
+            }
+            setShowErrorModal(true);
         }
     };
 
@@ -140,9 +152,14 @@ const TransformPage = () => {
             setMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
                 setSelectedSubListField(filteredMetadata[0].columnName);
+                // set default value for these two values in the configuration to the first column name
                 setConfig(prev => ({
                     ...prev,
                     ['subFieldListField']: filteredMetadata[0]?.columnName
+                }));
+                setConfig(prev => ({
+                    ...prev,
+                    ['subFieldRegexField']: filteredMetadata[0]?.columnName
                 }));
             }
         }
@@ -178,17 +195,11 @@ const TransformPage = () => {
         }
     }
 
-    const handleSelectSubRegexChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedSubRegexField(event.target.value);
-        setConfig(prev => ({ ...prev, ['subFieldRegexField']: event.target.value }));
-
-    };
 
     useEffect(() => {
         if (id) {
             try {
                 handleGetConfigs();
-                console.log("CONFIGS:", configs)
                 getDatasetMetadata();
             } catch (error) {
                 alert("Error getting the data");
@@ -232,8 +243,29 @@ const TransformPage = () => {
                             <MdOutlineAdd size={30} />
                             <p className='ml-2 text-md'> Add a configuration </p>
                         </button>
+                        {/* Modal for showing error messages */}
+                        <Modal
+                            show={showErrorModal}
+                            onClose={() => setShowErrorModal(false)}
+                        >
+                            <Modal.Body>
+                                <div className="text-center ">
+                                    <div className="space-y-6">
+                                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                            Error
+                                        </p>
+                                        <div>{errorMessage}</div>
+                                    </div>
+                                    <div className="flex justify-center gap-4 mt-4 ">
+
+                                        <Button color="failure" onClick={() => setShowErrorModal(false)}>Close</Button>
+                                    </div>
+                                </div>
+                            </Modal.Body>
+
+                        </Modal>
                         <div className='flex w-full'>
-                            <div className=" mt-5 overflow-x-auto w-full h-full border  border-gray-300 rounded ml-3">
+                            <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
                                 <Table hoverable>
                                     <Table.Head>
                                         {metadata?.map((meta) =>
@@ -259,7 +291,7 @@ const TransformPage = () => {
                                     </Table.Body>
                                 </Table>
                             </div >
-                            <div className="mt-5 ml-10 overflow-auto w-1/2 rounded  border border-gray-300 pt-4">
+                            <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
                                 <div>
                                     {configs.map((config) => (
                                         <>
@@ -483,7 +515,7 @@ const TransformPage = () => {
                                                 name="subFieldRegexField"
                                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                 value={selectedSubRegexField}
-                                                onChange={handleSelectSubRegexChange}  // This will be updated next
+                                                onChange={handleChange}  // This will be updated next
                                             >
                                                 {metadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
@@ -491,8 +523,8 @@ const TransformPage = () => {
                                                     </option>
                                                 ))}
                                             </select>
-                                            <label htmlFor="subFieldRegex" className="block text-sm font-medium text-gray-700">Regex expression to be substituted</label>
-                                            <textarea name="subFieldRegex" id="subFieldRegex" placeholder='^allergy[1-3]$' onChange={handleChange} className="mt-1 block w-1/2  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                                            <label htmlFor="subFieldRegexRegex" className="block text-sm font-medium text-gray-700">Regex expression to be substituted</label>
+                                            <textarea name="subFieldRegexRegex" id="subFieldRegexRegex" placeholder='^allergy[1-3]$' onChange={handleChange} className="mt-1 block w-1/2  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                                             <label htmlFor="subFieldRegexReplacement" className="block text-sm font-medium text-gray-700">Replacement string</label>
                                             <textarea name="subFieldRegexReplacement" id="subFieldRegexReplacement" placeholder='ALLERGY_ID' onChange={handleChange} className="mt-1 block w-1/2  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                                         </div>
