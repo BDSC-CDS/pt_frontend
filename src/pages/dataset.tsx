@@ -200,10 +200,10 @@ export default function Dataset() {
                 <p className='m-8'> Please log in to consult your datasets.</p>
             }
             {isLoggedIn &&
-                <div className="flex flex-col items-end p-5">
+                <div className="flex flex-col items-center p-5">
                     <button
                         onClick={() => setIsUploadModalOpen(true)}
-                        className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                        className="fixed right-10 flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                         <MdOutlineAdd size={30} />
                         <p className='ml-2 text-sm'> Upload</p>
                     </button>
@@ -260,50 +260,54 @@ export default function Dataset() {
                             <Button onClick={() => submitCSVToBackend()}>Save</Button>
                         </Modal.Footer>
                     </Modal>
+                    {datasetsList.length > 0 ? (
+                        <div className="mt-20 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
 
-                    <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-                        <Table hoverable>
-                            <Table.Head>
-                                <Table.HeadCell>Dataset ID</Table.HeadCell>
-                                <Table.HeadCell>Dataset name</Table.HeadCell>
-                                <Table.HeadCell>Date created</Table.HeadCell>
-                                <Table.HeadCell>
-                                    <span className="sr-only">Edit</span>
-                                </Table.HeadCell>
-                            </Table.Head>
-                            <Table.Body className="divide-y">
-                                {datasetsList.map((dataset) => (
-                                    < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                    >
-                                        <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
-                                            {dataset.id}
-                                        </Table.Cell>
-                                        <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {dataset.datasetName}
-                                        </Table.Cell>
-                                        <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
-                                        < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                            <a onMouseEnter={() => handleMenuOpen(dataset.id)} className="text-gray-900 hover:text-blue-500">
-                                                <MdMoreHoriz size={20} />
-                                            </a>
-                                            {openMenuId === dataset.id && (
-                                                <div className="dropdown-menu">
-                                                    <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
-                                                        <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                            onClick={() => handleTransform(dataset.id)}>Transform</li>
-                                                        <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                            onClick={() => handleDelete(dataset.id)}>Delete</li>
-                                                    </ul>
-                                                </div>
-                                            )}
+                            <Table hoverable>
+                                <Table.Head>
+                                    <Table.HeadCell>Dataset ID</Table.HeadCell>
+                                    <Table.HeadCell>Dataset name</Table.HeadCell>
+                                    <Table.HeadCell>Date created</Table.HeadCell>
+                                    <Table.HeadCell>
+                                        <span className="sr-only">Edit</span>
+                                    </Table.HeadCell>
+                                </Table.Head>
+                                <Table.Body className="divide-y">
+                                    {datasetsList.map((dataset) => (
+                                        < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                        >
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
+                                                {dataset.id}
+                                            </Table.Cell>
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                {dataset.datasetName}
+                                            </Table.Cell>
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
+                                            < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
+                                                <a onMouseEnter={() => handleMenuOpen(dataset.id)} className="text-gray-900 hover:text-blue-500">
+                                                    <MdMoreHoriz size={20} />
+                                                </a>
+                                                {openMenuId === dataset.id && (
+                                                    <div className="dropdown-menu">
+                                                        <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                onClick={() => handleTransform(dataset.id)}>Transform</li>
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                onClick={() => handleDelete(dataset.id)}>Delete</li>
+                                                        </ul>
+                                                    </div>
+                                                )}
 
-                                        </Table.Cell>
+                                            </Table.Cell>
 
-                                    </Table.Row>
-                                ))}
-                            </Table.Body>
-                        </Table>
-                    </div >
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        </div >
+                    ) : (
+                        <div className="text-center text-gray-500 mt-20">No datasets yet</div>
+                    )}
                 </div >
             }
         </>
