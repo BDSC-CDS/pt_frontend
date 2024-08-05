@@ -1114,6 +1114,8 @@ definitions:
         type: string
       type:
         type: string
+      identifier:
+        type: string
   templatebackendQuestionnaire:
     type: object
     properties:
@@ -1297,6 +1299,8 @@ definitions:
         type: string
       types:
         type: string
+      identifiers:
+        type: string
     title: Create a Dataset
   templatebackendStoreDatasetResult:
     type: object
@@ -1321,11 +1325,9 @@ definitions:
   templatebackendTransformDatasetResult:
     type: object
     properties:
-      columns:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/templatebackendColumn'
+      id:
+        type: integer
+        format: int64
   templatebackendUpdatePasswordReply:
     type: object
     properties:

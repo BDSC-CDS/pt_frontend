@@ -134,7 +134,7 @@ const TransformPage = () => {
             console.log("RESPONSE: ", response)
             // Implement the transformation logic for selected configurations
             if (response?.result) {
-                router.push("/dataset");
+                router.push("/dataset/" + response.result.id);
             }
         } catch (error) {
             // Safely check if error is an instance of Error
