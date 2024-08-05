@@ -31,6 +31,8 @@ models/TemplatebackendCreateUserReply.ts
 models/TemplatebackendCreateUserResult.ts
 models/TemplatebackendCredentials.ts
 models/TemplatebackendDataset.ts
+models/TemplatebackendDeleteConfigReply.ts
+models/TemplatebackendDeleteConfigResult.ts
 models/TemplatebackendDeleteDatasetReply.ts
 models/TemplatebackendDeleteDatasetResult.ts
 models/TemplatebackendDeleteQuestionnaireReply.ts

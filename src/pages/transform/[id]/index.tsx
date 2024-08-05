@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { createConfig, getConfigs } from "../../../utils/config"
+import { createConfig, getConfigs, deleteConfig } from "../../../utils/config"
 import { useEffect, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
@@ -59,6 +59,8 @@ const TransformPage = () => {
     const [nRows, setNRows] = useState<number>(0);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
         if (id) {
@@ -194,7 +196,22 @@ const TransformPage = () => {
             }
         }
     }
+    const handleMenuOpen = (id: number | undefined) => {
+        if (id) {
+            setOpenMenuId(id);
+        }
+    };
 
+    const handleMenuClose = () => {
+        setOpenMenuId(null);
+    };
+
+    const handleDeleteConfig = async (id: number | undefined) => {
+        if (id) {
+            const response = await deleteConfig(id);
+            handleGetConfigs();
+        }
+    };
 
     useEffect(() => {
         if (id) {
@@ -304,16 +321,35 @@ const TransformPage = () => {
                                                         className="form-checkbox h-5 w-5 mr-4 mt-2"
                                                     />
                                                     <div className='w-full'>
-                                                        <button
-                                                            onClick={() => toggleConfig(config.id)}
-                                                            className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
-                                                        >
-                                                            Configuration {config.id}
-                                                            {/* <span className={`ml-2 transform ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'} transition-transform`}> */}
-                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
-                                                                ▼
-                                                            </span>
-                                                        </button>
+                                                        <div className='flex ' onMouseLeave={handleMenuClose}>
+                                                            <button
+                                                                onClick={() => toggleConfig(config.id)}
+                                                                className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
+                                                            >
+                                                                Configuration {config.id}
+                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
+                                                                    ▼
+                                                                </span>
+                                                            </button>
+                                                            <div className='flex justify-start items-center'>
+                                                                <a
+                                                                    onMouseEnter={() => handleMenuOpen(config.id)}
+
+                                                                    className="text-gray-900 hover:text-blue-500">
+                                                                    <MdMoreHoriz size={20} />
+                                                                </a>
+                                                                {openMenuId === config.id && (
+                                                                    <div className="dropdown-menu">
+                                                                        <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                                onClick={() => handleDeleteConfig(config.id)}>Delete</li>
+                                                                        </ul>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+
                                                         {openConfigId === config.id && (
                                                             <div className="mt-2 bg-white p-2">
                                                                 {config.hasScrambleField && (
@@ -396,9 +432,6 @@ const TransformPage = () => {
                                                 <hr className="border-t border-gray-300 my-4" />
                                             </>
                                         ))
-
-
-
                                         }
                                     </div>
                                 </div>

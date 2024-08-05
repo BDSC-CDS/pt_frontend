@@ -127,6 +127,12 @@ export interface TemplatebackendConfig {
      * @memberof TemplatebackendConfig
      */
     createdAt?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof TemplatebackendConfig
+     */
+    deletedAt?: Date;
 }
 
 /**
@@ -166,6 +172,7 @@ export function TemplatebackendConfigFromJSONTyped(json: any, ignoreDiscriminato
         'subFieldRegexRegex': !exists(json, 'subFieldRegexRegex') ? undefined : json['subFieldRegexRegex'],
         'subFieldRegexReplacement': !exists(json, 'subFieldRegexReplacement') ? undefined : json['subFieldRegexReplacement'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
+        'deletedAt': !exists(json, 'deletedAt') ? undefined : (new Date(json['deletedAt'])),
     };
 }
 
@@ -196,6 +203,7 @@ export function TemplatebackendConfigToJSON(value?: TemplatebackendConfig | null
         'subFieldRegexRegex': value.subFieldRegexRegex,
         'subFieldRegexReplacement': value.subFieldRegexReplacement,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
+        'deletedAt': value.deletedAt === undefined ? undefined : (value.deletedAt.toISOString()),
     };
 }
 
