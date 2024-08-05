@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { TemplatebackendColumn } from './TemplatebackendColumn';
-import {
-    TemplatebackendColumnFromJSON,
-    TemplatebackendColumnFromJSONTyped,
-    TemplatebackendColumnToJSON,
-} from './TemplatebackendColumn';
-
 /**
  * 
  * @export
@@ -28,10 +21,10 @@ import {
 export interface TemplatebackendTransformDatasetResult {
     /**
      * 
-     * @type {Array<TemplatebackendColumn>}
+     * @type {number}
      * @memberof TemplatebackendTransformDatasetResult
      */
-    columns?: Array<TemplatebackendColumn>;
+    id?: number;
 }
 
 /**
@@ -53,7 +46,7 @@ export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ig
     }
     return {
         
-        'columns': !exists(json, 'columns') ? undefined : ((json['columns'] as Array<any>).map(TemplatebackendColumnFromJSON)),
+        'id': !exists(json, 'id') ? undefined : json['id'],
     };
 }
 
@@ -66,7 +59,7 @@ export function TemplatebackendTransformDatasetResultToJSON(value?: Templateback
     }
     return {
         
-        'columns': value.columns === undefined ? undefined : ((value.columns as Array<any>).map(TemplatebackendColumnToJSON)),
+        'id': value.id,
     };
 }
 

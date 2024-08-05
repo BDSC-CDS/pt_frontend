@@ -55,6 +55,12 @@ export interface TemplatebackendMetadata {
      * @memberof TemplatebackendMetadata
      */
     type?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplatebackendMetadata
+     */
+    identifier?: string;
 }
 
 /**
@@ -82,6 +88,7 @@ export function TemplatebackendMetadataFromJSONTyped(json: any, ignoreDiscrimina
         'columnId': !exists(json, 'columnId') ? undefined : json['columnId'],
         'columnName': !exists(json, 'columnName') ? undefined : json['columnName'],
         'type': !exists(json, 'type') ? undefined : json['type'],
+        'identifier': !exists(json, 'identifier') ? undefined : json['identifier'],
     };
 }
 
@@ -100,6 +107,7 @@ export function TemplatebackendMetadataToJSON(value?: TemplatebackendMetadata | 
         'columnId': value.columnId,
         'columnName': value.columnName,
         'type': value.type,
+        'identifier': value.identifier,
     };
 }
 

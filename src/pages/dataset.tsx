@@ -20,6 +20,7 @@ export default function Dataset() {
     const [fileName, setFileName] = useState('');
     const [csvString, setCsvString] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
+    const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
@@ -75,14 +76,12 @@ export default function Dataset() {
         }
         Papa.parse(file, {
             complete: (result) => {
-                // const data = result.data as Record<string, any>[];
                 if (result.data.length === 0) {
                     alert("No data found in the CSV.");
                     event.target.value = '';
                     return;
                 }
-                // setCsvData(result.data);
-                console.log(result.data)
+
                 // Get headers (column names)
                 if (!result.data[0]) {
                     console.log("First item is undefined, which shouldn't happen.");
@@ -92,6 +91,13 @@ export default function Dataset() {
                 //detect types
                 const initialTypes = detectColumnTypes(result.data as Record<string, any>[]);
                 setColumnTypes(initialTypes);
+
+                // Initialize columnIdentifying with default values
+                const initialIdentifying: ColumnTypes = {};
+                Object.keys(initialTypes).forEach(key => {
+                    initialIdentifying[key] = 'identifier';
+                });
+                setColumnIdentifying(initialIdentifying);
                 // read data
                 const headers = Object.keys(result.data[0]);
                 console.log("headers: ", headers)
@@ -103,7 +109,6 @@ export default function Dataset() {
                         return headers.map(fieldName => `"${String(record[fieldName] || '').replace(/"/g, '""')}"`).join(',')
                     })
                 ).join('\\n');
-                console.log("CSV Format String: ", csvString);
                 // set variable
                 setCsvString(csvString);
             },
@@ -128,7 +133,10 @@ export default function Dataset() {
     const setColumnType = (column: string, type: string) => {
         setColumnTypes(prev => ({ ...prev, [column]: type }));
     };
-
+    const setColumnIdentifying_ = (column: string, type: string) => {
+        console.log("SERT COLUMN IDENTIFIER: ", column, " AT VALUE ", type)
+        setColumnIdentifying(prev => ({ ...prev, [column]: type }));
+    };
     const processCSV = async () => {
         if (fileName == '') {
             alert("You must input a name for the dataset.")
@@ -136,7 +144,6 @@ export default function Dataset() {
         }
         // check that there is not already a dataset with same name
         const all_names = datasetsList.map((dataset) => dataset.datasetName);
-        console.log(all_names.indexOf(fileName) > -1)
         if (all_names.indexOf(fileName) > -1) {
             alert("There already is a dataset with this name.")
             return;
@@ -152,7 +159,8 @@ export default function Dataset() {
     const submitCSVToBackend = async () => {
         try {
             const types = JSON.stringify(columnTypes)
-            const response = await storeDataset(fileName, csvString, types);
+            const identifiers = JSON.stringify(columnIdentifying)
+            const response = await storeDataset(fileName, csvString, types, identifiers);
             if (!response) {
                 alert('Failed to upload CSV');
             }
@@ -236,22 +244,43 @@ export default function Dataset() {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-
                     <Modal show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
                         <Modal.Header>
-                            Edit Column Types
+                            Data information
                         </Modal.Header>
                         <Modal.Body>
                             <div className="space-y-4">
+                                <div className="flex items-center justify-between font-bold">
+                                    <span className="w-1/2">Column Name</span>
+                                    <div className="flex space-x-4 w-1/2">
+                                        <span className="w-1/2">Type</span>
+                                        <span className="w-1/2">Identifier</span>
+                                    </div>
+                                </div>
                                 {Object.keys(columnTypes).map((column, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <span>{column}:</span>
-                                        <select value={columnTypes[column]} onChange={(e) => setColumnType(column, e.target.value)} className="select select-bordered">
-                                            <option value="string">String</option>
-                                            <option value="int">Integer</option>
-                                            <option value="float">Float</option>
-                                            <option value="date">Date</option>
-                                        </select>
+                                        <span className="w-1/2">{column}:</span>
+                                        <div className="flex space-x-4 w-1/2">
+                                            <select
+                                                value={columnTypes[column]}
+                                                onChange={(e) => setColumnType(column, e.target.value)}
+                                                className="select select-bordered w-1/2"
+                                            >
+                                                <option value="string">String</option>
+                                                <option value="int">Integer</option>
+                                                <option value="float">Float</option>
+                                                <option value="date">Date</option>
+                                            </select>
+                                            <select
+                                                value={columnIdentifying[column]}
+                                                onChange={(e) => setColumnIdentifying_(column, e.target.value)}
+                                                className="select select-bordered w-1/2"
+                                            >
+                                                <option value="identifier">Identifier</option>
+                                                <option value="quasi-identifier">Quasi-identifier</option>
+                                                <option value="non-identifying">Non-identifying</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -260,6 +289,8 @@ export default function Dataset() {
                             <Button onClick={() => submitCSVToBackend()}>Save</Button>
                         </Modal.Footer>
                     </Modal>
+
+
                     {datasetsList.length > 0 ? (
                         <div className="mt-20 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
 

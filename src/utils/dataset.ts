@@ -14,14 +14,16 @@ import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index
  * @param dataset The content of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
-export const storeDataset = async (dataset_name: string, dataset: string, types: string) => {
+export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string) => {
     const d: DatasetServiceStoreDatasetRequest = {
         body: {
             datasetName: dataset_name,
             dataset: dataset,
-            types: types
+            types: types,
+            identifiers: identifiers,
         }
     };
+    console.log("REQUEST SENT: ", d.body)
 
     try {
         const response = await apiClientDataset.datasetServiceStoreDataset(d, getAuthInitOverrides());
