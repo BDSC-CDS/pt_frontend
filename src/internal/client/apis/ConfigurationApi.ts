@@ -18,6 +18,7 @@ import type {
   RpcStatus,
   TemplatebackendConfig,
   TemplatebackendCreateConfigReply,
+  TemplatebackendDeleteConfigReply,
   TemplatebackendGetConfigsReply,
 } from '../models/index';
 import {
@@ -27,12 +28,18 @@ import {
     TemplatebackendConfigToJSON,
     TemplatebackendCreateConfigReplyFromJSON,
     TemplatebackendCreateConfigReplyToJSON,
+    TemplatebackendDeleteConfigReplyFromJSON,
+    TemplatebackendDeleteConfigReplyToJSON,
     TemplatebackendGetConfigsReplyFromJSON,
     TemplatebackendGetConfigsReplyToJSON,
 } from '../models/index';
 
 export interface ConfigServiceCreateConfigRequest {
     body: TemplatebackendConfig;
+}
+
+export interface ConfigServiceDeleteConfigRequest {
+    id: number;
 }
 
 /**
@@ -76,6 +83,42 @@ export class ConfigurationApi extends runtime.BaseAPI {
      */
     async configServiceCreateConfig(requestParameters: ConfigServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateConfigReply> {
         const response = await this.configServiceCreateConfigRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint deletes a config
+     * Deletes a config
+     */
+    async configServiceDeleteConfigRaw(requestParameters: ConfigServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteConfigReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configServiceDeleteConfig.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/config/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendDeleteConfigReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint deletes a config
+     * Deletes a config
+     */
+    async configServiceDeleteConfig(requestParameters: ConfigServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteConfigReply> {
+        const response = await this.configServiceDeleteConfigRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

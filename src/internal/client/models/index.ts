@@ -24,6 +24,8 @@ export * from './TemplatebackendCreateUserReply';
 export * from './TemplatebackendCreateUserResult';
 export * from './TemplatebackendCredentials';
 export * from './TemplatebackendDataset';
+export * from './TemplatebackendDeleteConfigReply';
+export * from './TemplatebackendDeleteConfigResult';
 export * from './TemplatebackendDeleteDatasetReply';
 export * from './TemplatebackendDeleteDatasetResult';
 export * from './TemplatebackendDeleteQuestionnaireReply';

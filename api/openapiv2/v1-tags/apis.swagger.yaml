@@ -280,6 +280,29 @@ paths:
       tags:
         - AuditLog
       x-openapi-router-controller: audit_log_controller
+  /api/v1/config/{id}:
+    delete:
+      summary: Deletes a config
+      description: This endpoint deletes a config
+      operationId: ConfigService_DeleteConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendDeleteConfigReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Configuration
+      x-openapi-router-controller: config_generator_controller
   /api/v1/dataset:
     get:
       summary: List datasets
@@ -785,6 +808,9 @@ definitions:
       createdAt:
         type: string
         format: date-time
+      deletedAt:
+        type: string
+        format: date-time
   templatebackendCreateConfigReply:
     type: object
     properties:
@@ -900,6 +926,16 @@ definitions:
       deletedAt:
         type: string
         format: date-time
+  templatebackendDeleteConfigReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendDeleteConfigResult'
+  templatebackendDeleteConfigResult:
+    type: object
+    properties:
+      success:
+        type: boolean
   templatebackendDeleteDatasetReply:
     type: object
     properties:
