@@ -113,7 +113,7 @@ export default function Dataset() {
                 // set variable
                 setCsvString(csvString);
                 // Set preview (first 5 rows)
-                setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => row[header] || ''))]);
+                setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => (row as Record<string, any>)[header] || ''))]);
 
             },
             header: true,
