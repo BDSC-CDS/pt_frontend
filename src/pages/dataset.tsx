@@ -23,6 +23,7 @@ export default function Dataset() {
     const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
 
     const handleMenuOpen = (id: number | undefined) => {
         if (id) {
@@ -111,6 +112,9 @@ export default function Dataset() {
                 ).join('\\n');
                 // set variable
                 setCsvString(csvString);
+                // Set preview (first 5 rows)
+                setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => row[header] || ''))]);
+
             },
             header: true,
         });
@@ -250,6 +254,24 @@ export default function Dataset() {
                         </Modal.Header>
                         <Modal.Body>
                             <div className="space-y-4">
+                                <div className="mb-4">
+                                    <Table className="text-xs border border-slate-400 rounded">
+                                        <Table.Head>
+                                            {csvPreview[0]?.map((header, index) => (
+                                                <Table.HeadCell className="text-xs" key={index}>{header}</Table.HeadCell>
+                                            ))}
+                                        </Table.Head>
+                                        <Table.Body>
+                                            {csvPreview.slice(1).map((row, rowIndex) => (
+                                                <Table.Row key={rowIndex}>
+                                                    {row.map((cell, cellIndex) => (
+                                                        <Table.Cell key={cellIndex} className='py-1'>{cell}</Table.Cell>
+                                                    ))}
+                                                </Table.Row>
+                                            ))}
+                                        </Table.Body>
+                                    </Table>
+                                </div>
                                 <div className="flex items-center justify-between font-bold">
                                     <span className="w-1/2">Column Name</span>
                                     <div className="flex space-x-4 w-1/2">
