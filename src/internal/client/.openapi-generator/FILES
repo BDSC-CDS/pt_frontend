@@ -69,6 +69,8 @@ models/TemplatebackendQuestionnaireQuestionReply.ts
 models/TemplatebackendQuestionnaireReply.ts
 models/TemplatebackendQuestionnaireVersion.ts
 models/TemplatebackendResetPasswordReply.ts
+models/TemplatebackendRevertDatasetReply.ts
+models/TemplatebackendRevertDatasetRequest.ts
 models/TemplatebackendStoreDatasetReply.ts
 models/TemplatebackendStoreDatasetRequest.ts
 models/TemplatebackendStoreDatasetResult.ts

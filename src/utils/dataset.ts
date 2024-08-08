@@ -5,6 +5,7 @@ import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetReques
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
+import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
 
 
 /**
@@ -100,5 +101,20 @@ export const deleteDataset = async (dataset_id: number) => {
         return response;
     } catch (error) {
         console.log("Error deleting the dataset:" + error);
+    }
+}
+
+
+export const revertDataset = async (dataset_id: number) => {
+    const request: DatasetServiceRevertDatasetRequest = {
+        body: {
+            id: dataset_id
+        }
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceRevertDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error reverting the dataset:" + error);
     }
 }
