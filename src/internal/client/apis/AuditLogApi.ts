@@ -28,12 +28,16 @@ import {
 export interface AuditLogServiceGetLogsRequest {
     offset?: number;
     limit?: number;
+    filters?: string;
+    sortBy?: string;
 }
 
 export interface AuditLogServiceGetLogsForUserRequest {
     userid: number;
     offset?: number;
     limit?: number;
+    filters?: string;
+    sortBy?: string;
 }
 
 /**
@@ -54,6 +58,14 @@ export class AuditLogApi extends runtime.BaseAPI {
 
         if (requestParameters.limit !== undefined) {
             queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.filters !== undefined) {
+            queryParameters['filters'] = requestParameters.filters;
+        }
+
+        if (requestParameters.sortBy !== undefined) {
+            queryParameters['sortBy'] = requestParameters.sortBy;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -98,6 +110,14 @@ export class AuditLogApi extends runtime.BaseAPI {
 
         if (requestParameters.limit !== undefined) {
             queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.filters !== undefined) {
+            queryParameters['filters'] = requestParameters.filters;
+        }
+
+        if (requestParameters.sortBy !== undefined) {
+            queryParameters['sortBy'] = requestParameters.sortBy;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

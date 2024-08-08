@@ -34,7 +34,7 @@ export default function AuditLogging() {
     };
 
     useEffect(() => {
-        getListAuditLogs(undefined, undefined,);
+        getListAuditLogs();
     }, []);
 
     useEffect(() => {
@@ -125,7 +125,10 @@ export default function AuditLogging() {
     const currentLogs = filteredAuditLogsList.slice(indexOfFirstRow, indexOfLastRow);
     const totalPages = Math.ceil(filteredAuditLogsList.length / rowsPerPage);
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber: number) => {
+        if (pageNumber < 1 || pageNumber > totalPages) return;
+        setCurrentPage(pageNumber);
+    };
 
     return (
         <>
@@ -205,14 +208,14 @@ export default function AuditLogging() {
                     </div>
                     <div className="flex mt-5 justify-center items-center space-x-2">
                         <button
-                            onClick={() => setCurrentPage(1)}
+                            onClick={() => paginate(1)}
                             className={`px-2 py-1 rounded ${currentPage === 1 ? 'bg-gray-300' : 'bg-gray-200'}`}
                             disabled={currentPage === 1}
                         >
                             {'<<'}
                         </button>
                         <button
-                            onClick={() => setCurrentPage(currentPage - 1)}
+                            onClick={() => paginate(currentPage - 1)}
                             className={`px-2 py-1 rounded ${currentPage === 1 ? 'bg-gray-300' : 'bg-gray-200'}`}
                             disabled={currentPage === 1}
                         >
@@ -220,14 +223,14 @@ export default function AuditLogging() {
                         </button>
                         <span>Page {currentPage} of {totalPages}</span>
                         <button
-                            onClick={() => setCurrentPage(currentPage + 1)}
+                            onClick={() => paginate(currentPage + 1)}
                             className={`px-2 py-1 rounded ${currentPage === totalPages ? 'bg-gray-300' : 'bg-gray-200'}`}
                             disabled={currentPage === totalPages}
                         >
                             {'>'}
                         </button>
                         <button
-                            onClick={() => setCurrentPage(totalPages)}
+                            onClick={() => paginate(totalPages)}
                             className={`px-2 py-1 rounded ${currentPage === totalPages ? 'bg-gray-300' : 'bg-gray-200'}`}
                             disabled={currentPage === totalPages}
                         >
