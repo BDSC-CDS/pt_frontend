@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import TabsComponent from '../../../components/Tabs';
 import dynamic from "next/dynamic";
 import { Table } from 'flowbite-react';
-import { getMetadata, getDatasetContent } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
@@ -42,6 +42,16 @@ const DatasetPage = () => {
     const handleTransform = async () => {
         if (datasetId) {
             router.push(`/transform/${datasetId}`);
+        }
+    };
+    const handleReverse = async () => {
+        if (datasetId) {
+            const response = await revertDataset(datasetId);
+            if (response && response?.id) {
+                router.push(`/dataset/${response.id}`);
+            } else {
+                alert("The dataset has not been transformed and therefore cannot be reversed.");
+            }
         }
     };
 
@@ -90,6 +100,8 @@ const DatasetPage = () => {
                         </Table>
                     </div >
                     <button onClick={handleTransform} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Transform </button>
+                    <button onClick={handleReverse} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Reverse </button>
+
                 </>
             }
         </>

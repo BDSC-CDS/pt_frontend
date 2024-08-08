@@ -62,6 +62,8 @@ export * from './TemplatebackendQuestionnaireQuestionReply';
 export * from './TemplatebackendQuestionnaireReply';
 export * from './TemplatebackendQuestionnaireVersion';
 export * from './TemplatebackendResetPasswordReply';
+export * from './TemplatebackendRevertDatasetReply';
+export * from './TemplatebackendRevertDatasetRequest';
 export * from './TemplatebackendStoreDatasetReply';
 export * from './TemplatebackendStoreDatasetRequest';
 export * from './TemplatebackendStoreDatasetResult';
