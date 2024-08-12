@@ -17,7 +17,7 @@ export default function AuditLogging() {
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [logDetails, setLogDetails] = useState('');
     const { isLoggedIn } = useAuth();
-    const [filters, setFilters] = useState<{ userId?: string; action?: string; createdAtFrom?: string; createdAtTo?: string }>({});
+    const [filters, setFilters] = useState<{ userId?: string; action?: string; createdAtFrom?: string; createdAtTo?: string; service?: string; body?: string; response?: string; error?: string }>({});
 
     const getListAuditLogs = async (offset?: number, limit?: number) => {
         try {
@@ -62,6 +62,26 @@ export default function AuditLogging() {
         if (filters.createdAtTo) {
             filteredLogs = filteredLogs.filter(log =>
                 new Date(log.createdAt) <= new Date(filters.createdAtTo!)
+            );
+        }
+        if (filters.service) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.service?.toLowerCase().includes(filters.service!.toLowerCase())
+            );
+        }
+        if (filters.body) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.body?.toLowerCase().includes(filters.body!.toLowerCase())
+            );
+        }
+        if (filters.response) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.response?.toLowerCase().includes(filters.response!.toLowerCase())
+            );
+        }
+        if (filters.error) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.error?.toLowerCase().includes(filters.error!.toLowerCase())
             );
         }
 
@@ -162,6 +182,32 @@ export default function AuditLogging() {
                             <input
                                 type="date"
                                 onChange={(e) => handleFilterChange(e, 'createdAtTo')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                        </div>
+                        <div className="flex space-x-2 w-full">
+                            <input
+                                type="text"
+                                placeholder="Filter by service"
+                                onChange={(e) => handleFilterChange(e, 'service')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Filter by body"
+                                onChange={(e) => handleFilterChange(e, 'body')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Filter by response"
+                                onChange={(e) => handleFilterChange(e, 'response')}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Filter by error"
+                                onChange={(e) => handleFilterChange(e, 'error')}
                                 className="w-full p-2 border border-gray-300 rounded"
                             />
                         </div>
