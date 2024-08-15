@@ -97,8 +97,27 @@ const TransformPage = () => {
                 setHassubFieldRegex(target.checked);
             }
             setConfig(prev => ({ ...prev, [target.name]: target.checked }));
-        } else if (target.name === 'subFieldListSubstitute') {
+        }
+
+        // Handle date shift range updates
+        else if (target.name === 'dateShiftLowrange' || target.name === 'dateShiftHighrange') {
+            const newValue = parseInt(target.value, 10);
+            // Update the dateShiftRange state
+            setDateShiftRange(prev => ({
+                ...prev,
+                [target.name === 'dateShiftLowrange' ? 'low' : 'high']: newValue,
+            }));
+            // Update the config with the new values
+            setConfig(prev => ({
+                ...prev,
+                dateShiftLowrange: target.name === 'dateShiftLowrange' ? newValue : prev.dateShiftLowrange,
+                dateShiftHighrange: target.name === 'dateShiftHighrange' ? newValue : prev.dateShiftHighrange,
+            }));
+        }
+
+        else if (target.name === 'subFieldListSubstitute') {
             setConfig(prev => ({ ...prev, ['subFieldListSubstitute']: target.value.split(',').map(item => item.trim()) }));
+
         } else {
             setConfig(prev => ({ ...prev, [target.name]: target.value }));
         }
