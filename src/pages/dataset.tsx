@@ -3,7 +3,7 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets } from "../utils/dataset"
+import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -20,8 +20,22 @@ export default function Dataset() {
     const [fileName, setFileName] = useState('');
     const [csvString, setCsvString] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
+    const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
     const { isLoggedIn } = useAuth();
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
 
+    const handleMenuOpen = (id: number | undefined) => {
+        if (id) {
+            setOpenMenuId(id);
+        }
+    };
+
+    const handleMenuClose = () => {
+        setOpenMenuId(null);
+        getListDatasets();
+
+    };
 
     const getListDatasets = async (offset?: number, limit?: number) => {
         // Call API
@@ -40,6 +54,7 @@ export default function Dataset() {
             setDatasetsList(result);
         }
     }
+
     useEffect(() => {
         try {
             getListDatasets();
@@ -62,14 +77,12 @@ export default function Dataset() {
         }
         Papa.parse(file, {
             complete: (result) => {
-                // const data = result.data as Record<string, any>[];
                 if (result.data.length === 0) {
                     alert("No data found in the CSV.");
                     event.target.value = '';
                     return;
                 }
-                // setCsvData(result.data);
-                console.log(result.data)
+
                 // Get headers (column names)
                 if (!result.data[0]) {
                     console.log("First item is undefined, which shouldn't happen.");
@@ -79,6 +92,13 @@ export default function Dataset() {
                 //detect types
                 const initialTypes = detectColumnTypes(result.data as Record<string, any>[]);
                 setColumnTypes(initialTypes);
+
+                // Initialize columnIdentifying with default values
+                const initialIdentifying: ColumnTypes = {};
+                Object.keys(initialTypes).forEach(key => {
+                    initialIdentifying[key] = 'identifier';
+                });
+                setColumnIdentifying(initialIdentifying);
                 // read data
                 const headers = Object.keys(result.data[0]);
                 console.log("headers: ", headers)
@@ -90,9 +110,11 @@ export default function Dataset() {
                         return headers.map(fieldName => `"${String(record[fieldName] || '').replace(/"/g, '""')}"`).join(',')
                     })
                 ).join('\\n');
-                console.log("CSV Format String: ", csvString);
                 // set variable
                 setCsvString(csvString);
+                // Set preview (first 5 rows)
+                setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => (row as Record<string, any>)[header] || ''))]);
+
             },
             header: true,
         });
@@ -115,7 +137,10 @@ export default function Dataset() {
     const setColumnType = (column: string, type: string) => {
         setColumnTypes(prev => ({ ...prev, [column]: type }));
     };
-
+    const setColumnIdentifying_ = (column: string, type: string) => {
+        console.log("SERT COLUMN IDENTIFIER: ", column, " AT VALUE ", type)
+        setColumnIdentifying(prev => ({ ...prev, [column]: type }));
+    };
     const processCSV = async () => {
         if (fileName == '') {
             alert("You must input a name for the dataset.")
@@ -123,7 +148,6 @@ export default function Dataset() {
         }
         // check that there is not already a dataset with same name
         const all_names = datasetsList.map((dataset) => dataset.datasetName);
-        console.log(all_names.indexOf(fileName) > -1)
         if (all_names.indexOf(fileName) > -1) {
             alert("There already is a dataset with this name.")
             return;
@@ -139,7 +163,8 @@ export default function Dataset() {
     const submitCSVToBackend = async () => {
         try {
             const types = JSON.stringify(columnTypes)
-            const response = await storeDataset(fileName, csvString, types);
+            const identifiers = JSON.stringify(columnIdentifying)
+            const response = await storeDataset(fileName, csvString, types, identifiers);
             if (!response) {
                 alert('Failed to upload CSV');
             }
@@ -157,9 +182,24 @@ export default function Dataset() {
         getListDatasets();
     };
     const router = useRouter();
+
     const handleRowClick = (id: number | undefined) => {
         if (id) {
             router.push(`/dataset/${id}`);
+        }
+    };
+
+    const handleTransform = async (id: number | undefined) => {
+        if (id) {
+            // const config_id = 1;
+            // const response = await transformDataset(id, config_id);
+            router.push(`/transform/${id}`);
+        }
+    };
+    const handleDelete = async (id: number | undefined) => {
+        if (id) {
+            const response = await deleteDataset(id);
+            getListDatasets();
         }
     };
 
@@ -172,10 +212,10 @@ export default function Dataset() {
                 <p className='m-8'> Please log in to consult your datasets.</p>
             }
             {isLoggedIn &&
-                <div className="flex flex-col items-end p-5">
+                <div className="flex flex-col items-center p-5">
                     <button
                         onClick={() => setIsUploadModalOpen(true)}
-                        className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                        className="fixed right-10 flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                         <MdOutlineAdd size={30} />
                         <p className='ml-2 text-sm'> Upload</p>
                     </button>
@@ -208,22 +248,61 @@ export default function Dataset() {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-
                     <Modal show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
                         <Modal.Header>
-                            Edit Column Types
+                            Data information
                         </Modal.Header>
                         <Modal.Body>
                             <div className="space-y-4">
+                                <div className="mb-4">
+                                    <Table className="text-xs border border-slate-400 rounded">
+                                        <Table.Head>
+                                            {csvPreview[0]?.map((header, index) => (
+                                                <Table.HeadCell className="text-xs" key={index}>{header}</Table.HeadCell>
+                                            ))}
+                                        </Table.Head>
+                                        <Table.Body>
+                                            {csvPreview.slice(1).map((row, rowIndex) => (
+                                                <Table.Row key={rowIndex}>
+                                                    {row.map((cell, cellIndex) => (
+                                                        <Table.Cell key={cellIndex} className='py-1'>{cell}</Table.Cell>
+                                                    ))}
+                                                </Table.Row>
+                                            ))}
+                                        </Table.Body>
+                                    </Table>
+                                </div>
+                                <div className="flex items-center justify-between font-bold">
+                                    <span className="w-1/2">Column Name</span>
+                                    <div className="flex space-x-4 w-1/2">
+                                        <span className="w-1/2">Type</span>
+                                        <span className="w-1/2">Identifier</span>
+                                    </div>
+                                </div>
                                 {Object.keys(columnTypes).map((column, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <span>{column}:</span>
-                                        <select value={columnTypes[column]} onChange={(e) => setColumnType(column, e.target.value)} className="select select-bordered">
-                                            <option value="string">String</option>
-                                            <option value="int">Integer</option>
-                                            <option value="float">Float</option>
-                                            <option value="date">Date</option>
-                                        </select>
+                                        <span className="w-1/2">{column}:</span>
+                                        <div className="flex space-x-4 w-1/2">
+                                            <select
+                                                value={columnTypes[column]}
+                                                onChange={(e) => setColumnType(column, e.target.value)}
+                                                className="select select-bordered w-1/2"
+                                            >
+                                                <option value="string">String</option>
+                                                <option value="int">Integer</option>
+                                                <option value="float">Float</option>
+                                                <option value="date">Date</option>
+                                            </select>
+                                            <select
+                                                value={columnIdentifying[column]}
+                                                onChange={(e) => setColumnIdentifying_(column, e.target.value)}
+                                                className="select select-bordered w-1/2"
+                                            >
+                                                <option value="identifier">Identifier</option>
+                                                <option value="quasi-identifier">Quasi-identifier</option>
+                                                <option value="non-identifying">Non-identifying</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -233,38 +312,55 @@ export default function Dataset() {
                         </Modal.Footer>
                     </Modal>
 
-                    <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-                        <Table hoverable>
-                            <Table.Head>
-                                <Table.HeadCell>Dataset ID</Table.HeadCell>
-                                <Table.HeadCell>Dataset name</Table.HeadCell>
-                                <Table.HeadCell>Date created</Table.HeadCell>
-                                <Table.HeadCell>
-                                    <span className="sr-only">Edit</span>
-                                </Table.HeadCell>
-                            </Table.Head>
-                            <Table.Body className="divide-y">
-                                {datasetsList.map((dataset) => (
-                                    < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => handleRowClick(dataset.id)}
-                                    >
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {dataset.id}
-                                        </Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {dataset.datasetName}
-                                        </Table.Cell>
-                                        <Table.Cell> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
-                                        < Table.Cell >
-                                            <a href="#" onClick={(e) => e.stopPropagation()}>
-                                                <MdMoreHoriz size={20} />
-                                            </a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                ))}
-                            </Table.Body>
-                        </Table>
-                    </div >
+
+                    {datasetsList.length > 0 ? (
+                        <div className="mt-20 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
+
+                            <Table hoverable>
+                                <Table.Head>
+                                    <Table.HeadCell>Dataset ID</Table.HeadCell>
+                                    <Table.HeadCell>Dataset name</Table.HeadCell>
+                                    <Table.HeadCell>Date created</Table.HeadCell>
+                                    <Table.HeadCell>
+                                        <span className="sr-only">Edit</span>
+                                    </Table.HeadCell>
+                                </Table.Head>
+                                <Table.Body className="divide-y">
+                                    {datasetsList.map((dataset) => (
+                                        < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                        >
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
+                                                {dataset.id}
+                                            </Table.Cell>
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                {dataset.datasetName}
+                                            </Table.Cell>
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
+                                            < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
+                                                <a onMouseEnter={() => handleMenuOpen(dataset.id)} className="text-gray-900 hover:text-blue-500">
+                                                    <MdMoreHoriz size={20} />
+                                                </a>
+                                                {openMenuId === dataset.id && (
+                                                    <div className="dropdown-menu">
+                                                        <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                onClick={() => handleTransform(dataset.id)}>Transform</li>
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                onClick={() => handleDelete(dataset.id)}>Delete</li>
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                            </Table.Cell>
+
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        </div >
+                    ) : (
+                        <div className="text-center text-gray-500 mt-20">No datasets yet</div>
+                    )}
                 </div >
             }
         </>

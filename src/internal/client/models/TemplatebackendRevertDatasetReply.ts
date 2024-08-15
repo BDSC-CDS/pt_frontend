@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendTransformDatasetResult
+ * @interface TemplatebackendRevertDatasetReply
  */
-export interface TemplatebackendTransformDatasetResult {
+export interface TemplatebackendRevertDatasetReply {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendTransformDatasetResult
+     * @memberof TemplatebackendRevertDatasetReply
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendTransformDatasetResult interface.
+ * Check if a given object implements the TemplatebackendRevertDatasetReply interface.
  */
-export function instanceOfTemplatebackendTransformDatasetResult(value: object): boolean {
+export function instanceOfTemplatebackendRevertDatasetReply(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendTransformDatasetResultFromJSON(json: any): TemplatebackendTransformDatasetResult {
-    return TemplatebackendTransformDatasetResultFromJSONTyped(json, false);
+export function TemplatebackendRevertDatasetReplyFromJSON(json: any): TemplatebackendRevertDatasetReply {
+    return TemplatebackendRevertDatasetReplyFromJSONTyped(json, false);
 }
 
-export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendTransformDatasetResult {
+export function TemplatebackendRevertDatasetReplyFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendRevertDatasetReply {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ig
     };
 }
 
-export function TemplatebackendTransformDatasetResultToJSON(value?: TemplatebackendTransformDatasetResult | null): any {
+export function TemplatebackendRevertDatasetReplyToJSON(value?: TemplatebackendRevertDatasetReply | null): any {
     if (value === undefined) {
         return undefined;
     }

@@ -87,10 +87,10 @@ export interface TemplatebackendConfig {
     dateShiftHighrange?: number;
     /**
      * 
-     * @type {Array<string>}
+     * @type {string}
      * @memberof TemplatebackendConfig
      */
-    subFieldListFields?: Array<string>;
+    subFieldListField?: string;
     /**
      * 
      * @type {Array<string>}
@@ -105,10 +105,10 @@ export interface TemplatebackendConfig {
     subFieldListReplacement?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {string}
      * @memberof TemplatebackendConfig
      */
-    subFieldRegexFields?: Array<string>;
+    subFieldRegexField?: string;
     /**
      * 
      * @type {string}
@@ -127,6 +127,12 @@ export interface TemplatebackendConfig {
      * @memberof TemplatebackendConfig
      */
     createdAt?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof TemplatebackendConfig
+     */
+    deletedAt?: Date;
 }
 
 /**
@@ -159,13 +165,14 @@ export function TemplatebackendConfigFromJSONTyped(json: any, ignoreDiscriminato
         'scrambleFieldFields': !exists(json, 'scrambleFieldFields') ? undefined : json['scrambleFieldFields'],
         'dateShiftLowrange': !exists(json, 'dateShiftLowrange') ? undefined : json['dateShiftLowrange'],
         'dateShiftHighrange': !exists(json, 'dateShiftHighrange') ? undefined : json['dateShiftHighrange'],
-        'subFieldListFields': !exists(json, 'subFieldListFields') ? undefined : json['subFieldListFields'],
+        'subFieldListField': !exists(json, 'subFieldListField') ? undefined : json['subFieldListField'],
         'subFieldListSubstitute': !exists(json, 'subFieldListSubstitute') ? undefined : json['subFieldListSubstitute'],
         'subFieldListReplacement': !exists(json, 'subFieldListReplacement') ? undefined : json['subFieldListReplacement'],
-        'subFieldRegexFields': !exists(json, 'subFieldRegexFields') ? undefined : json['subFieldRegexFields'],
+        'subFieldRegexField': !exists(json, 'subFieldRegexField') ? undefined : json['subFieldRegexField'],
         'subFieldRegexRegex': !exists(json, 'subFieldRegexRegex') ? undefined : json['subFieldRegexRegex'],
         'subFieldRegexReplacement': !exists(json, 'subFieldRegexReplacement') ? undefined : json['subFieldRegexReplacement'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
+        'deletedAt': !exists(json, 'deletedAt') ? undefined : (new Date(json['deletedAt'])),
     };
 }
 
@@ -189,13 +196,14 @@ export function TemplatebackendConfigToJSON(value?: TemplatebackendConfig | null
         'scrambleFieldFields': value.scrambleFieldFields,
         'dateShiftLowrange': value.dateShiftLowrange,
         'dateShiftHighrange': value.dateShiftHighrange,
-        'subFieldListFields': value.subFieldListFields,
+        'subFieldListField': value.subFieldListField,
         'subFieldListSubstitute': value.subFieldListSubstitute,
         'subFieldListReplacement': value.subFieldListReplacement,
-        'subFieldRegexFields': value.subFieldRegexFields,
+        'subFieldRegexField': value.subFieldRegexField,
         'subFieldRegexRegex': value.subFieldRegexRegex,
         'subFieldRegexReplacement': value.subFieldRegexReplacement,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
+        'deletedAt': value.deletedAt === undefined ? undefined : (value.deletedAt.toISOString()),
     };
 }
 

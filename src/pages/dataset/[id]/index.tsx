@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import TabsComponent from '../../../components/Tabs';
 import dynamic from "next/dynamic";
 import { Table } from 'flowbite-react';
-import { getMetadata, getDatasetContent } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
@@ -39,6 +39,22 @@ const DatasetPage = () => {
             }
         }
     }
+    const handleTransform = async () => {
+        if (datasetId) {
+            router.push(`/transform/${datasetId}`);
+        }
+    };
+    const handleReverse = async () => {
+        if (datasetId) {
+            const response = await revertDataset(datasetId);
+            if (response && response?.id) {
+                router.push(`/dataset/${response.id}`);
+            } else {
+                alert("The dataset has not been transformed and therefore cannot be reversed.");
+            }
+        }
+    };
+
     useEffect(() => {
         if (id) {
             try {
@@ -56,40 +72,37 @@ const DatasetPage = () => {
                 <p className='m-8'> Please log in to consult your datasets.</p>
             }
             {isLoggedIn &&
-                <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded ml-3">
-                    <Table hoverable>
-                        <Table.Head>
-                            {metadata?.map((meta) =>
-                                <Table.HeadCell>{meta.columnName}</Table.HeadCell>
-                            )}
-                            {/* <Table.HeadCell>
-                            <span className="sr-only">Edit</span>
-                        </Table.HeadCell> */}
-                        </Table.Head>
-                        <Table.Body className="divide-y">
+                <>
+                    <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded ml-3">
+                        <Table hoverable>
+                            <Table.Head>
+                                {metadata?.map((meta) =>
+                                    <Table.HeadCell>{meta.columnName}</Table.HeadCell>
+                                )}
 
-                            {/* {columns?.map((element) => ( */}
-                            {Array.from({ length: nRows }, (_, index) => (
-                                < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                // onClick={() => handleRowClick(dataset.id)}
-                                >
-                                    {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                    {columns?.map((col, colIndex) => (
+                            </Table.Head>
+                            <Table.Body className="divide-y">
 
-                                        <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {col?.at(index)}
-                                        </Table.Cell>
-                                    ))}
-                                    {/* < Table.Cell >
-                                    <a href="#" onClick={(e) => e.stopPropagation()}>
-                                        <MdMoreHoriz size={20} />
-                                    </a>
-                                </Table.Cell> */}
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
-                </div >
+                                {Array.from({ length: nRows }, (_, index) => (
+                                    < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
+                                        {columns?.map((col, colIndex) => (
+
+                                            <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                {col?.at(index)}
+                                            </Table.Cell>
+                                        ))}
+
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table>
+                    </div >
+                    <button onClick={handleTransform} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Transform </button>
+                    <button onClick={handleReverse} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Reverse </button>
+
+                </>
             }
         </>
     );

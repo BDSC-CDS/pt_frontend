@@ -20,6 +20,8 @@ import type {
   TemplatebackendGetDatasetContentReply,
   TemplatebackendGetDatasetMetadataReply,
   TemplatebackendListDatasetsReply,
+  TemplatebackendRevertDatasetReply,
+  TemplatebackendRevertDatasetRequest,
   TemplatebackendStoreDatasetReply,
   TemplatebackendStoreDatasetRequest,
   TemplatebackendTransformDatasetReply,
@@ -36,6 +38,10 @@ import {
     TemplatebackendGetDatasetMetadataReplyToJSON,
     TemplatebackendListDatasetsReplyFromJSON,
     TemplatebackendListDatasetsReplyToJSON,
+    TemplatebackendRevertDatasetReplyFromJSON,
+    TemplatebackendRevertDatasetReplyToJSON,
+    TemplatebackendRevertDatasetRequestFromJSON,
+    TemplatebackendRevertDatasetRequestToJSON,
     TemplatebackendStoreDatasetReplyFromJSON,
     TemplatebackendStoreDatasetReplyToJSON,
     TemplatebackendStoreDatasetRequestFromJSON,
@@ -63,6 +69,10 @@ export interface DatasetServiceGetDatasetMetadataRequest {
 export interface DatasetServiceListDatasetsRequest {
     offset?: number;
     limit?: number;
+}
+
+export interface DatasetServiceRevertDatasetRequest {
+    body: TemplatebackendRevertDatasetRequest;
 }
 
 export interface DatasetServiceStoreDatasetRequest {
@@ -231,6 +241,45 @@ export class DatasetApi extends runtime.BaseAPI {
      */
     async datasetServiceListDatasets(requestParameters: DatasetServiceListDatasetsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendListDatasetsReply> {
         const response = await this.datasetServiceListDatasetsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint reverts a dataset
+     * Revert a dataset
+     */
+    async datasetServiceRevertDatasetRaw(requestParameters: DatasetServiceRevertDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendRevertDatasetReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceRevertDataset.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/revert`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendRevertDatasetRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendRevertDatasetReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint reverts a dataset
+     * Revert a dataset
+     */
+    async datasetServiceRevertDataset(requestParameters: DatasetServiceRevertDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendRevertDatasetReply> {
+        const response = await this.datasetServiceRevertDatasetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

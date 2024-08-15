@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendTransformDatasetResult
+ * @interface TemplatebackendCreateReplyResult
  */
-export interface TemplatebackendTransformDatasetResult {
+export interface TemplatebackendCreateReplyResult {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendTransformDatasetResult
+     * @memberof TemplatebackendCreateReplyResult
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendTransformDatasetResult interface.
+ * Check if a given object implements the TemplatebackendCreateReplyResult interface.
  */
-export function instanceOfTemplatebackendTransformDatasetResult(value: object): boolean {
+export function instanceOfTemplatebackendCreateReplyResult(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendTransformDatasetResultFromJSON(json: any): TemplatebackendTransformDatasetResult {
-    return TemplatebackendTransformDatasetResultFromJSONTyped(json, false);
+export function TemplatebackendCreateReplyResultFromJSON(json: any): TemplatebackendCreateReplyResult {
+    return TemplatebackendCreateReplyResultFromJSONTyped(json, false);
 }
 
-export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendTransformDatasetResult {
+export function TemplatebackendCreateReplyResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendCreateReplyResult {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ig
     };
 }
 
-export function TemplatebackendTransformDatasetResultToJSON(value?: TemplatebackendTransformDatasetResult | null): any {
+export function TemplatebackendCreateReplyResultToJSON(value?: TemplatebackendCreateReplyResult | null): any {
     if (value === undefined) {
         return undefined;
     }

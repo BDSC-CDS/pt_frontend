@@ -23,7 +23,7 @@ export default function AuditLogging() {
         try {
             const response = await listAuditLogs(offset, limit);
             if (response?.logs) {
-                const sortedLogs = response.logs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                const sortedLogs = response.logs.filter(l => l.createdAt).sort((a, b) => (b?.createdAt?.getTime() || 0) - (a?.createdAt?.getTime() || 0));
                 setOriginalAuditLogsList(sortedLogs);
                 setFilteredAuditLogsList(sortedLogs);
             }
@@ -56,12 +56,12 @@ export default function AuditLogging() {
         }
         if (filters.createdAtFrom) {
             filteredLogs = filteredLogs.filter(log =>
-                new Date(log.createdAt) >= new Date(filters.createdAtFrom!)
+                log?.createdAt || new Date() >= new Date(filters.createdAtFrom!)
             );
         }
         if (filters.createdAtTo) {
             filteredLogs = filteredLogs.filter(log =>
-                new Date(log.createdAt) <= new Date(filters.createdAtTo!)
+                log?.createdAt || new Date() <= new Date(filters.createdAtTo!)
             );
         }
         if (filters.service) {
@@ -81,7 +81,8 @@ export default function AuditLogging() {
         }
         if (filters.error) {
             filteredLogs = filteredLogs.filter(log =>
-                log.error?.toLowerCase().includes(filters.error!.toLowerCase())
+                // log.error?.toLowerCase().includes(filters.error!.toLowerCase())
+                log.error
             );
         }
 
@@ -128,8 +129,7 @@ export default function AuditLogging() {
         );
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
+    const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat('en-GB', {
             day: '2-digit',
             month: '2-digit',
@@ -238,13 +238,14 @@ export default function AuditLogging() {
                                                     </div>
                                                     <div className="ml-3">
                                                         {log.user?.firstName} {log.user?.lastName}<br />
-                                                        <span className="text-sm text-gray-500">{log.user?.role}</span>
+                                                        <span className="text-sm text-gray-500">{log.user?.roles}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-2 border">{log.action}</td>
                                             <td className="px-4 py-2 border">
-                                                {formatDate(log.createdAt)}
+                                                {formatDate(log.createdAt || new Date())}
+                                                {/* <TimeAgo date={log.createdAt || ''} /> */}
                                             </td>
                                         </tr>
                                     ))

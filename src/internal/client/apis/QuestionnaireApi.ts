@@ -18,6 +18,10 @@ import type {
   RpcStatus,
   TemplatebackendCreateQuestionnaireReply,
   TemplatebackendCreateQuestionnaireRequest,
+  TemplatebackendCreateQuestionnaireVersionReply,
+  TemplatebackendCreateQuestionnaireVersionRequest,
+  TemplatebackendCreateReplyReply,
+  TemplatebackendCreateReplyRequest,
   TemplatebackendDeleteQuestionnaireReply,
   TemplatebackendGetQuestionnaireReply,
   TemplatebackendGetReplyReply,
@@ -31,6 +35,14 @@ import {
     TemplatebackendCreateQuestionnaireReplyToJSON,
     TemplatebackendCreateQuestionnaireRequestFromJSON,
     TemplatebackendCreateQuestionnaireRequestToJSON,
+    TemplatebackendCreateQuestionnaireVersionReplyFromJSON,
+    TemplatebackendCreateQuestionnaireVersionReplyToJSON,
+    TemplatebackendCreateQuestionnaireVersionRequestFromJSON,
+    TemplatebackendCreateQuestionnaireVersionRequestToJSON,
+    TemplatebackendCreateReplyReplyFromJSON,
+    TemplatebackendCreateReplyReplyToJSON,
+    TemplatebackendCreateReplyRequestFromJSON,
+    TemplatebackendCreateReplyRequestToJSON,
     TemplatebackendDeleteQuestionnaireReplyFromJSON,
     TemplatebackendDeleteQuestionnaireReplyToJSON,
     TemplatebackendGetQuestionnaireReplyFromJSON,
@@ -47,6 +59,14 @@ export interface QuestionnaireServiceCreateQuestionnaireRequest {
     body: TemplatebackendCreateQuestionnaireRequest;
 }
 
+export interface QuestionnaireServiceCreateQuestionnaireVersionRequest {
+    body: TemplatebackendCreateQuestionnaireVersionRequest;
+}
+
+export interface QuestionnaireServiceCreateReplyRequest {
+    body: TemplatebackendCreateReplyRequest;
+}
+
 export interface QuestionnaireServiceDeleteQuestionnaireRequest {
     id: string;
 }
@@ -56,8 +76,7 @@ export interface QuestionnaireServiceGetQuestionnaireRequest {
 }
 
 export interface QuestionnaireServiceGetReplyRequest {
-    questionnaireVersionId: number;
-    replyId: number;
+    id: number;
 }
 
 export interface QuestionnaireServiceListQuestionnaireRequest {
@@ -66,7 +85,6 @@ export interface QuestionnaireServiceListQuestionnaireRequest {
 }
 
 export interface QuestionnaireServiceListRepliesRequest {
-    questionnaireVersionId: number;
     offset?: number;
     limit?: number;
 }
@@ -112,6 +130,84 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      */
     async questionnaireServiceCreateQuestionnaire(requestParameters: QuestionnaireServiceCreateQuestionnaireRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateQuestionnaireReply> {
         const response = await this.questionnaireServiceCreateQuestionnaireRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint creates a questionnaire version
+     * Create a questionnaire version
+     */
+    async questionnaireServiceCreateQuestionnaireVersionRaw(requestParameters: QuestionnaireServiceCreateQuestionnaireVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateQuestionnaireVersionReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling questionnaireServiceCreateQuestionnaireVersion.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/questionnaire/version`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendCreateQuestionnaireVersionRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendCreateQuestionnaireVersionReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint creates a questionnaire version
+     * Create a questionnaire version
+     */
+    async questionnaireServiceCreateQuestionnaireVersion(requestParameters: QuestionnaireServiceCreateQuestionnaireVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateQuestionnaireVersionReply> {
+        const response = await this.questionnaireServiceCreateQuestionnaireVersionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allows ceating a user\'s questionnaires reply
+     * Create questionnaires reply
+     */
+    async questionnaireServiceCreateReplyRaw(requestParameters: QuestionnaireServiceCreateReplyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateReplyReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling questionnaireServiceCreateReply.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/questionnaire/replies`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendCreateReplyRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendCreateReplyReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allows ceating a user\'s questionnaires reply
+     * Create questionnaires reply
+     */
+    async questionnaireServiceCreateReply(requestParameters: QuestionnaireServiceCreateReplyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateReplyReply> {
+        const response = await this.questionnaireServiceCreateReplyRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -192,12 +288,8 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      * Get a questionnaires reply
      */
     async questionnaireServiceGetReplyRaw(requestParameters: QuestionnaireServiceGetReplyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetReplyReply>> {
-        if (requestParameters.questionnaireVersionId === null || requestParameters.questionnaireVersionId === undefined) {
-            throw new runtime.RequiredError('questionnaireVersionId','Required parameter requestParameters.questionnaireVersionId was null or undefined when calling questionnaireServiceGetReply.');
-        }
-
-        if (requestParameters.replyId === null || requestParameters.replyId === undefined) {
-            throw new runtime.RequiredError('replyId','Required parameter requestParameters.replyId was null or undefined when calling questionnaireServiceGetReply.');
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling questionnaireServiceGetReply.');
         }
 
         const queryParameters: any = {};
@@ -209,7 +301,7 @@ export class QuestionnaireApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/questionnaire/{questionnaireVersionId}/replies/{replyId}`.replace(`{${"questionnaireVersionId"}}`, encodeURIComponent(String(requestParameters.questionnaireVersionId))).replace(`{${"replyId"}}`, encodeURIComponent(String(requestParameters.replyId))),
+            path: `/api/v1/questionnaire/replies/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -272,10 +364,6 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      * List questionnaires replies
      */
     async questionnaireServiceListRepliesRaw(requestParameters: QuestionnaireServiceListRepliesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendListRepliesReply>> {
-        if (requestParameters.questionnaireVersionId === null || requestParameters.questionnaireVersionId === undefined) {
-            throw new runtime.RequiredError('questionnaireVersionId','Required parameter requestParameters.questionnaireVersionId was null or undefined when calling questionnaireServiceListReplies.');
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -293,7 +381,7 @@ export class QuestionnaireApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/questionnaire/{questionnaireVersionId}/replies`.replace(`{${"questionnaireVersionId"}}`, encodeURIComponent(String(requestParameters.questionnaireVersionId))),
+            path: `/api/v1/questionnaire/replies`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -306,7 +394,7 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      * This endpoint allows listing a user\'s questionnaires replies
      * List questionnaires replies
      */
-    async questionnaireServiceListReplies(requestParameters: QuestionnaireServiceListRepliesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendListRepliesReply> {
+    async questionnaireServiceListReplies(requestParameters: QuestionnaireServiceListRepliesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendListRepliesReply> {
         const response = await this.questionnaireServiceListRepliesRaw(requestParameters, initOverrides);
         return await response.value();
     }

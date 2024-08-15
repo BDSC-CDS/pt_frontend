@@ -1,10 +1,11 @@
 import apiClientDataset from './apiClientDataset';
-import {getAuthInitOverrides} from './authContext'
+import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
+import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
 
 
 /**
@@ -14,14 +15,16 @@ import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index
  * @param dataset The content of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
-export const storeDataset = async (dataset_name: string, dataset: string, types: string) => {
+export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string) => {
     const d: DatasetServiceStoreDatasetRequest = {
         body: {
             datasetName: dataset_name,
             dataset: dataset,
-            types: types
+            types: types,
+            identifiers: identifiers,
         }
     };
+    console.log("REQUEST SENT: ", d.body)
 
     try {
         const response = await apiClientDataset.datasetServiceStoreDataset(d, getAuthInitOverrides());
@@ -77,3 +80,41 @@ export const getDatasetContent = async (id: number, offset?: number, limit?: num
         console.log("Error getting the dataset content:" + error);
     }
 };
+
+export const transformDataset = async (dataset_id: number, config_id: number) => {
+    const request: DatasetServiceTransformDatasetRequest = {
+        body: {
+            datasetId: dataset_id,
+            configId: config_id
+        }
+    }
+    const response = await apiClientDataset.datasetServiceTransformDataset(request, getAuthInitOverrides())
+    return response;
+}
+
+export const deleteDataset = async (dataset_id: number) => {
+    const request: DatasetServiceDeleteDatasetRequest = {
+        id: dataset_id
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceDeleteDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error deleting the dataset:" + error);
+    }
+}
+
+
+export const revertDataset = async (dataset_id: number) => {
+    const request: DatasetServiceRevertDatasetRequest = {
+        body: {
+            id: dataset_id
+        }
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceRevertDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error reverting the dataset:" + error);
+    }
+}

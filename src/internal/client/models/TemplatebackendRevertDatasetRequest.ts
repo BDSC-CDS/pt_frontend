@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendTransformDatasetResult
+ * @interface TemplatebackendRevertDatasetRequest
  */
-export interface TemplatebackendTransformDatasetResult {
+export interface TemplatebackendRevertDatasetRequest {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendTransformDatasetResult
+     * @memberof TemplatebackendRevertDatasetRequest
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendTransformDatasetResult interface.
+ * Check if a given object implements the TemplatebackendRevertDatasetRequest interface.
  */
-export function instanceOfTemplatebackendTransformDatasetResult(value: object): boolean {
+export function instanceOfTemplatebackendRevertDatasetRequest(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendTransformDatasetResultFromJSON(json: any): TemplatebackendTransformDatasetResult {
-    return TemplatebackendTransformDatasetResultFromJSONTyped(json, false);
+export function TemplatebackendRevertDatasetRequestFromJSON(json: any): TemplatebackendRevertDatasetRequest {
+    return TemplatebackendRevertDatasetRequestFromJSONTyped(json, false);
 }
 
-export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendTransformDatasetResult {
+export function TemplatebackendRevertDatasetRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendRevertDatasetRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ig
     };
 }
 
-export function TemplatebackendTransformDatasetResultToJSON(value?: TemplatebackendTransformDatasetResult | null): any {
+export function TemplatebackendRevertDatasetRequestToJSON(value?: TemplatebackendRevertDatasetRequest | null): any {
     if (value === undefined) {
         return undefined;
     }

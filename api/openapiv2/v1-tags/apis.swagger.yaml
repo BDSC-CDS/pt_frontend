@@ -296,6 +296,29 @@ paths:
       tags:
         - AuditLog
       x-openapi-router-controller: audit_log_controller
+  /api/v1/config/{id}:
+    delete:
+      summary: Deletes a config
+      description: This endpoint deletes a config
+      operationId: ConfigService_DeleteConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendDeleteConfigReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Configuration
+      x-openapi-router-controller: config_generator_controller
   /api/v1/dataset:
     get:
       summary: List datasets
@@ -399,6 +422,29 @@ paths:
           required: true
           type: integer
           format: int64
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/revert:
+    post:
+      summary: Revert a dataset
+      description: This endpoint reverts a dataset
+      operationId: DatasetService_RevertDataset
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendRevertDatasetReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendRevertDatasetRequest'
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
@@ -548,6 +594,104 @@ paths:
       tags:
         - Questionnaire
       x-openapi-router-controller: questionnaire_controller
+  /api/v1/questionnaire/replies:
+    get:
+      summary: List questionnaires replies
+      description: This endpoint allows listing a user's questionnaires replies
+      operationId: QuestionnaireService_ListReplies
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendListRepliesReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: offset
+          description: uint32 questionnaire_version_id = 1;
+          in: query
+          required: false
+          type: integer
+          format: int64
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int64
+      tags:
+        - Questionnaire
+      x-openapi-router-controller: questionnaire_controller
+    post:
+      summary: Create questionnaires reply
+      description: This endpoint allows ceating a user's questionnaires reply
+      operationId: QuestionnaireService_CreateReply
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendCreateReplyReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendCreateReplyRequest'
+      tags:
+        - Questionnaire
+      x-openapi-router-controller: questionnaire_controller
+  /api/v1/questionnaire/replies/{id}:
+    get:
+      summary: Get a questionnaires reply
+      description: This endpoint allows getting a user's questionnaires reply
+      operationId: QuestionnaireService_GetReply
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendGetReplyReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          description: uint32 questionnaire_version_id = 1;
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Questionnaire
+      x-openapi-router-controller: questionnaire_controller
+  /api/v1/questionnaire/version:
+    post:
+      summary: Create a questionnaire version
+      description: This endpoint creates a questionnaire version
+      operationId: QuestionnaireService_CreateQuestionnaireVersion
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendCreateQuestionnaireVersionReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendCreateQuestionnaireVersionRequest'
+      tags:
+        - Questionnaire
+      x-openapi-router-controller: questionnaire_controller
   /api/v1/questionnaire/{id}:
     get:
       summary: Get questionnaires
@@ -589,67 +733,6 @@ paths:
           in: path
           required: true
           type: string
-      tags:
-        - Questionnaire
-      x-openapi-router-controller: questionnaire_controller
-  /api/v1/questionnaire/{questionnaireVersionId}/replies:
-    get:
-      summary: List questionnaires replies
-      description: This endpoint allows listing a user's questionnaires replies
-      operationId: QuestionnaireService_ListReplies
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendListRepliesReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      parameters:
-        - name: questionnaireVersionId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: offset
-          in: query
-          required: false
-          type: integer
-          format: int64
-        - name: limit
-          in: query
-          required: false
-          type: integer
-          format: int64
-      tags:
-        - Questionnaire
-      x-openapi-router-controller: questionnaire_controller
-  /api/v1/questionnaire/{questionnaireVersionId}/replies/{replyId}:
-    get:
-      summary: Get a questionnaires reply
-      description: This endpoint allows getting a user's questionnaires reply
-      operationId: QuestionnaireService_GetReply
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendGetReplyReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      parameters:
-        - name: questionnaireVersionId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: replyId
-          in: path
-          required: true
-          type: integer
-          format: int64
       tags:
         - Questionnaire
       x-openapi-router-controller: questionnaire_controller
@@ -747,25 +830,24 @@ definitions:
       dateShiftHighrange:
         type: integer
         format: int32
-      subFieldListFields:
-        type: array
-        items:
-          type: string
+      subFieldListField:
+        type: string
       subFieldListSubstitute:
         type: array
         items:
           type: string
       subFieldListReplacement:
         type: string
-      subFieldRegexFields:
-        type: array
-        items:
-          type: string
+      subFieldRegexField:
+        type: string
       subFieldRegexRegex:
         type: string
       subFieldRegexReplacement:
         type: string
       createdAt:
+        type: string
+        format: date-time
+      deletedAt:
         type: string
         format: date-time
   templatebackendCreateConfigReply:
@@ -801,6 +883,42 @@ definitions:
         $ref: '#/definitions/templatebackendQuestionnaire'
     title: Message definitions for requests and responses
   templatebackendCreateQuestionnaireResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+  templatebackendCreateQuestionnaireVersionReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendCreateQuestionnaireVersionResult'
+  templatebackendCreateQuestionnaireVersionRequest:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      version:
+        $ref: '#/definitions/templatebackendQuestionnaireVersion'
+    title: Message definitions for requests and responses
+  templatebackendCreateQuestionnaireVersionResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+  templatebackendCreateReplyReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendCreateReplyResult'
+  templatebackendCreateReplyRequest:
+    type: object
+    properties:
+      reply:
+        $ref: '#/definitions/templatebackendQuestionnaireReply'
+  templatebackendCreateReplyResult:
     type: object
     properties:
       id:
@@ -847,6 +965,16 @@ definitions:
       deletedAt:
         type: string
         format: date-time
+  templatebackendDeleteConfigReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendDeleteConfigResult'
+  templatebackendDeleteConfigResult:
+    type: object
+    properties:
+      success:
+        type: boolean
   templatebackendDeleteDatasetReply:
     type: object
     properties:
@@ -1025,6 +1153,8 @@ definitions:
         type: string
       type:
         type: string
+      identifier:
+        type: string
   templatebackendQuestionnaire:
     type: object
     properties:
@@ -1148,9 +1278,11 @@ definitions:
       id:
         type: integer
         format: int64
-      questionnaireQuestionId:
+      questionnaireVersionId:
         type: integer
         format: int64
+      projectName:
+        type: string
       replies:
         type: array
         items:
@@ -1176,6 +1308,8 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/templatebackendQuestionnaireQuestion'
+      published:
+        type: boolean
       createdAt:
         type: string
         format: date-time
@@ -1190,6 +1324,18 @@ definitions:
         $ref: '#/definitions/templatebackendResetPasswordResult'
   templatebackendResetPasswordResult:
     type: object
+  templatebackendRevertDatasetReply:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+  templatebackendRevertDatasetRequest:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
   templatebackendStoreDatasetReply:
     type: object
     properties:
@@ -1203,6 +1349,8 @@ definitions:
       dataset:
         type: string
       types:
+        type: string
+      identifiers:
         type: string
     title: Create a Dataset
   templatebackendStoreDatasetResult:
@@ -1228,11 +1376,9 @@ definitions:
   templatebackendTransformDatasetResult:
     type: object
     properties:
-      columns:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/templatebackendColumn'
+      id:
+        type: integer
+        format: int64
   templatebackendUpdatePasswordReply:
     type: object
     properties:

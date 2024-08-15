@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendTransformDatasetResult
+ * @interface TemplatebackendCreateQuestionnaireVersionResult
  */
-export interface TemplatebackendTransformDatasetResult {
+export interface TemplatebackendCreateQuestionnaireVersionResult {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendTransformDatasetResult
+     * @memberof TemplatebackendCreateQuestionnaireVersionResult
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendTransformDatasetResult interface.
+ * Check if a given object implements the TemplatebackendCreateQuestionnaireVersionResult interface.
  */
-export function instanceOfTemplatebackendTransformDatasetResult(value: object): boolean {
+export function instanceOfTemplatebackendCreateQuestionnaireVersionResult(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendTransformDatasetResultFromJSON(json: any): TemplatebackendTransformDatasetResult {
-    return TemplatebackendTransformDatasetResultFromJSONTyped(json, false);
+export function TemplatebackendCreateQuestionnaireVersionResultFromJSON(json: any): TemplatebackendCreateQuestionnaireVersionResult {
+    return TemplatebackendCreateQuestionnaireVersionResultFromJSONTyped(json, false);
 }
 
-export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendTransformDatasetResult {
+export function TemplatebackendCreateQuestionnaireVersionResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendCreateQuestionnaireVersionResult {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendTransformDatasetResultFromJSONTyped(json: any, ig
     };
 }
 
-export function TemplatebackendTransformDatasetResultToJSON(value?: TemplatebackendTransformDatasetResult | null): any {
+export function TemplatebackendCreateQuestionnaireVersionResultToJSON(value?: TemplatebackendCreateQuestionnaireVersionResult | null): any {
     if (value === undefined) {
         return undefined;
     }
