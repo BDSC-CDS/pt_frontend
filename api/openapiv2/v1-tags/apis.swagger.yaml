@@ -244,6 +244,14 @@ paths:
           required: false
           type: integer
           format: int32
+        - name: filters
+          in: query
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          required: false
+          type: string
       tags:
         - AuditLog
       x-openapi-router-controller: audit_log_controller
@@ -277,6 +285,14 @@ paths:
           required: false
           type: integer
           format: int32
+        - name: filters
+          in: query
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          required: false
+          type: string
       tags:
         - AuditLog
       x-openapi-router-controller: audit_log_controller
