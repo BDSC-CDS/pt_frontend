@@ -809,6 +809,8 @@ definitions:
       tenantid:
         type: integer
         format: int64
+      configName:
+        type: string
       questionnaireid:
         type: integer
         format: int64
