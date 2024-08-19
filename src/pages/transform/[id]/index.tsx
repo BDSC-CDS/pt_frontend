@@ -52,6 +52,7 @@ const TransformPage = () => {
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
     const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [filteredMetadata, setFilteredMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
     const [selectedSubListField, setSelectedSubListField] = useState("");
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
@@ -126,6 +127,11 @@ const TransformPage = () => {
     const handleCreateConfig = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("config that is sent to backend_: ", config)
+        if (!config.configName) {
+            setErrorMessage("Please provide a configuration name.");
+            setShowErrorModal(true);
+            return;
+        }
         const response = await createConfig(config);
         if (response?.result?.id) {
             handleGetConfigs();
@@ -169,8 +175,9 @@ const TransformPage = () => {
     const getDatasetMetadata = async () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
+            setMetadata(response.metadata.metadata);
             const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
-            setMetadata(filteredMetadata);
+            setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
                 setSelectedSubListField(filteredMetadata[0].columnName);
                 // set default value for these two values in the configuration to the first column name
@@ -201,7 +208,8 @@ const TransformPage = () => {
     };
 
     const getAndProcessDatasetContent = async () => {
-        const response = await getDatasetContent(datasetId);
+        const response = await getDatasetContent(datasetId, 0, 5);
+        console.log("RESPONSE: ", response)
         if (response && response.result?.columns) {
             const result = response.result?.columns.map((col) => {
                 return col.value;
@@ -298,8 +306,9 @@ const TransformPage = () => {
                                     </div>
                                 </div>
                             </Modal.Body>
-
                         </Modal>
+
+                        {/* Dataset */}
                         <div className='flex w-full'>
                             <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
                                 <Table hoverable>
@@ -307,10 +316,8 @@ const TransformPage = () => {
                                         {metadata?.map((meta) =>
                                             <Table.HeadCell>{meta.columnName}</Table.HeadCell>
                                         )}
-
                                     </Table.Head>
                                     <Table.Body className="divide-y">
-
                                         {Array.from({ length: nRows }, (_, index) => (
                                             < Table.Row key={index} className="bg-white"
                                             >
@@ -345,7 +352,7 @@ const TransformPage = () => {
                                                                 onClick={() => toggleConfig(config.id)}
                                                                 className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
                                                             >
-                                                                Configuration {config.id}
+                                                                {config.configName || `Configuration ${config.id}`}
                                                                 <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
                                                                     ▼
                                                                 </span>
@@ -472,7 +479,21 @@ const TransformPage = () => {
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-bold mb-2">New Configuration</h2>
                                     <form onSubmit={handleCreateConfig} className="space-y-4">
-                                        {/* <input type="text" name="userid" onChange={handleChange} placeholder="User ID" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" /> */}
+                                        {/* Config Name */}
+                                        <div>
+                                            <label htmlFor="configName" className="block text-sm font-medium text-gray-700">
+                                                Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="configName"
+                                                id="configName"
+                                                value={config.configName || ''}
+                                                onChange={handleChange}
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                required
+                                            />
+                                        </div>
                                         {/* Date Shift */}
                                         <div>
                                             <label htmlFor="hasDateShift" className="block text-sm font-medium text-gray-700">Has Date Shift</label>
@@ -521,7 +542,7 @@ const TransformPage = () => {
                                                 value={selectedScrambleFields}
                                                 onChange={handleMultiSelectChange}
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>
@@ -546,7 +567,7 @@ const TransformPage = () => {
                                                 value={selectedSubListField}
                                                 onChange={handleChange}  // This will be updated next
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>
@@ -573,7 +594,7 @@ const TransformPage = () => {
                                                 value={selectedSubRegexField}
                                                 onChange={handleChange}  // This will be updated next
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>
