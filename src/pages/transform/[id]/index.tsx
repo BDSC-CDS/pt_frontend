@@ -75,8 +75,27 @@ const TransformPage = () => {
     const handleGetConfigs = async () => {
         const response = await getConfigs();
         if (response && response.result?.config && response.result?.config.length > 0) {
-            setConfigs(response.result?.config)
-            console.log(configs)
+            filterConfigs(response.result.config)
+        }
+    }
+
+    // filter the configurations to keep only those that match the dataset
+    const filterConfigs = (configs: TemplatebackendConfig[]) => {
+        if (metadata) {
+            const column_names = metadata.map(item => item.columnName)
+            const filteredconfigs = configs.filter(config => {
+                // Check if subFieldRegexField, subFieldListField, and scrambleFieldFields meet the conditions
+                const isSubFieldRegexFieldValid = !config.hassubFieldRegex || column_names.includes(config.subFieldRegexField);
+                const isSubFieldListFieldValid = !config.hassubFieldList || column_names.includes(config.subFieldListField);
+                const isScrambleFieldFieldsValid = !config.hasScrambleField ||
+                    config.scrambleFieldFields?.every(field => column_names.includes(field));
+
+                // Keep the config if all conditions are satisfied
+                return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
+            })
+            // set the configurations to those that match the dataset columns
+            console.log("filtered: ", filteredconfigs)
+            setConfigs(filteredconfigs)
         }
     }
 
@@ -243,8 +262,8 @@ const TransformPage = () => {
     useEffect(() => {
         if (id) {
             try {
-                handleGetConfigs();
                 getDatasetMetadata();
+                handleGetConfigs();
             } catch (error) {
                 alert("Error getting the data");
             }
