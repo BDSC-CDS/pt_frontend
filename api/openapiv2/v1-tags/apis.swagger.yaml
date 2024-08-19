@@ -1030,6 +1030,9 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/templatebackendColumn'
+      nRows:
+        type: integer
+        format: int64
   templatebackendGetDatasetMetadataReply:
     type: object
     properties:
