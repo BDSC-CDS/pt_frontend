@@ -32,6 +32,12 @@ export interface TemplatebackendGetDatasetContentResult {
      * @memberof TemplatebackendGetDatasetContentResult
      */
     columns?: Array<TemplatebackendColumn>;
+    /**
+     * 
+     * @type {number}
+     * @memberof TemplatebackendGetDatasetContentResult
+     */
+    nRows?: number;
 }
 
 /**
@@ -54,6 +60,7 @@ export function TemplatebackendGetDatasetContentResultFromJSONTyped(json: any, i
     return {
         
         'columns': !exists(json, 'columns') ? undefined : ((json['columns'] as Array<any>).map(TemplatebackendColumnFromJSON)),
+        'nRows': !exists(json, 'nRows') ? undefined : json['nRows'],
     };
 }
 
@@ -67,6 +74,7 @@ export function TemplatebackendGetDatasetContentResultToJSON(value?: Templatebac
     return {
         
         'columns': value.columns === undefined ? undefined : ((value.columns as Array<any>).map(TemplatebackendColumnToJSON)),
+        'nRows': value.nRows,
     };
 }
 
