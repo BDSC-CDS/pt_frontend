@@ -1,8 +1,5 @@
-import TimeAgo from 'react-timeago';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { listAuditLogs } from '../utils/auditlog';
 import { TemplatebackendAuditLog, TemplatebackendUser } from '../internal/client';
 import { useAuth } from '~/utils/authContext';
@@ -18,15 +15,33 @@ export default function AuditLogging() {
     const [logDetails, setLogDetails] = useState('');
     const { isLoggedIn } = useAuth();
     const [filters, setFilters] = useState<{ userId?: string; action?: string; createdAtFrom?: string; createdAtTo?: string; service?: string; body?: string; response?: string; error?: string }>({});
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
-    const getListAuditLogs = async (offset?: number, limit?: number) => {
+    const getListAuditLogs = async () => {
+        let allLogs : TemplatebackendAuditLog[]  = [];
+        let hasMoreLogs = true;
+        let offset = 0;
+        const limit = 100; // Number of logs per request
+
         try {
-            const response = await listAuditLogs(offset, limit);
-            if (response?.logs) {
-                const sortedLogs = response.logs.filter(l => l.createdAt).sort((a, b) => (b?.createdAt?.getTime() || 0) - (a?.createdAt?.getTime() || 0));
-                setOriginalAuditLogsList(sortedLogs);
-                setFilteredAuditLogsList(sortedLogs);
+            while (hasMoreLogs) {
+                const response = await listAuditLogs(offset, limit);
+                if (response?.logs) {
+                    allLogs = allLogs.concat(response.logs);
+
+                    if (response.logs.length < limit) {
+                        hasMoreLogs = false;
+                    } else {
+                        offset += limit;
+                    }
+                } else {
+                    hasMoreLogs = false;
+                }
             }
+
+            const sortedLogs = allLogs.filter(l => l.createdAt).sort((a, b) => (b?.createdAt?.getTime() || 0) - (a?.createdAt?.getTime() || 0));
+            setOriginalAuditLogsList(sortedLogs);
+            setFilteredAuditLogsList(sortedLogs);
         } catch (error) {
             console.error("Error listing the audit logs:", error);
             alert("Error listing the audit logs");
@@ -40,6 +55,12 @@ export default function AuditLogging() {
     useEffect(() => {
         applyFilters();
     }, [filters, currentPage]);
+
+    useEffect(() => {
+        if (sortConfig !== null) {
+            applySort();
+        }
+    }, [sortConfig, filteredAuditLogsList]);
 
     const applyFilters = () => {
         let filteredLogs = [...originalAuditLogsList];
@@ -55,13 +76,16 @@ export default function AuditLogging() {
             );
         }
         if (filters.createdAtFrom) {
+            const createdAtFrom = new Date(filters.createdAtFrom);
             filteredLogs = filteredLogs.filter(log =>
-                log?.createdAt || new Date() >= new Date(filters.createdAtFrom!)
+                log.createdAt && new Date(log.createdAt) >= createdAtFrom
             );
         }
         if (filters.createdAtTo) {
+            const createdAtTo = new Date(filters.createdAtTo);
+            createdAtTo.setDate(createdAtTo.getDate() + 1);
             filteredLogs = filteredLogs.filter(log =>
-                log?.createdAt || new Date() <= new Date(filters.createdAtTo!)
+                log.createdAt && new Date(log.createdAt) < createdAtTo
             );
         }
         if (filters.service) {
@@ -80,18 +104,49 @@ export default function AuditLogging() {
             );
         }
         if (filters.error) {
-            filteredLogs = filteredLogs.filter(log =>
-                // log.error?.toLowerCase().includes(filters.error!.toLowerCase())
-                log.error
-            );
+            filteredLogs = filteredLogs.filter(log => log.error);
         }
 
         setFilteredAuditLogsList(filteredLogs);
     };
 
+    const applySort = () => {
+        let sortedLogs = [...filteredAuditLogsList];
+        if (sortConfig !== null) {
+            sortedLogs.sort((a, b) => {
+                const aValue = sortConfig.key === 'user'
+                    ? `${a.user?.firstName} ${a.user?.lastName}`.toLowerCase()
+                    : sortConfig.key === 'action'
+                        ? a.action?.toLowerCase()
+                        : a.createdAt?.getTime();
+
+                const bValue = sortConfig.key === 'user'
+                    ? `${b.user?.firstName} ${b.user?.lastName}`.toLowerCase()
+                    : sortConfig.key === 'action'
+                        ? b.action?.toLowerCase()
+                        : b.createdAt?.getTime();
+
+                if (aValue && bValue && aValue < bValue) {
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue && bValue && aValue > bValue) {
+                    return sortConfig.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        setFilteredAuditLogsList(sortedLogs);
+    };
+
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, filterType: string) => {
         const value = e.target.value || undefined;
         setFilters({ ...filters, [filterType]: value });
+    };
+
+    const resetFilters = () => {
+        setFilters({});
+        setFilteredAuditLogsList(originalAuditLogsList);
+        setCurrentPage(1);
     };
 
     const handleLogClick = (log: TemplatebackendAuditLog | undefined) => {
@@ -140,6 +195,14 @@ export default function AuditLogging() {
         }).format(date);
     };
 
+    const requestSort = (key: string) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentLogs = filteredAuditLogsList.slice(indexOfFirstRow, indexOfLastRow);
@@ -167,22 +230,26 @@ export default function AuditLogging() {
                                 placeholder="Filter by user"
                                 onChange={(e) => handleFilterChange(e, 'userId')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.userId || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by action"
                                 onChange={(e) => handleFilterChange(e, 'action')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.action || ''}
                             />
                             <input
                                 type="date"
                                 onChange={(e) => handleFilterChange(e, 'createdAtFrom')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.createdAtFrom || ''}
                             />
                             <input
                                 type="date"
                                 onChange={(e) => handleFilterChange(e, 'createdAtTo')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.createdAtTo || ''}
                             />
                         </div>
                         <div className="flex space-x-2 w-full">
@@ -191,34 +258,47 @@ export default function AuditLogging() {
                                 placeholder="Filter by service"
                                 onChange={(e) => handleFilterChange(e, 'service')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.service || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by body"
                                 onChange={(e) => handleFilterChange(e, 'body')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.body || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by response"
                                 onChange={(e) => handleFilterChange(e, 'response')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.response || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by error"
                                 onChange={(e) => handleFilterChange(e, 'error')}
                                 className="w-full p-2 border border-gray-300 rounded"
+                                value={filters.error || ''}
                             />
                         </div>
+                    </div>
+                    <div className="flex justify-end w-full mb-4">
+                        <Button onClick={resetFilters} className="bg-red-500 text-white">Reset Filters</Button>
                     </div>
                     <div className="w-full overflow-x-auto">
                         <table className="min-w-full bg-white border border-gray-300">
                             <thead>
                                 <tr>
-                                    <th className="px-4 py-2 border">User</th>
-                                    <th className="px-4 py-2 border">Action</th>
-                                    <th className="px-4 py-2 border">Date</th>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('user')}>
+                                        User {sortConfig?.key === 'user' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                    </th>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('action')}>
+                                        Action {sortConfig?.key === 'action' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                    </th>
+                                    <th className="px-4 py-2 border cursor-pointer" onClick={() => requestSort('createdAt')}>
+                                        Date {sortConfig?.key === 'createdAt' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,7 +325,6 @@ export default function AuditLogging() {
                                             <td className="px-4 py-2 border">{log.action}</td>
                                             <td className="px-4 py-2 border">
                                                 {formatDate(log.createdAt || new Date())}
-                                                {/* <TimeAgo date={log.createdAt || ''} /> */}
                                             </td>
                                         </tr>
                                     ))
