@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/router';
 import { createConfig, getConfigs, deleteConfig } from "../../../utils/config"
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
@@ -18,6 +18,8 @@ const TransformPage = () => {
     const datasetId = Number(id);
     const { isLoggedIn } = useAuth();
     const [configs, setConfigs] = useState<TemplatebackendConfig[]>([]);
+    const [filteredConfigs, setFilteredConfigs] = useState<TemplatebackendConfig[]>([]);
+
     const [openConfigId, setOpenConfigId] = useState<number | null>(null);
     const [openDetailId, setOpenDetailId] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -52,6 +54,7 @@ const TransformPage = () => {
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
     const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [filteredMetadata, setFilteredMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
     const [selectedSubListField, setSelectedSubListField] = useState("");
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
@@ -60,6 +63,7 @@ const TransformPage = () => {
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
@@ -74,21 +78,38 @@ const TransformPage = () => {
     const handleGetConfigs = async () => {
         const response = await getConfigs();
         if (response && response.result?.config && response.result?.config.length > 0) {
-            setConfigs(response.result?.config)
-            console.log(configs)
+            setConfigs(response.result.config)
         }
     }
 
+    // // filter the configurations to keep only those that match the dataset
+    // const filterConfigs = () => {
+    //     if (!metadata) return; // Ensure metadata is available before filtering
+
+    //     const column_names = metadata.map(item => item.columnName)
+    //     const filteredconfigs = configs.filter(config => {
+    //         // Check if subFieldRegexField, subFieldListField, and scrambleFieldFields meet the conditions
+    //         const isSubFieldRegexFieldValid = !config.hassubFieldRegex || column_names.includes(config.subFieldRegexField);
+    //         const isSubFieldListFieldValid = !config.hassubFieldList || column_names.includes(config.subFieldListField);
+    //         const isScrambleFieldFieldsValid = !config.hasScrambleField ||
+    //             config.scrambleFieldFields?.every(field => column_names.includes(field));
+
+    //         // Keep the config if all conditions are satisfied
+    //         return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
+    //     })
+    //     // set the configurations to those that match the dataset columns
+    //     setConfigs(filteredconfigs)
+    // }
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target as HTMLInputElement; // Assumption made for simplicity, adjust if needed
-        console.log("type target: ", target.type, " and name: ", target.name)
         if (target.type === 'checkbox') {
             if (target.name === 'hasScrambleField') {
                 setHasScrambleField(target.checked);
             }
             else if (target.name === 'hasDateShift') {
                 setHasDateShift(target.checked);
-                console.log("hasdateshift checked: ", target.checked)
             }
             else if (target.name === 'hassubFieldList') {
                 setHassubFieldList(target.checked);
@@ -97,8 +118,27 @@ const TransformPage = () => {
                 setHassubFieldRegex(target.checked);
             }
             setConfig(prev => ({ ...prev, [target.name]: target.checked }));
-        } else if (target.name === 'subFieldListSubstitute') {
+        }
+
+        // Handle date shift range updates
+        else if (target.name === 'dateShiftLowrange' || target.name === 'dateShiftHighrange') {
+            const newValue = parseInt(target.value, 10);
+            // Update the dateShiftRange state
+            setDateShiftRange(prev => ({
+                ...prev,
+                [target.name === 'dateShiftLowrange' ? 'low' : 'high']: newValue,
+            }));
+            // Update the config with the new values
+            setConfig(prev => ({
+                ...prev,
+                dateShiftLowrange: target.name === 'dateShiftLowrange' ? newValue : prev.dateShiftLowrange,
+                dateShiftHighrange: target.name === 'dateShiftHighrange' ? newValue : prev.dateShiftHighrange,
+            }));
+        }
+
+        else if (target.name === 'subFieldListSubstitute') {
             setConfig(prev => ({ ...prev, ['subFieldListSubstitute']: target.value.split(',').map(item => item.trim()) }));
+
         } else {
             setConfig(prev => ({ ...prev, [target.name]: target.value }));
         }
@@ -106,7 +146,11 @@ const TransformPage = () => {
 
     const handleCreateConfig = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("config that is sent to backend_: ", config)
+        if (!config.configName) {
+            setErrorMessage("Please provide a configuration name.");
+            setShowErrorModal(true);
+            return;
+        }
         const response = await createConfig(config);
         if (response?.result?.id) {
             handleGetConfigs();
@@ -131,7 +175,6 @@ const TransformPage = () => {
         if (!configId) return;
         try {
             const response = await transformDataset(datasetId, configId);
-            console.log("RESPONSE: ", response)
             // Implement the transformation logic for selected configurations
             if (response?.result) {
                 router.push("/dataset/" + response.result.id);
@@ -150,8 +193,9 @@ const TransformPage = () => {
     const getDatasetMetadata = async () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
+            setMetadata(response.metadata.metadata);
             const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
-            setMetadata(filteredMetadata);
+            setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
                 setSelectedSubListField(filteredMetadata[0].columnName);
                 // set default value for these two values in the configuration to the first column name
@@ -182,13 +226,12 @@ const TransformPage = () => {
     };
 
     const getAndProcessDatasetContent = async () => {
-        const response = await getDatasetContent(datasetId);
+        const response = await getDatasetContent(datasetId, 0, 5);
         if (response && response.result?.columns) {
             const result = response.result?.columns.map((col) => {
                 return col.value;
             })
             if (result) {
-                console.log(result)
                 setColumns(result)
                 if (result[0]) {
                     setNRows(result[0].length)
@@ -214,17 +257,6 @@ const TransformPage = () => {
     };
 
     useEffect(() => {
-        if (id) {
-            try {
-                handleGetConfigs();
-                getDatasetMetadata();
-            } catch (error) {
-                alert("Error getting the data");
-            }
-        }
-    }, [id]);
-
-    useEffect(() => {
         setConfig(prev => ({
             ...prev,
             scrambleFieldFields: selectedScrambleFields
@@ -236,12 +268,63 @@ const TransformPage = () => {
             try {
                 getDatasetMetadata();
                 getAndProcessDatasetContent();
+                // handleGetConfigs();
             } catch (error) {
                 alert("Error getting the data");
             }
         }
     }, [id]);
 
+    // Fetch metadata and configs
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                const [metadataResponse, configsResponse] = await Promise.all([
+                    getMetadata(datasetId),
+                    getConfigs()
+                ]);
+
+                if (metadataResponse?.metadata?.metadata) {
+                    setMetadata(metadataResponse.metadata.metadata);
+                }
+
+                if (configsResponse?.result?.config) {
+                    setConfigs(configsResponse.result.config);
+                }
+
+                setIsLoading(false);
+            } catch (error) {
+                setErrorMessage("Error fetching data");
+                setIsLoading(false);
+            }
+        };
+
+        if (datasetId) {
+            fetchData();
+        }
+    }, [datasetId]);
+
+    // Preprocess metadata column names for efficient lookups
+    const columnNamesSet = useMemo(() => {
+        return new Set(metadata?.map(item => item.columnName));
+    }, [metadata]);
+
+    // Filter the configurations based on the metadata
+    useEffect(() => {
+        if (metadata?.length && metadata.length > 0 && configs.length > 0) {
+            const filtered = configs.filter(config => {
+                const isSubFieldRegexFieldValid = !config.hassubFieldRegex || columnNamesSet.has(config.subFieldRegexField);
+                const isSubFieldListFieldValid = !config.hassubFieldList || columnNamesSet.has(config.subFieldListField);
+                const isScrambleFieldFieldsValid = !config.hasScrambleField ||
+                    (config.scrambleFieldFields && config.scrambleFieldFields.every(field => columnNamesSet.has(field)));
+
+                return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
+            });
+
+            setFilteredConfigs(filtered);
+        }
+    }, [configs, metadata, columnNamesSet]);
     // ------------------------------- html -------------------------------------------- //
     return (
         <>
@@ -279,8 +362,9 @@ const TransformPage = () => {
                                     </div>
                                 </div>
                             </Modal.Body>
-
                         </Modal>
+
+                        {/* Dataset */}
                         <div className='flex w-full'>
                             <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
                                 <Table hoverable>
@@ -288,10 +372,8 @@ const TransformPage = () => {
                                         {metadata?.map((meta) =>
                                             <Table.HeadCell>{meta.columnName}</Table.HeadCell>
                                         )}
-
                                     </Table.Head>
                                     <Table.Body className="divide-y">
-
                                         {Array.from({ length: nRows }, (_, index) => (
                                             < Table.Row key={index} className="bg-white"
                                             >
@@ -308,10 +390,10 @@ const TransformPage = () => {
                                     </Table.Body>
                                 </Table>
                             </div >
-                            {configs.length > 0 ? (
+                            {filteredConfigs.length > 0 ? (
                                 <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
                                     <div>
-                                        {configs.map((config) => (
+                                        {filteredConfigs?.map((config) => (
                                             <>
                                                 <div key={config.id} className="mb-4 p-4 py-1 flex items-start">
                                                     <input
@@ -326,7 +408,7 @@ const TransformPage = () => {
                                                                 onClick={() => toggleConfig(config.id)}
                                                                 className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
                                                             >
-                                                                Configuration {config.id}
+                                                                {config.configName || `Configuration ${config.id}`}
                                                                 <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
                                                                     ▼
                                                                 </span>
@@ -453,7 +535,21 @@ const TransformPage = () => {
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-bold mb-2">New Configuration</h2>
                                     <form onSubmit={handleCreateConfig} className="space-y-4">
-                                        {/* <input type="text" name="userid" onChange={handleChange} placeholder="User ID" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" /> */}
+                                        {/* Config Name */}
+                                        <div>
+                                            <label htmlFor="configName" className="block text-sm font-medium text-gray-700">
+                                                Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="configName"
+                                                id="configName"
+                                                value={config.configName || ''}
+                                                onChange={handleChange}
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                required
+                                            />
+                                        </div>
                                         {/* Date Shift */}
                                         <div>
                                             <label htmlFor="hasDateShift" className="block text-sm font-medium text-gray-700">Has Date Shift</label>
@@ -502,7 +598,7 @@ const TransformPage = () => {
                                                 value={selectedScrambleFields}
                                                 onChange={handleMultiSelectChange}
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>
@@ -527,7 +623,7 @@ const TransformPage = () => {
                                                 value={selectedSubListField}
                                                 onChange={handleChange}  // This will be updated next
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>
@@ -554,7 +650,7 @@ const TransformPage = () => {
                                                 value={selectedSubRegexField}
                                                 onChange={handleChange}  // This will be updated next
                                             >
-                                                {metadata?.map((item, index) => (
+                                                {filteredMetadata?.map((item, index) => (
                                                     <option key={index} value={item.columnName}>
                                                         {item.columnName}
                                                     </option>

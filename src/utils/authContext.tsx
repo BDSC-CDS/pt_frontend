@@ -1,5 +1,4 @@
-
-import { InitOverrideFunction, HTTPRequestInit,  RequestOpts } from '../internal/client/index';
+import { InitOverrideFunction, HTTPRequestInit, RequestOpts } from '../internal/client/index';
 import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent } from 'react';
 import { getMyUser } from "./user";
 
@@ -14,20 +13,20 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthProviderProps = {
-    children: ReactNode; 
+    children: ReactNode;
 };
 
 import dynamic from 'next/dynamic';
 
 type ClientOnlyProps = { children: JSX.Element };
 const ClientOnly = (props: ClientOnlyProps) => {
-  const { children } = props;
+    const { children } = props;
 
-  return children;
+    return children;
 };
 
 export default dynamic(() => Promise.resolve(ClientOnly), {
-  ssr: false,
+    ssr: false,
 });
 
 export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
@@ -36,11 +35,13 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
     const [isAdmin, setAdmin] = useState<boolean>(false);
 
     useEffect(() => {
-        const t = localStorage.getItem('token');
-        if (t) {
-            login(t)
-        } else {
-            logout();
+        if (typeof window !== 'undefined') { // Ensure this code only runs on the client side
+            const t = localStorage.getItem('token');
+            if (t) {
+                login(t)
+            } else {
+                logout();
+            }
         }
     }, []);
 
@@ -52,34 +53,38 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
     };
 
     const login = async (t: string) => {
-        localStorage.setItem('token', t); 
-        setLoggedIn(true);
-        setToken(t); 
-        checkAdminStatus();
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('token', t);
+            setLoggedIn(true);
+            setToken(t);
+            checkAdminStatus();
+        }
     };
-    
+
     const logout = () => {
-        localStorage.removeItem('token'); 
-        setLoggedIn(false); 
-        setToken(''); 
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            setLoggedIn(false);
+            setToken('');
+        }
     };
 
     return (
         <AuthContext.Provider value={{ isLoggedIn, isAdmin, login, logout, token }}>
-            {children} 
+            {children}
         </AuthContext.Provider>
     );
 };
 
 export const useAuth = (): AuthContextType => {
-    const context = useContext(AuthContext); 
+    const context = useContext(AuthContext);
     if (!context) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
-    return context; 
+    return context;
 };
 
-export const getAuthInitOverrides = (): InitOverrideFunction  => {
+export const getAuthInitOverrides = (): InitOverrideFunction => {
     return async (requestContext: { init: HTTPRequestInit, context: RequestOpts }) => {
         if (typeof window !== 'undefined' && window.localStorage) {
             const token = localStorage.getItem('token');
@@ -94,4 +99,23 @@ export const getAuthInitOverrides = (): InitOverrideFunction  => {
     }
 }
 
+// Define global logout function
+export const globalLogout = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        window.location.href = '/authenticate'; // Redirect to login page
+    }
+};
 
+// Intercept fetch globally
+if (typeof window !== 'undefined') { // Ensure this only runs on the client side
+    const originalFetch = window.fetch;
+
+    window.fetch = async (url, options) => {
+        const response = await originalFetch(url, options);
+        if (response.status === 401 || response.status === 403) {
+            globalLogout(); // Call global logout function when token is invalid
+        }
+        return response;
+    };
+}
