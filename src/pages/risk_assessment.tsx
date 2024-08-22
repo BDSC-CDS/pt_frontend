@@ -21,13 +21,13 @@ export default function RiskAssessment() {
             return
         }
 
-        if (replies.length==0) {
+        if (replies.length == 0) {
             router.push('/questionnaire/new');
         }
 
         console.log("reeeplies", replies);
 
-        
+
         setReplies(replies);
     }
 
@@ -56,7 +56,7 @@ export default function RiskAssessment() {
                 <title>Risk assessment</title>
             </Head>
             <div className="flex flex-col items-end p-5">
-                <Link href='/new-project' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <Link href='/questionnaire/new' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <MdOutlineAdd size={30} />
                     <p className='ml-2 text-sm'> New project</p>
                 </Link>
