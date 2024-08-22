@@ -237,6 +237,10 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
     }
 
+    const isTabCompleted = (tab: string) => {
+        return reportData.sectionsCompleted.includes(tab);
+    }
+
     const [exportInProgress, setExportInProgress] = useState(false);
 
     const exportPDF = async () => {
@@ -437,7 +441,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                             onClick={() => setActiveTab(tab.id)}
                         >
                             <div className='flex items-center pl-2'>
-                                <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                <span className={`flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ${isTabCompleted(tab.title) ? 'bg-green-50' : 'bg-red-50'}`}>
                                     {tab.id}
                                 </span>
                                 <span>
