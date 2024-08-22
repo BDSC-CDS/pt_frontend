@@ -1,4 +1,3 @@
-import TimeAgo from 'react-timeago';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { listAuditLogs } from '../utils/auditlog';
@@ -19,7 +18,7 @@ export default function AuditLogging() {
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
     const getListAuditLogs = async () => {
-        let allLogs = [];
+        let allLogs : TemplatebackendAuditLog[]  = [];
         let hasMoreLogs = true;
         let offset = 0;
         const limit = 100; // Number of logs per request
@@ -127,10 +126,10 @@ export default function AuditLogging() {
                         ? b.action?.toLowerCase()
                         : b.createdAt?.getTime();
 
-                if (aValue < bValue) {
+                if (aValue && bValue && aValue < bValue) {
                     return sortConfig.direction === 'asc' ? -1 : 1;
                 }
-                if (aValue > bValue) {
+                if (aValue && bValue && aValue > bValue) {
                     return sortConfig.direction === 'asc' ? 1 : -1;
                 }
                 return 0;
