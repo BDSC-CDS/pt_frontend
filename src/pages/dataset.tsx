@@ -1,8 +1,9 @@
+
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset";
+import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -33,6 +34,7 @@ export default function Dataset() {
     const handleMenuClose = () => {
         setOpenMenuId(null);
         getListDatasets();
+
     };
 
     const getListDatasets = async (offset?: number, limit?: number) => {
@@ -41,22 +43,23 @@ export default function Dataset() {
         if (!offset && !limit) {
             response = await listDatasets();
         } else if (offset && limit) {
-            response = await listDatasets();
+            response = await listDatasets(
+            );
         } else {
-            console.log("ERROR You have to define both the offset and the limit"); // TODO
+            console.log("ERROR You have to define both the offset and the limit") // TODO
             return;
         }
-        const result = response?.result?.datasets;
+        const result = response?.result?.datasets
         if (result) {
             setDatasetsList(result);
         }
-    };
+    }
 
     useEffect(() => {
         try {
             getListDatasets();
         } catch (error) {
-            alert("Error listing the datasets");
+            alert("Error listing the datasets")
         }
     }, []);
 
@@ -86,7 +89,7 @@ export default function Dataset() {
                     return;
                 }
 
-                // Detect types
+                //detect types
                 const initialTypes = detectColumnTypes(result.data as Record<string, any>[]);
                 setColumnTypes(initialTypes);
 
@@ -96,23 +99,22 @@ export default function Dataset() {
                     initialIdentifying[key] = 'identifier';
                 });
                 setColumnIdentifying(initialIdentifying);
-
-                // Read data
+                // read data
                 const headers = Object.keys(result.data[0]);
-                console.log("headers: ", headers);
+                console.log("headers: ", headers)
                 const csvString = [
                     headers.join(",") // Header row
                 ].concat(
                     result.data.map(row => {
                         const record = row as Record<string, any>;
-                        return headers.map(fieldName => `"${String(record[fieldName] || '').replace(/"/g, '""')}"`).join(',');
+                        return headers.map(fieldName => `"${String(record[fieldName] || '').replace(/"/g, '""')}"`).join(',')
                     })
                 ).join('\\n');
-
-                // Set variable
+                // set variable
                 setCsvString(csvString);
                 // Set preview (first 5 rows)
                 setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => (row as Record<string, any>)[header] || ''))]);
+
             },
             header: true,
         });
@@ -136,32 +138,32 @@ export default function Dataset() {
         setColumnTypes(prev => ({ ...prev, [column]: type }));
     };
     const setColumnIdentifying_ = (column: string, type: string) => {
-        console.log("SET COLUMN IDENTIFIER: ", column, " AT VALUE ", type);
+        console.log("SERT COLUMN IDENTIFIER: ", column, " AT VALUE ", type)
         setColumnIdentifying(prev => ({ ...prev, [column]: type }));
     };
     const processCSV = async () => {
         if (fileName == '') {
-            alert("You must input a name for the dataset.");
+            alert("You must input a name for the dataset.")
             return;
         }
-        // Check that there is not already a dataset with the same name
+        // check that there is not already a dataset with same name
         const all_names = datasetsList.map((dataset) => dataset.datasetName);
         if (all_names.indexOf(fileName) > -1) {
-            alert("There already is a dataset with this name.");
+            alert("There already is a dataset with this name.")
             return;
         }
         if (csvString == '') {
-            alert("You must upload a file.");
+            alert("You must upload a file.")
             return;
         }
-        // Open type detection window
+        //open type detection window
         setIsTypeModalOpen(true);
-    };
+    }
 
     const submitCSVToBackend = async () => {
         try {
-            const types = JSON.stringify(columnTypes);
-            const identifiers = JSON.stringify(columnIdentifying);
+            const types = JSON.stringify(columnTypes)
+            const identifiers = JSON.stringify(columnIdentifying)
             const response = await storeDataset(fileName, csvString, types, identifiers);
             if (!response) {
                 alert('Failed to upload CSV');
@@ -171,11 +173,11 @@ export default function Dataset() {
         }
         setCsvString('');
         closeUploadModals();
-    };
+    }
 
     const closeUploadModals = () => {
         setIsUploadModalOpen(false);
-        setIsTypeModalOpen(false);
+        setIsTypeModalOpen(false)
         setFileName('');
         getListDatasets();
     };
@@ -189,6 +191,8 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
+            // const config_id = 1;
+            // const response = await transformDataset(id, config_id);
             router.push(`/transform/${id}`);
         }
     };
