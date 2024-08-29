@@ -1,41 +1,36 @@
-
 import { useEffect, useState } from 'react';
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import Link from 'next/link';
-import TimeAgo from 'react-timeago'
+import TimeAgo from 'react-timeago';
 import { useRouter } from 'next/router';
 import { TemplatebackendQuestionnaireReply } from '../internal/client/index';
-import { listReplies } from "../utils/questionnaire"
+import { listReplies } from "../utils/questionnaire";
 
 export default function RiskAssessment() {
-    const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>();
-
+    const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>([]);
     const router = useRouter();
 
     const loadReplies = async () => {
-        const replies = await listReplies()
+        const replies = await listReplies();
 
         if (!replies) {
-            return
+            return;
         }
 
-        if (replies.length == 0) {
+        if (replies.length === 0) {
             router.push('/questionnaire/new');
         }
 
-        console.log("reeeplies", replies);
-
-
         setReplies(replies);
-    }
+    };
 
     useEffect(() => {
         try {
             loadReplies();
         } catch (error) {
-            alert("Error listing the replies")
+            alert("Error listing the replies");
         }
     }, []);
 
@@ -53,20 +48,24 @@ export default function RiskAssessment() {
     return (
         <>
             <Head>
-                <title>Risk assessment</title>
+                <title>Risk Assessment</title>
             </Head>
-            <div className="flex flex-col items-end p-5">
-                <Link href='/questionnaire/new' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <MdOutlineAdd size={30} />
-                    <p className='ml-2 text-sm'> New project</p>
-                </Link>
-                <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
+            <div className="flex flex-col p-8">
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-3xl font-bold">Risk Assessment</h1>
+                    <div className="flex space-x-4">
+                        <Link href='/questionnaire/new' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                            <span className="text-xl font-bold">+</span>
+                            <p className='ml-2 text-sm'>New project</p>
+                        </Link>
+                    </div>
+                </div>
+                <div className="overflow-x-auto w-full">
                     <Table hoverable>
                         <Table.Head>
-                            <Table.HeadCell>Project name</Table.HeadCell>
-                            <Table.HeadCell>Date created</Table.HeadCell>
-                            <Table.HeadCell>Last modified</Table.HeadCell>
+                            <Table.HeadCell>Name</Table.HeadCell>
                             <Table.HeadCell>Status</Table.HeadCell>
+                            <Table.HeadCell>Date created</Table.HeadCell>
                             <Table.HeadCell>
                                 <span className="sr-only">Edit</span>
                             </Table.HeadCell>
@@ -78,9 +77,8 @@ export default function RiskAssessment() {
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                         {reply.projectName}
                                     </Table.Cell>
+                                    <Table.Cell>Finished</Table.Cell>
                                     <Table.Cell><TimeAgo date={reply.createdAt || ''} /></Table.Cell>
-                                    <Table.Cell><TimeAgo date={reply.updatedAt || ''} /></Table.Cell>
-                                    <Table.Cell>{(reply.replies?.length || 0 + 1)} question(s) answered</Table.Cell>
                                     <Table.Cell>
                                         <a href="#" onClick={(e) => e.stopPropagation()}>
                                             <MdMoreHoriz size={20} />
@@ -88,7 +86,6 @@ export default function RiskAssessment() {
                                     </Table.Cell>
                                 </Table.Row>
                             ))}
-
                         </Table.Body>
                     </Table>
                 </div>

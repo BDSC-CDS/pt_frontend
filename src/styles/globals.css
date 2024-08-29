@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 body {
-    /* font-family: Arial, sans-serif; */
     font-family: "Inter", sans-serif;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead th {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: "Inter", sans-serif;
+    color: #1f2937;
+    text-transform: none;
+    text-align: left;
+    padding: 8px;
+    vertical-align: middle;
+}
+
+table tbody td {
+    font-size: 12px;
+    font-family: "Inter", sans-serif;
+    color: #374151;
+    text-align: left;
+    padding: 8px;
+    vertical-align: middle;
+}
+
