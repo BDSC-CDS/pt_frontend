@@ -18,7 +18,7 @@ export default function AuditLogging() {
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
     const getListAuditLogs = async () => {
-        let allLogs : TemplatebackendAuditLog[]  = [];
+        let allLogs: TemplatebackendAuditLog[] = [];
         let hasMoreLogs = true;
         let offset = 0;
         const limit = 100; // Number of logs per request
@@ -229,26 +229,26 @@ export default function AuditLogging() {
                                 type="text"
                                 placeholder="Filter by user"
                                 onChange={(e) => handleFilterChange(e, 'userId')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.userId || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by action"
                                 onChange={(e) => handleFilterChange(e, 'action')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.action || ''}
                             />
                             <input
                                 type="date"
                                 onChange={(e) => handleFilterChange(e, 'createdAtFrom')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.createdAtFrom || ''}
                             />
                             <input
                                 type="date"
                                 onChange={(e) => handleFilterChange(e, 'createdAtTo')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.createdAtTo || ''}
                             />
                         </div>
@@ -257,32 +257,33 @@ export default function AuditLogging() {
                                 type="text"
                                 placeholder="Filter by service"
                                 onChange={(e) => handleFilterChange(e, 'service')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.service || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by body"
                                 onChange={(e) => handleFilterChange(e, 'body')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.body || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by response"
                                 onChange={(e) => handleFilterChange(e, 'response')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.response || ''}
                             />
                             <input
                                 type="text"
                                 placeholder="Filter by error"
                                 onChange={(e) => handleFilterChange(e, 'error')}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className="w-full p-1 text-sm border border-gray-300 rounded"
                                 value={filters.error || ''}
                             />
                         </div>
                     </div>
+
                     <div className="flex justify-end w-full mb-4">
                         <Button onClick={resetFilters} className="bg-red-500 text-white">Reset Filters</Button>
                     </div>
