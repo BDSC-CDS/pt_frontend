@@ -73,6 +73,15 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         }
     };
 
+    const isQuestionAnswered = (question: Question) => {
+        for (let answer of question.answers) {
+            if (answer.selected) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const setSelectedAnswer = (question: Question, answerId: string) => {
         question.answers.forEach(a => {
             a.selected = false;
@@ -98,7 +107,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                                 </label>
                                 <select
                                     id={question.questionId}
-                                    className="bg-gray-50  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5"
+                                    className={`bg-gray-50  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${isQuestionAnswered(question) ? 'border-green-400' : 'border-red-400'}`}
                                     value={getSelectedAnswer(question)}
                                     onChange={e => setSelectedAnswer(question, e.target.value)}
                                 >
@@ -235,6 +244,10 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             overallCompletionRate: (completionRate * 100).toFixed(2) + "%",
         });
 
+    }
+
+    const isTabCompleted = (tab: string) => {
+        return reportData.sectionsCompleted.includes(tab);
     }
 
     const [exportInProgress, setExportInProgress] = useState(false);
@@ -437,7 +450,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                             onClick={() => setActiveTab(tab.id)}
                         >
                             <div className='flex items-center pl-2'>
-                                <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                <span className={`flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ${isTabCompleted(tab.title) ? 'bg-green-50' : 'bg-red-50'}`}>
                                     {tab.id}
                                 </span>
                                 <span>
