@@ -62,6 +62,12 @@ export interface DatasetServiceGetDatasetContentRequest {
     limit?: number;
 }
 
+export interface DatasetServiceGetDatasetIdentifierRequest {
+    id: number;
+    offset?: number;
+    limit?: number;
+}
+
 export interface DatasetServiceGetDatasetMetadataRequest {
     id: number;
 }
@@ -165,6 +171,50 @@ export class DatasetApi extends runtime.BaseAPI {
      */
     async datasetServiceGetDatasetContent(requestParameters: DatasetServiceGetDatasetContentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetDatasetContentReply> {
         const response = await this.datasetServiceGetDatasetContentRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset Content filtered by identifying and quasi identifying columns
+     * Get Dataset Content filtered by identifying and quasi identifying columns
+     */
+    async datasetServiceGetDatasetIdentifierRaw(requestParameters: DatasetServiceGetDatasetIdentifierRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetDatasetContentReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetIdentifier.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/identifier/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendGetDatasetContentReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset Content filtered by identifying and quasi identifying columns
+     * Get Dataset Content filtered by identifying and quasi identifying columns
+     */
+    async datasetServiceGetDatasetIdentifier(requestParameters: DatasetServiceGetDatasetIdentifierRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetDatasetContentReply> {
+        const response = await this.datasetServiceGetDatasetIdentifierRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

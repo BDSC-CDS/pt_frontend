@@ -5,6 +5,7 @@ import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetReques
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
+import { DatasetServiceGetDatasetIdentifierRequest } from '../internal/client/index';
 import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
 
 
@@ -78,6 +79,24 @@ export const getDatasetContent = async (id: number, offset?: number, limit?: num
         return response;
     } catch (error) {
         console.log("Error getting the dataset content:" + error);
+    }
+};
+
+export const getDatasetIdentifier = async (id: number, offset?: number, limit?: number) => {
+    const request: DatasetServiceGetDatasetIdentifierRequest = {
+        id: id
+    };
+    if (offset) {
+        request.offset = offset;
+    }
+    if (limit) {
+        request.limit = limit;
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceGetDatasetIdentifier(request, getAuthInitOverrides());
+        return response;
+    } catch (error) {
+        console.log("Error getting the dataset identifying content:" + error);
     }
 };
 
