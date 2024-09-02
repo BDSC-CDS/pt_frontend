@@ -24,6 +24,7 @@ export default function Dataset() {
     const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
+    const [idCol, setIdCol] = useState<string>();
 
     const handleMenuOpen = (id: number | undefined) => {
         if (id) {
@@ -138,7 +139,6 @@ export default function Dataset() {
         setColumnTypes(prev => ({ ...prev, [column]: type }));
     };
     const setColumnIdentifying_ = (column: string, type: string) => {
-        console.log("SERT COLUMN IDENTIFIER: ", column, " AT VALUE ", type)
         setColumnIdentifying(prev => ({ ...prev, [column]: type }));
     };
     const processCSV = async () => {
@@ -161,10 +161,14 @@ export default function Dataset() {
     }
 
     const submitCSVToBackend = async () => {
+        if (!idCol) {
+            alert("You must select an identifier column.");
+            return;
+        }
         try {
-            const types = JSON.stringify(columnTypes)
-            const identifiers = JSON.stringify(columnIdentifying)
-            const response = await storeDataset(fileName, csvString, types, identifiers);
+            const types = JSON.stringify(columnTypes);
+            const identifiers = JSON.stringify(columnIdentifying);
+            const response = await storeDataset(fileName, csvString, types, identifiers, idCol);
             if (!response) {
                 alert('Failed to upload CSV');
             }
@@ -277,6 +281,7 @@ export default function Dataset() {
                                     <div className="flex space-x-4 w-1/2">
                                         <span className="w-1/2">Type</span>
                                         <span className="w-1/2">Identifier</span>
+                                        <span className="w-1/3">Is Identifier?</span>
                                     </div>
                                 </div>
                                 {Object.keys(columnTypes).map((column, index) => (
@@ -302,6 +307,13 @@ export default function Dataset() {
                                                 <option value="quasi-identifier">Quasi-identifier</option>
                                                 <option value="non-identifying">Non-identifying</option>
                                             </select>
+                                            <input
+                                                type="radio"
+                                                name="identifier-column"  // Radio group name should be the same for all
+                                                checked={idCol === column}
+                                                onChange={() => setIdCol(column)}
+                                                className="radio radio-bordered"
+                                            />
                                         </div>
                                     </div>
                                 ))}
