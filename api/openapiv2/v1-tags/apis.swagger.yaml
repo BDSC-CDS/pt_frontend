@@ -1160,6 +1160,8 @@ definitions:
         type: string
       identifier:
         type: string
+      isId:
+        type: boolean
   templatebackendQuestionnaire:
     type: object
     properties:
@@ -1356,6 +1358,8 @@ definitions:
       types:
         type: string
       identifiers:
+        type: string
+      isId:
         type: string
     title: Create a Dataset
   templatebackendStoreDatasetResult:
