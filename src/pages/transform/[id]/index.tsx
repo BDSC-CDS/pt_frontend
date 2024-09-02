@@ -6,8 +6,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
-import { Button, Modal } from 'flowbite-react';
-import { transformDataset, getMetadata, getDatasetContent } from "../../../utils/dataset";
+import { Button, Modal, Alert } from 'flowbite-react';
+import { transformDataset, getMetadata, getDatasetContent, getDatasetIdentifier } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
 
 const TransformPage = () => {
@@ -193,7 +193,8 @@ const TransformPage = () => {
     const getDatasetMetadata = async () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
-            setMetadata(response.metadata.metadata);
+            const identifierMetadata = response.metadata.metadata.filter(item => (item.identifier === "identifier" || item.identifier === "quasi-identifier"));
+            setMetadata(identifierMetadata);
             const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
             setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
@@ -226,7 +227,8 @@ const TransformPage = () => {
     };
 
     const getAndProcessDatasetContent = async () => {
-        const response = await getDatasetContent(datasetId, 0, 5);
+        //const response = await getDatasetContent(datasetId, 0, 5);
+        const response = await getDatasetIdentifier(datasetId, 0, 5);
         if (response && response.result?.columns) {
             const result = response.result?.columns.map((col) => {
                 return col.value;
@@ -285,10 +287,6 @@ const TransformPage = () => {
                     getConfigs()
                 ]);
 
-                if (metadataResponse?.metadata?.metadata) {
-                    setMetadata(metadataResponse.metadata.metadata);
-                }
-
                 if (configsResponse?.result?.config) {
                     setConfigs(configsResponse.result.config);
                 }
@@ -325,7 +323,9 @@ const TransformPage = () => {
             setFilteredConfigs(filtered);
         }
     }, [configs, metadata, columnNamesSet]);
+
     // ------------------------------- html -------------------------------------------- //
+
     return (
         <>
             {!isLoggedIn &&
@@ -365,161 +365,167 @@ const TransformPage = () => {
                         </Modal>
 
                         {/* Dataset */}
-                        <div className='flex w-full'>
-                            <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
-                                <Table hoverable>
-                                    <Table.Head>
-                                        {metadata?.map((meta) =>
-                                            <Table.HeadCell>{meta.columnName}</Table.HeadCell>
-                                        )}
-                                    </Table.Head>
-                                    <Table.Body className="divide-y">
-                                        {Array.from({ length: nRows }, (_, index) => (
-                                            < Table.Row key={index} className="bg-white"
-                                            >
-                                                {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                                {columns?.map((col, colIndex) => (
 
-                                                    <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                        {col?.at(index)}
-                                                    </Table.Cell>
-                                                ))}
+                        <div className='flex flex-col w-full'>
+                            <Alert className="mt-5 ml-3 w-1/2" color="info" >
+                                These are only the identying and quasi-identifying columns. To change the column types, click <button className='underline'>here</button>.
+                            </Alert>
+                            <div className='flex'>
+                                <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
+                                    <Table hoverable>
+                                        <Table.Head>
+                                            {metadata?.map((meta) =>
+                                                <Table.HeadCell>{meta.columnName}</Table.HeadCell>
+                                            )}
+                                        </Table.Head>
+                                        <Table.Body className="divide-y">
+                                            {Array.from({ length: nRows }, (_, index) => (
+                                                < Table.Row key={index} className="bg-white"
+                                                >
+                                                    {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
+                                                    {columns?.map((col, colIndex) => (
 
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table>
-                            </div >
-                            {filteredConfigs.length > 0 ? (
-                                <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
-                                    <div>
-                                        {filteredConfigs?.map((config) => (
-                                            <>
-                                                <div key={config.id} className="mb-4 p-4 py-1 flex items-start">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedConfigId === config.id}
-                                                        onChange={() => handleCheckboxChange(config.id)}
-                                                        className="form-checkbox h-5 w-5 mr-4 mt-2"
-                                                    />
-                                                    <div className='w-full'>
-                                                        <div className='flex ' onMouseLeave={handleMenuClose}>
-                                                            <button
-                                                                onClick={() => toggleConfig(config.id)}
-                                                                className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
-                                                            >
-                                                                {config.configName || `Configuration ${config.id}`}
-                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
-                                                                    ▼
-                                                                </span>
-                                                            </button>
-                                                            <div className='flex justify-start items-center'>
-                                                                <a
-                                                                    onMouseEnter={() => handleMenuOpen(config.id)}
+                                                        <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                            {col?.at(index)}
+                                                        </Table.Cell>
+                                                    ))}
 
-                                                                    className="text-gray-900 hover:text-blue-500">
-                                                                    <MdMoreHoriz size={20} />
-                                                                </a>
-                                                                {openMenuId === config.id && (
-                                                                    <div className="dropdown-menu">
-                                                                        <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                                                onClick={() => handleDeleteConfig(config.id)}>Delete</li>
-                                                                        </ul>
-                                                                    </div>
-                                                                )}
+                                                </Table.Row>
+                                            ))}
+                                        </Table.Body>
+                                    </Table>
+                                </div >
+                                {filteredConfigs.length > 0 ? (
+                                    <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
+                                        <div>
+                                            {filteredConfigs?.map((config) => (
+                                                <>
+                                                    <div key={config.id} className="mb-4 p-4 py-1 flex items-start">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedConfigId === config.id}
+                                                            onChange={() => handleCheckboxChange(config.id)}
+                                                            className="form-checkbox h-5 w-5 mr-4 mt-2"
+                                                        />
+                                                        <div className='w-full'>
+                                                            <div className='flex ' onMouseLeave={handleMenuClose}>
+                                                                <button
+                                                                    onClick={() => toggleConfig(config.id)}
+                                                                    className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
+                                                                >
+                                                                    {config.configName || `Configuration ${config.id}`}
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                <div className='flex justify-start items-center'>
+                                                                    <a
+                                                                        onMouseEnter={() => handleMenuOpen(config.id)}
+
+                                                                        className="text-gray-900 hover:text-blue-500">
+                                                                        <MdMoreHoriz size={20} />
+                                                                    </a>
+                                                                    {openMenuId === config.id && (
+                                                                        <div className="dropdown-menu">
+                                                                            <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                                                                <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                                    onClick={() => handleDeleteConfig(config.id)}>Delete</li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
+
+
+                                                            {openConfigId === config.id && (
+                                                                <div className="mt-2 bg-white p-2">
+                                                                    {config.hasScrambleField && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`scramble-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                Scramble Field
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `scramble-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Scramble Field Parameters:</h4>
+                                                                                    <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hasDateShift && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                Date Shift
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `dateShift-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Date Shift Parameters:</h4>
+                                                                                    <p>Low Range: {config.dateShiftLowrange}</p>
+                                                                                    <p>High Range: {config.dateShiftHighrange}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hassubFieldList && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                SubField List Replacement
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `subfieldlist-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
+                                                                                    <p>Field: {config.subFieldListField}</p>
+                                                                                    <p>Substitute: {config.subFieldListSubstitute}</p>
+                                                                                    <p>Replacement: {config.subFieldListReplacement}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hassubFieldRegex && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                SubField Regex Replacement
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `subfieldregex-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
+                                                                                    <p>Field: {config.subFieldRegexField}</p>
+                                                                                    <p>Regex: {config.subFieldRegexRegex}</p>
+                                                                                    <p>Replacement: {config.subFieldRegexReplacement}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </div>
-
-
-                                                        {openConfigId === config.id && (
-                                                            <div className="mt-2 bg-white p-2">
-                                                                {config.hasScrambleField && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`scramble-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            Scramble Field
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `scramble-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Scramble Field Parameters:</h4>
-                                                                                <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hasDateShift && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            Date Shift
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `dateShift-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Date Shift Parameters:</h4>
-                                                                                <p>Low Range: {config.dateShiftLowrange}</p>
-                                                                                <p>High Range: {config.dateShiftHighrange}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hassubFieldList && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            SubField List Replacement
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `subfieldlist-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
-                                                                                <p>Field: {config.subFieldListField}</p>
-                                                                                <p>Substitute: {config.subFieldListSubstitute}</p>
-                                                                                <p>Replacement: {config.subFieldListReplacement}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hassubFieldRegex && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            SubField Regex Replacement
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `subfieldregex-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
-                                                                                <p>Field: {config.subFieldRegexField}</p>
-                                                                                <p>Regex: {config.subFieldRegexRegex}</p>
-                                                                                <p>Replacement: {config.subFieldRegexReplacement}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        )}
                                                     </div>
-                                                </div>
-                                                <hr className="border-t border-gray-300 my-4" />
-                                            </>
-                                        ))
-                                        }
+                                                    <hr className="border-t border-gray-300 my-4" />
+                                                </>
+                                            ))
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <p className='fixed right-10 text-gray-500 mt-5 '>No configurations yet</p>
-                            )}
+                                ) : (
+                                    <p className='fixed right-10 text-gray-500 mt-5 '>No configurations yet</p>
+                                )}
+                            </div>
                         </div>
                         <div className="p-4 fixed bottom-10 right-0 max-w-xs">
                             <button
