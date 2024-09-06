@@ -6,8 +6,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
-import { Button, Modal, Alert } from 'flowbite-react';
-import { transformDataset, getMetadata, getDatasetContent, getDatasetIdentifier } from "../../../utils/dataset";
+import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
+import { transformDataset, getMetadata, getDatasetContent, getDatasetIdentifier, changeTypesDataset } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
 
 const TransformPage = () => {
@@ -54,16 +54,26 @@ const TransformPage = () => {
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
     const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [idMetadata, setIDMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [filteredMetadata, setFilteredMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [newMetadata, setNewMetadata] = useState<Array<TemplatebackendMetadata>>([]);
     const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
     const [selectedSubListField, setSelectedSubListField] = useState("");
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
     const [columns, setColumns] = useState<Array<Array<string | undefined> | undefined>>();
     const [nRows, setNRows] = useState<number>(0);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showColTypeModal, setShowColTypeModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    interface ColumnTypes {
+        [key: string]: string;
+    };
+    const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
+    const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
+    const [idCol, setIdCol] = useState<string>();
+
 
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
@@ -193,8 +203,10 @@ const TransformPage = () => {
     const getDatasetMetadata = async () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
+            setMetadata(response.metadata.metadata);
+            setNewMetadata(JSON.parse(JSON.stringify(response.metadata.metadata)));
             const identifierMetadata = response.metadata.metadata.filter(item => (item.identifier === "identifier" || item.identifier === "quasi-identifier"));
-            setMetadata(identifierMetadata);
+            setIDMetadata(identifierMetadata);
             const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
             setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
@@ -208,6 +220,11 @@ const TransformPage = () => {
                     ...prev,
                     ['subFieldRegexField']: filteredMetadata[0]?.columnName
                 }));
+            }
+            // set the original id column
+            const originalIdCol = response.metadata.metadata.find((meta) => meta.isId)?.columnName;
+            if (originalIdCol) {
+                setIdCol(originalIdCol); // Reset idCol to original identifier column
             }
         }
     }
@@ -255,6 +272,34 @@ const TransformPage = () => {
         if (id) {
             const response = await deleteConfig(id);
             handleGetConfigs();
+        }
+    };
+
+    const handleColumnTypeChange = async () => {
+        setShowColTypeModal(true);
+    };
+
+    const setColumnType = (column: string | undefined, type: string) => {
+        if (column && newMetadata) {
+            // Update the newMetadata array
+            const updatedMetadata = newMetadata.map(meta => {
+                if (meta.columnName === column) {
+                    return { ...meta, type: type };
+                }
+                return meta;
+            });
+            setNewMetadata(updatedMetadata); // Update the newMetadata state
+        };
+    };
+    const setColumnIdentifying_ = (column: string | undefined, newIdentifier: string) => {
+        if (column && newMetadata) {
+            const updatedMetadata = newMetadata.map(meta => {
+                if (meta.columnName === column) {
+                    return { ...meta, identifier: newIdentifier };
+                }
+                return meta;
+            });
+            setNewMetadata(updatedMetadata); // Update the newMetadata state
         }
     };
 
@@ -324,6 +369,54 @@ const TransformPage = () => {
         }
     }, [configs, metadata, columnNamesSet]);
 
+    const closeColumnTypeModal = () => {
+        // Close the modal and reset newMetadata back to the original metadata
+        setNewMetadata(JSON.parse(JSON.stringify(metadata))); // Reset to original values
+        const originalIdCol = metadata?.find((meta) => meta.isId)?.columnName;
+        if (originalIdCol) {
+            setIdCol(originalIdCol); // Reset idCol to original identifier column
+        }
+        setShowColTypeModal(false);
+    };
+
+    const handleChangeTypes = async () => {
+        // if the types have not changed from the original types
+        if (!newMetadata || JSON.stringify(newMetadata) === JSON.stringify(metadata)) {
+            closeColumnTypeModal();
+            return;
+        }
+        try {
+            const response = await changeTypesDataset(datasetId, newMetadata);
+            // Implement the transformation logic for selected configurations
+            if (response?.id) {
+                router.push("/dataset/" + response.id);
+                closeColumnTypeModal();
+            }
+        } catch (error) {
+            // Safely check if error is an instance of Error
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage('An unexpected error occurred');
+            }
+            setShowErrorModal(true);
+        }
+    }
+
+    const ColumnWithTooltip = (column: string, metadata: TemplatebackendMetadata) => {
+        return (
+            <Tooltip
+                content={(
+                    <div className="text-sm">
+                        <p><strong>Type:</strong> {metadata.type}</p>
+                        <p><strong>Identifier:</strong> {metadata.identifier}</p>
+                    </div>
+                )}
+            >
+                <span className="cursor-pointer">{column}</span>
+            </Tooltip>
+        );
+    };
     // ------------------------------- html -------------------------------------------- //
 
     return (
@@ -363,19 +456,89 @@ const TransformPage = () => {
                                 </div>
                             </Modal.Body>
                         </Modal>
-
+                        <Modal
+                            show={showColTypeModal}
+                            onClose={() => closeColumnTypeModal()}
+                        >
+                            <Modal.Header>
+                                Change Column Types
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between font-bold">
+                                        <span className="w-1/2">Column Name</span>
+                                        <div className="flex space-x-4 w-1/2">
+                                            <span className="w-1/2">Type</span>
+                                            <span className="w-1/2">Identifier</span>
+                                            <span className="w-1/3">Is Identifier?</span>
+                                        </div>
+                                    </div>
+                                    {newMetadata?.map(meta => (
+                                        <>
+                                            <div key={meta.columnId} className="flex items-center justify-between">
+                                                <span className="w-1/2">{meta.columnName}:</span>
+                                                <div className="flex space-x-4 w-1/2">
+                                                    <select
+                                                        value={meta.type}
+                                                        onChange={(e) => setColumnType(meta.columnName, e.target.value)}
+                                                        className="select select-bordered w-1/2"
+                                                    >
+                                                        <option value="string">String</option>
+                                                        <option value="int">Integer</option>
+                                                        <option value="float">Float</option>
+                                                        <option value="date">Date</option>
+                                                    </select>
+                                                    <select
+                                                        value={meta.identifier}
+                                                        onChange={(e) => setColumnIdentifying_(meta.columnName, e.target.value)}
+                                                        className="select select-bordered w-1/2"
+                                                    >
+                                                        <option value="identifier">Identifier</option>
+                                                        <option value="quasi-identifier">Quasi-identifier</option>
+                                                        <option value="non-identifying">Non-identifying</option>
+                                                    </select>
+                                                    <input
+                                                        type="radio"
+                                                        name="identifier-column"  // Radio group name should be the same for all
+                                                        checked={idCol === meta.columnName}
+                                                        onChange={() => setIdCol(meta.columnName)}
+                                                        className="radio radio-bordered"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>))
+                                    }
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer className='flex justify-between'>
+                                <Button className='bg-gray-400' onClick={() => closeColumnTypeModal()}>Close</Button>
+                                <Button onClick={() => handleChangeTypes()}>Save</Button>
+                            </Modal.Footer>
+                        </Modal>
                         {/* Dataset */}
 
                         <div className='flex flex-col w-full'>
                             <Alert className="mt-5 ml-3 w-1/2" color="info" >
-                                These are only the identying and quasi-identifying columns. To change the column types, click <button className='underline'>here</button>.
+                                These are only the identying and quasi-identifying columns. To change the column types, click <button onClick={handleColumnTypeChange} className='underline'>here</button>.
                             </Alert>
                             <div className='flex'>
                                 <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
                                     <Table hoverable>
                                         <Table.Head>
-                                            {metadata?.map((meta) =>
-                                                <Table.HeadCell>{meta.columnName}</Table.HeadCell>
+                                            {idMetadata?.map((meta) =>
+                                                <Table.HeadCell key={meta.columnId}>
+                                                    <Tooltip
+                                                        content={(
+                                                            <div className="text-xs" style={{ textTransform: 'none' }}>
+                                                                <p><strong>Type:</strong> {meta.type}</p>
+                                                                <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                                                <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                                                            </div>
+                                                        )}
+                                                    >
+                                                        <span className="cursor-pointer">{meta.columnName}</span>
+                                                    </Tooltip>
+                                                </Table.HeadCell>
                                             )}
                                         </Table.Head>
                                         <Table.Body className="divide-y">

@@ -13,6 +13,8 @@ models/RpcStatus.ts
 models/TemplatebackendAuditLog.ts
 models/TemplatebackendAuthenticationReply.ts
 models/TemplatebackendAuthenticationResult.ts
+models/TemplatebackendChangeTypesDatasetReply.ts
+models/TemplatebackendChangeTypesDatasetRequest.ts
 models/TemplatebackendColumn.ts
 models/TemplatebackendConfig.ts
 models/TemplatebackendCreateConfigReply.ts

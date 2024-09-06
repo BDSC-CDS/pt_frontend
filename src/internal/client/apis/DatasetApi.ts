@@ -16,6 +16,8 @@
 import * as runtime from '../runtime';
 import type {
   RpcStatus,
+  TemplatebackendChangeTypesDatasetReply,
+  TemplatebackendChangeTypesDatasetRequest,
   TemplatebackendDeleteDatasetReply,
   TemplatebackendGetDatasetContentReply,
   TemplatebackendGetDatasetMetadataReply,
@@ -30,6 +32,10 @@ import type {
 import {
     RpcStatusFromJSON,
     RpcStatusToJSON,
+    TemplatebackendChangeTypesDatasetReplyFromJSON,
+    TemplatebackendChangeTypesDatasetReplyToJSON,
+    TemplatebackendChangeTypesDatasetRequestFromJSON,
+    TemplatebackendChangeTypesDatasetRequestToJSON,
     TemplatebackendDeleteDatasetReplyFromJSON,
     TemplatebackendDeleteDatasetReplyToJSON,
     TemplatebackendGetDatasetContentReplyFromJSON,
@@ -51,6 +57,10 @@ import {
     TemplatebackendTransformDatasetRequestFromJSON,
     TemplatebackendTransformDatasetRequestToJSON,
 } from '../models/index';
+
+export interface DatasetServiceChangeTypesDatasetRequest {
+    body: TemplatebackendChangeTypesDatasetRequest;
+}
 
 export interface DatasetServiceDeleteDatasetRequest {
     id: number;
@@ -93,6 +103,45 @@ export interface DatasetServiceTransformDatasetRequest {
  * 
  */
 export class DatasetApi extends runtime.BaseAPI {
+
+    /**
+     * This endpoint changes the types of a dataset
+     * Change the types of a dataset
+     */
+    async datasetServiceChangeTypesDatasetRaw(requestParameters: DatasetServiceChangeTypesDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendChangeTypesDatasetReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceChangeTypesDataset.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/types`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendChangeTypesDatasetRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendChangeTypesDatasetReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint changes the types of a dataset
+     * Change the types of a dataset
+     */
+    async datasetServiceChangeTypesDataset(requestParameters: DatasetServiceChangeTypesDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendChangeTypesDatasetReply> {
+        const response = await this.datasetServiceChangeTypesDatasetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * This endpoint deletes a dataset
