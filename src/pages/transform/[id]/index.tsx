@@ -92,24 +92,7 @@ const TransformPage = () => {
         }
     }
 
-    // // filter the configurations to keep only those that match the dataset
-    // const filterConfigs = () => {
-    //     if (!metadata) return; // Ensure metadata is available before filtering
 
-    //     const column_names = metadata.map(item => item.columnName)
-    //     const filteredconfigs = configs.filter(config => {
-    //         // Check if subFieldRegexField, subFieldListField, and scrambleFieldFields meet the conditions
-    //         const isSubFieldRegexFieldValid = !config.hassubFieldRegex || column_names.includes(config.subFieldRegexField);
-    //         const isSubFieldListFieldValid = !config.hassubFieldList || column_names.includes(config.subFieldListField);
-    //         const isScrambleFieldFieldsValid = !config.hasScrambleField ||
-    //             config.scrambleFieldFields?.every(field => column_names.includes(field));
-
-    //         // Keep the config if all conditions are satisfied
-    //         return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
-    //     })
-    //     // set the configurations to those that match the dataset columns
-    //     setConfigs(filteredconfigs)
-    // }
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -386,7 +369,13 @@ const TransformPage = () => {
             return;
         }
         try {
-            const response = await changeTypesDataset(datasetId, newMetadata);
+
+            const updatedMetadata = newMetadata.map(meta => ({
+                ...meta,
+                isId: meta.columnName === idCol // Ensure that isId is correct before sending
+            }));
+
+            const response = await changeTypesDataset(datasetId, updatedMetadata);
             // Implement the transformation logic for selected configurations
             if (response?.id) {
                 router.push("/dataset/" + response.id);
