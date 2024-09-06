@@ -6,6 +6,8 @@ export * from './RpcStatus';
 export * from './TemplatebackendAuditLog';
 export * from './TemplatebackendAuthenticationReply';
 export * from './TemplatebackendAuthenticationResult';
+export * from './TemplatebackendChangeTypesDatasetReply';
+export * from './TemplatebackendChangeTypesDatasetRequest';
 export * from './TemplatebackendColumn';
 export * from './TemplatebackendConfig';
 export * from './TemplatebackendCreateConfigReply';

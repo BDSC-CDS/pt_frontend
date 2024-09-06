@@ -1,13 +1,12 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, TemplatebackendChangeTypesDatasetRequest, DatasetServiceChangeTypesDatasetRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetIdentifierRequest } from '../internal/client/index';
 import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
-
 
 /**
  * Function to store a new dataset.
@@ -135,5 +134,20 @@ export const revertDataset = async (dataset_id: number) => {
         return response;
     } catch (error) {
         console.log("Error reverting the dataset:" + error);
+    }
+}
+
+export const changeTypesDataset = async (dataset_id: number, metadata: Array<TemplatebackendMetadata>) => {
+    const request: DatasetServiceChangeTypesDatasetRequest = {
+        body: {
+            datasetId: dataset_id,
+            metadata: metadata
+        }
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceChangeTypesDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error changing the types of the dataset:" + error);
     }
 }
