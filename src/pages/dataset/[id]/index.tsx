@@ -3,7 +3,7 @@
 import { useRouter } from 'next/router';
 import TabsComponent from '../../../components/Tabs';
 import dynamic from "next/dynamic";
-import { Table } from 'flowbite-react';
+import { Table, Tooltip } from 'flowbite-react';
 import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
@@ -106,7 +106,19 @@ const DatasetPage = () => {
                         <Table hoverable>
                             <Table.Head>
                                 {metadata?.map((meta) =>
-                                    <Table.HeadCell>{meta.columnName}</Table.HeadCell>
+                                    <Table.HeadCell key={meta.columnId}>
+                                        <Tooltip
+                                            content={(
+                                                <div className="text-sm" style={{ textTransform: 'none' }}>
+                                                    <p><strong>Type:</strong> {meta.type}</p>
+                                                    <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                                    <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                                                </div>
+                                            )}
+                                        >
+                                            <span className="cursor-pointer">{meta.columnName}</span>
+                                        </Tooltip>
+                                    </Table.HeadCell>
                                 )}
 
                             </Table.Head>

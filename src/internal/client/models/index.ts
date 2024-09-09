@@ -37,6 +37,7 @@ export * from './TemplatebackendGetConfigsReply';
 export * from './TemplatebackendGetConfigsResult';
 export * from './TemplatebackendGetDatasetContentReply';
 export * from './TemplatebackendGetDatasetContentResult';
+export * from './TemplatebackendGetDatasetInfoReply';
 export * from './TemplatebackendGetDatasetMetadataReply';
 export * from './TemplatebackendGetDatasetMetadataResult';
 export * from './TemplatebackendGetHelloReply';
