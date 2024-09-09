@@ -9,6 +9,7 @@ import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
 import { useAuth } from '~/utils/authContext';
+import { DateTime } from 'luxon';
 
 export default function Dataset() {
     interface ColumnTypes {
@@ -25,6 +26,15 @@ export default function Dataset() {
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
     const [idCol, setIdCol] = useState<string>();
+    const acceptedDateFormats = [
+        'yyyy-MM-dd',
+        'MM/dd/yyyy',
+        'dd/MM/yyyy',
+        'yyyy/MM/dd',
+        'yyyy-MM-ddTHH:mm:ss',
+        'dd-MM-yyyy',
+        'M/d/yyyy',
+    ];
 
     const handleMenuOpen = (id: number | undefined) => {
         if (id) {
@@ -64,6 +74,22 @@ export default function Dataset() {
         }
     }, []);
 
+    const getUniqueFileName = (baseFileName: string, datasetsList: TemplatebackendDataset[]): string => {
+        let uniqueFileName = baseFileName;
+        let counter = 1;
+
+        // Get all existing dataset names
+        const allNames = datasetsList.map((dataset) => dataset.datasetName);
+
+        // Loop to find a unique name
+        while (allNames.includes(uniqueFileName)) {
+            uniqueFileName = `${baseFileName} (${counter})`;
+            counter++;
+        }
+
+        return uniqueFileName;
+    };
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) {
             return;
@@ -76,6 +102,13 @@ export default function Dataset() {
             event.target.value = '';
             return;
         }
+
+        // Use the file name as the dataset name (remove extension)
+        const baseFileName = file.name.replace(/\.[^/.]+$/, "");
+        // Get a unique file name
+        const uniqueFileName = getUniqueFileName(baseFileName, datasetsList);
+        setFileName(uniqueFileName);
+
         Papa.parse(file, {
             complete: (result) => {
                 if (result.data.length === 0) {
@@ -135,23 +168,71 @@ export default function Dataset() {
         }
         return types;
     };
-    const setColumnType = (column: string, type: string) => {
-        setColumnTypes(prev => ({ ...prev, [column]: type }));
+
+    // Function to check if a value is a valid date
+    const isDate = (value: string): boolean => {
+        if (!isNaN(Number(value))) {
+            // Avoid treating numbers like dates (e.g., "12345")
+            return false;
+        }
+
+        // Attempt to parse with each format
+        for (const format of acceptedDateFormats) {
+            const date = DateTime.fromFormat(value, format);
+            if (date.isValid) return true;
+        }
+
+        // Lastly, try a generic parse
+        return DateTime.fromISO(value).isValid;
     };
+
+    const validateColumnType = (column: string, type: string, sampleData: (string | undefined)[]): boolean => {
+        for (let value of sampleData) {
+            if (value === undefined) continue;
+            if (type === "int" && !Number.isInteger(Number(value))) return false;
+            if (type === "float" && isNaN(parseFloat(value))) return false;
+            if (type === "date" && !isDate(value)) return false;
+            if (type === "string" && typeof value !== "string") return false;
+        }
+        return true;
+    };
+
+    const setColumnType = (column: string, type: string) => {
+        if (!csvPreview || !csvPreview[0]) {
+            alert("CSV data is not loaded yet.");
+            return;
+        }
+
+        // Get index of the column
+        const columnIndex = csvPreview[0].indexOf(column);
+        if (columnIndex === -1) {
+            alert(`Column "${column}" not found in the CSV headers.`);
+            return;
+        }
+
+        // Sample data from the column, filter out undefined values
+        const sampleData: string[] = csvPreview
+            .slice(1)
+            .map((row) => row[columnIndex])
+            .filter((value): value is string => value !== undefined); // Type guard to ensure only strings
+
+        if (validateColumnType(column, type, sampleData)) {
+            setColumnTypes((prev) => ({ ...prev, [column]: type }));
+        } else {
+            alert(`Invalid type selected for column "${column}". Please choose a compatible type.`);
+        }
+    };
+
     const setColumnIdentifying_ = (column: string, type: string) => {
         setColumnIdentifying(prev => ({ ...prev, [column]: type }));
     };
+
     const processCSV = async () => {
-        if (fileName == '') {
-            alert("You must input a name for the dataset.")
-            return;
-        }
-        // check that there is not already a dataset with same name
-        const all_names = datasetsList.map((dataset) => dataset.datasetName);
-        if (all_names.indexOf(fileName) > -1) {
-            alert("There already is a dataset with this name.")
-            return;
-        }
+        // if (fileName == '') {
+        //     alert("You must input a name for the dataset.")
+        //     return;
+        // }
+
         if (csvString == '') {
             alert("You must upload a file.")
             return;
@@ -227,13 +308,13 @@ export default function Dataset() {
                         <Modal.Body>
                             <div className="space-y-6">
                                 <h2 className="text-lg  mb-2">Upload CSV File</h2>
-                                <input
+                                {/*<input
                                     type="text"
                                     placeholder="Enter filename"
                                     value={fileName}
                                     onChange={(e) => setFileName(e.target.value)}
                                     className="input input-bordered w-full max-w-xs"
-                                />
+                                />*/}
                                 <input type="file" accept=".csv" onChange={handleFileUpload} />
 
                             </div>

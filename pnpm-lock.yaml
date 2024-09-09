@@ -11,6 +11,9 @@ dependencies:
   '@types/react-timeago':
     specifier: ^4.1.7
     version: 4.1.7
+  classnames:
+    specifier: ^2.5.1
+    version: 2.5.1
   flowbite:
     specifier: ^2.2.1
     version: 2.3.0
@@ -70,6 +73,9 @@ devDependencies:
   '@types/jest':
     specifier: ^29.5.11
     version: 29.5.11
+  '@types/luxon':
+    specifier: ^3.4.2
+    version: 3.4.2
   '@types/node':
     specifier: ^18.17.0
     version: 18.19.3
@@ -112,6 +118,9 @@ devDependencies:
   jest-environment-jsdom:
     specifier: ^29.7.0
     version: 29.7.0
+  luxon:
+    specifier: ^3.5.0
+    version: 3.5.0
   node-fetch:
     specifier: ^2.6.1
     version: 2.6.1
@@ -2077,6 +2086,10 @@ packages:
 
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+    dev: true
+
+  /@types/luxon@3.4.2:
+    resolution: {integrity: sha512-TifLZlFudklWlMBfhubvgqTXRzLDI5pCbGa4P8a3wPyUQSW+1xQ5eDsreP9DWHX3tjq1ke96uYG/nwundroWcA==}
     dev: true
 
   /@types/node@18.19.3:
@@ -5004,6 +5017,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: true
+
+  /luxon@3.5.0:
+    resolution: {integrity: sha512-rh+Zjr6DNfUYR3bPwJEnuwDdqMbxZW7LOQfUN4B54+Cl+0o5zaU9RJ6bcidfDtC1cWCZXQ+nvX8bf6bAji37QQ==}
+    engines: {node: '>=12'}
     dev: true
 
   /lz-string@1.5.0:
