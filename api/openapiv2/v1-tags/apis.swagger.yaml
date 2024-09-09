@@ -435,6 +435,29 @@ paths:
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/info/{id}:
+    get:
+      summary: Get Dataset Info
+      description: This endpoint allow getting a specific user's Dataset info
+      operationId: DatasetService_GetDatasetInfo
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendGetDatasetInfoReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
   /api/v1/dataset/metadata/{id}:
     get:
       summary: Get Dataset Metadata
@@ -1106,6 +1129,11 @@ definitions:
       nRows:
         type: integer
         format: int64
+  templatebackendGetDatasetInfoReply:
+    type: object
+    properties:
+      dataset:
+        $ref: '#/definitions/templatebackendDataset'
   templatebackendGetDatasetMetadataReply:
     type: object
     properties:
