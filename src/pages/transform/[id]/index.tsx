@@ -9,6 +9,7 @@ import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetContent, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
+import classNames from 'classnames';
 
 const TransformPage = () => {
 
@@ -195,7 +196,7 @@ const TransformPage = () => {
             setNewMetadata(JSON.parse(JSON.stringify(response.metadata.metadata)));
             const identifierMetadata = response.metadata.metadata.filter(item => (item.identifier === "identifier" || item.identifier === "quasi-identifier"));
             setIDMetadata(identifierMetadata);
-            const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
+            const filteredMetadata = response.metadata.metadata.filter(item => ((item.type === "int" || item.type === "float" || item.type === "string") && (item.identifier === "identifier" || item.identifier === "quasi-identifier")));
             setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
                 setSelectedSubListField(filteredMetadata[0].columnName);
@@ -340,26 +341,43 @@ const TransformPage = () => {
         }
     }, [datasetId]);
 
-    // Preprocess metadata column names for efficient lookups
-    const columnNamesSet = useMemo(() => {
-        return new Set(metadata?.map(item => item.columnName));
-    }, [metadata]);
-
     // Filter the configurations based on the metadata
     useEffect(() => {
         if (metadata?.length && metadata.length > 0 && configs.length > 0) {
             const filtered = configs.filter(config => {
-                const isSubFieldRegexFieldValid = !config.hassubFieldRegex || columnNamesSet.has(config.subFieldRegexField);
-                const isSubFieldListFieldValid = !config.hassubFieldList || columnNamesSet.has(config.subFieldListField);
-                const isScrambleFieldFieldsValid = !config.hasScrambleField ||
-                    (config.scrambleFieldFields && config.scrambleFieldFields.every(field => columnNamesSet.has(field)));
+                // Check scrambleFieldFields (if present)
+                const isValidScrambleFields = !config.hasScrambleField || (
+                    config.scrambleFieldFields?.every(field => {
+                        const column = metadata.find(meta => meta.columnName === field);
+                        return column?.identifier === 'identifier' || column?.identifier === 'quasi-identifier';
+                    })
+                );
 
-                return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
+                // Check subFieldListField (if present)
+                const isValidSubListField = !config.hassubFieldList || (
+                    config.subFieldListField ? metadata.some(meta =>
+                        meta.columnName === config.subFieldListField &&
+                        (meta.identifier === 'identifier' || meta.identifier === 'quasi-identifier')
+                    ) : true
+                );
+
+                // Check subFieldRegexField (if present)
+                const isValidSubRegexField = !config.hassubFieldRegex || (
+                    config.subFieldRegexField ? metadata.some(meta =>
+                        meta.columnName === config.subFieldRegexField &&
+                        (meta.identifier === 'identifier' || meta.identifier === 'quasi-identifier')
+                    ) : true
+                );
+
+                // Only include configs that pass all these checks
+                return isValidScrambleFields && isValidSubListField && isValidSubRegexField;
             });
 
-            setFilteredConfigs(filtered);
+            setFilteredConfigs(filtered);  // Set the filtered configurations
         }
-    }, [configs, metadata, columnNamesSet]);
+    }, [configs, metadata]);
+
+
 
     const closeColumnTypeModal = () => {
         // Close the modal and reset newMetadata back to the original metadata
@@ -505,11 +523,15 @@ const TransformPage = () => {
 
                         <div className='flex flex-col w-full'>
                             <div className="flex items-center justify-between w-full mb-3">
-                                {nonIdentifyingColumns && nonIdentifyingColumns.length > 0 && (
-                                    <Alert className="mt-2 ml-3 w-1/2" color="info" >
-                                        These are only the identying and quasi-identifying columns. To change the column types, click <button onClick={handleColumnTypeChange} className='underline'>here</button>.
+                                {nonIdentifyingColumns && nonIdentifyingColumns?.length > 0 ? (
+                                    <Alert className="mt-2 ml-3 w-1/2" color="info">
+                                        These are only the identifying and quasi-identifying columns. To change the column types, click <button onClick={handleColumnTypeChange} className='underline'>here</button>.
                                     </Alert>
-                                )}
+                                ) :
+                                    (
+
+                                        < div className="w-1/2"></div>
+                                    )}
                                 <button
                                     onClick={() => setShowModal(true)}
                                     className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
@@ -517,6 +539,7 @@ const TransformPage = () => {
                                     <p className='ml-2 text-md'> Add a configuration </p>
                                 </button>
                             </div>
+
                             <div className='flex '>
                                 <div className='flex flex-col w-3/4 h-full'>
                                     <div className=" mt-5 overflow-x-auto w-full h-full border border-gray-300 rounded ml-3">
@@ -555,7 +578,6 @@ const TransformPage = () => {
                                             </Table.Body>
                                         </Table>
                                     </div >
-                                    {/* "Change Column Types" button moved below the table */}
                                     <div className='flex justify-start mt-5 ml-3'>
                                         <button
                                             onClick={handleColumnTypeChange}
@@ -565,7 +587,8 @@ const TransformPage = () => {
                                         </button>
                                     </div>
                                 </div>
-                                {/* Configurations section remains unchanged */}
+
+                                {/* Configurations */}
                                 {filteredConfigs.length > 0 ? (
                                     <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
                                         <div>
