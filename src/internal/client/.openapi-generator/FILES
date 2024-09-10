@@ -40,6 +40,7 @@ models/TemplatebackendDeleteDatasetResult.ts
 models/TemplatebackendDeleteQuestionnaireReply.ts
 models/TemplatebackendDeleteQuestionnaireResult.ts
 models/TemplatebackendDeleteUserReply.ts
+models/TemplatebackendExportConfigReply.ts
 models/TemplatebackendGetConfigsReply.ts
 models/TemplatebackendGetConfigsResult.ts
 models/TemplatebackendGetDatasetContentReply.ts

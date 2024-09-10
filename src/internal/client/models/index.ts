@@ -33,6 +33,7 @@ export * from './TemplatebackendDeleteDatasetResult';
 export * from './TemplatebackendDeleteQuestionnaireReply';
 export * from './TemplatebackendDeleteQuestionnaireResult';
 export * from './TemplatebackendDeleteUserReply';
+export * from './TemplatebackendExportConfigReply';
 export * from './TemplatebackendGetConfigsReply';
 export * from './TemplatebackendGetConfigsResult';
 export * from './TemplatebackendGetDatasetContentReply';
