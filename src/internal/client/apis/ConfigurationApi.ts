@@ -19,6 +19,7 @@ import type {
   TemplatebackendConfig,
   TemplatebackendCreateConfigReply,
   TemplatebackendDeleteConfigReply,
+  TemplatebackendExportConfigReply,
   TemplatebackendGetConfigsReply,
 } from '../models/index';
 import {
@@ -30,6 +31,8 @@ import {
     TemplatebackendCreateConfigReplyToJSON,
     TemplatebackendDeleteConfigReplyFromJSON,
     TemplatebackendDeleteConfigReplyToJSON,
+    TemplatebackendExportConfigReplyFromJSON,
+    TemplatebackendExportConfigReplyToJSON,
     TemplatebackendGetConfigsReplyFromJSON,
     TemplatebackendGetConfigsReplyToJSON,
 } from '../models/index';
@@ -39,6 +42,10 @@ export interface ConfigServiceCreateConfigRequest {
 }
 
 export interface ConfigServiceDeleteConfigRequest {
+    id: number;
+}
+
+export interface ConfigServiceExportConfigRequest {
     id: number;
 }
 
@@ -119,6 +126,42 @@ export class ConfigurationApi extends runtime.BaseAPI {
      */
     async configServiceDeleteConfig(requestParameters: ConfigServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteConfigReply> {
         const response = await this.configServiceDeleteConfigRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint returns the JSON of a configuration
+     * Export a configuration as json (SPHN Connector format)
+     */
+    async configServiceExportConfigRaw(requestParameters: ConfigServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendExportConfigReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configServiceExportConfig.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/rest/v1/config/export/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendExportConfigReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint returns the JSON of a configuration
+     * Export a configuration as json (SPHN Connector format)
+     */
+    async configServiceExportConfig(requestParameters: ConfigServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendExportConfigReply> {
+        const response = await this.configServiceExportConfigRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

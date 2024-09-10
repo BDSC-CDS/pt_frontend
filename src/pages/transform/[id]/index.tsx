@@ -1,15 +1,15 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { createConfig, getConfigs, deleteConfig } from "../../../utils/config"
+import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/config"
 import { useEffect, useMemo, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
-import { transformDataset, getMetadata, getDatasetContent, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
+import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
-import classNames from 'classnames';
+import { saveAs } from 'file-saver';
 
 const TransformPage = () => {
 
@@ -90,7 +90,20 @@ const TransformPage = () => {
         }
     }
 
-
+    // Handle the export logic
+    const handleExportConfig = async (configId: number | undefined) => {
+        if (configId) {
+            try {
+                const response = await exportConfig(configId); // Call backend to get the config as a string
+                if (response?.config) {
+                    const blob = new Blob([response.config], { type: "application/json" });
+                    saveAs(blob, `config_${configId}.json`); // Download the file with the configId as its name
+                }
+            } catch (error) {
+                console.error("Error exporting the configuration", error);
+            }
+        }
+    };
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -623,7 +636,15 @@ const TransformPage = () => {
                                                                         <div className="dropdown-menu">
                                                                             <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                                                                 <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                                                    onClick={() => handleDeleteConfig(config.id)}>Delete</li>
+                                                                                    onClick={() => handleDeleteConfig(config.id)}>
+                                                                                    Delete
+                                                                                </li>
+                                                                                <li
+                                                                                    className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                                    onClick={() => handleExportConfig(config.id)}
+                                                                                >
+                                                                                    Export
+                                                                                </li>
                                                                             </ul>
                                                                         </div>
                                                                     )}
@@ -644,7 +665,7 @@ const TransformPage = () => {
                                                                             </button>
                                                                             {openDetailId === `scramble-${config.id}` && (
                                                                                 <div className="p-2">
-                                                                                    <h4 className="font-bold">Scramble Field Parameters:</h4>
+                                                                                    <h4 className="font-bold">Parameters:</h4>
                                                                                     <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
                                                                                 </div>
                                                                             )}
@@ -661,7 +682,7 @@ const TransformPage = () => {
                                                                             </button>
                                                                             {openDetailId === `dateShift-${config.id}` && (
                                                                                 <div className="p-2">
-                                                                                    <h4 className="font-bold">Date Shift Parameters:</h4>
+                                                                                    <h4 className="font-bold">Parameters:</h4>
                                                                                     <p>Low Range: {config.dateShiftLowrange}</p>
                                                                                     <p>High Range: {config.dateShiftHighrange}</p>
                                                                                 </div>
@@ -679,7 +700,7 @@ const TransformPage = () => {
                                                                             </button>
                                                                             {openDetailId === `subfieldlist-${config.id}` && (
                                                                                 <div className="p-2">
-                                                                                    <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
+                                                                                    <h4 className="font-bold">Parameters:</h4>
                                                                                     <p>Field: {config.subFieldListField}</p>
                                                                                     <p>Substitute: {config.subFieldListSubstitute}</p>
                                                                                     <p>Replacement: {config.subFieldListReplacement}</p>
@@ -698,7 +719,7 @@ const TransformPage = () => {
                                                                             </button>
                                                                             {openDetailId === `subfieldregex-${config.id}` && (
                                                                                 <div className="p-2">
-                                                                                    <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
+                                                                                    <h4 className="font-bold">Parameters:</h4>
                                                                                     <p>Field: {config.subFieldRegexField}</p>
                                                                                     <p>Regex: {config.subFieldRegexRegex}</p>
                                                                                     <p>Replacement: {config.subFieldRegexReplacement}</p>
