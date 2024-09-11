@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/router';
 import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/config"
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
+import { MdOutlineAdd, MdMoreHoriz, MdFileUpload } from "react-icons/md";
 import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
@@ -23,7 +23,7 @@ const TransformPage = () => {
 
     const [openConfigId, setOpenConfigId] = useState<number | null>(null);
     const [openDetailId, setOpenDetailId] = useState<string | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [hasScrambleField, setHasScrambleField] = useState(false);
     const defaultScrambleFields = `
         sphn:SubjectPseudoIdentifier/sphn:hasIdentifier,
@@ -45,7 +45,6 @@ const TransformPage = () => {
         dateShiftLowrange: -30,
         dateShiftHighrange: 30,
     });
-
     const [hasDateShift, setHasDateShift] = useState(false);
     const [dateShiftRange, setDateShiftRange] = useState({
         low: -30,
@@ -72,6 +71,11 @@ const TransformPage = () => {
     const [idCol, setIdCol] = useState<string>();
     const [datasetName, setDatasetName] = useState<string>();
     const [createdAt, setCreatedAt] = useState<Date>();
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importedConfig, setImportedConfig] = useState<TemplatebackendConfig | null>(null);
+    const [configName, setConfigName] = useState(""); // New state for config name
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const buttonClass = "flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer"
 
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
@@ -163,7 +167,7 @@ const TransformPage = () => {
     }
 
     const closeCreateConfigModal = () => {
-        setShowModal(false);
+        setShowCreateModal(false);
         setHasDateShift(false);
         setHasScrambleField(false);
         setHassubFieldList(false);
@@ -435,6 +439,74 @@ const TransformPage = () => {
     const nonIdentifyingColumns = useMemo(() => {
         return metadata?.filter((meta) => meta.identifier === 'non-identifying');
     }, [metadata]);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const result = event.target?.result as string;
+                const jsonConfig = JSON.parse(result);
+
+                const newConfig: TemplatebackendConfig = {
+                    configName: configName || "Imported Config",
+                    hasScrambleField: !!jsonConfig.scrambleField,
+                    hasDateShift: !!jsonConfig.dateShift,
+                    hassubFieldList: !!jsonConfig.substituteFieldList,
+                    hassubFieldRegex: !!jsonConfig.substituteFieldRegex,
+
+                    // Scramble Field Mapping
+                    scrambleFieldFields: jsonConfig.scrambleField?.defaultScrambling?.applies_to_fields || [],
+
+                    // Date Shift Mapping
+                    dateShiftLowrange: jsonConfig.dateShift?.defaultDateShift?.low_range || -30,
+                    dateShiftHighrange: jsonConfig.dateShift?.defaultDateShift?.high_range || 30,
+
+                    // Substitute Field List Mapping
+                    subFieldListField: jsonConfig.substituteFieldList?.subIDlist?.applies_to_field || "",
+                    subFieldListSubstitute: jsonConfig.substituteFieldList?.subIDlist?.substitution_list || [],
+                    subFieldListReplacement: jsonConfig.substituteFieldList?.subIDlist?.replacement || "",
+
+                    // Substitute Field Regex Mapping
+                    subFieldRegexField: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.applies_to_field || "",
+                    subFieldRegexRegex: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.regex || "",
+                    subFieldRegexReplacement: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.replacement || ""
+                };
+
+                // Store the imported config in state
+                setImportedConfig(newConfig);
+            } catch (error) {
+                console.error('Error importing configuration:', error);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const handleImportSubmit = async () => {
+        if (!importedConfig) return;
+        try {
+            const response = await createConfig(importedConfig);
+            if (response?.result?.id) {
+                console.log("Config imported successfully!");
+                // You can refresh configs here
+            }
+            setShowImportModal(false); // Close modal after submit
+            handleGetConfigs();
+        } catch (error) {
+            console.error('Error submitting configuration:', error);
+        }
+    };
+
+    const handleOpenFileDialog = () => {
+        fileInputRef.current?.click();
+    };
+
+    const closeImportModal = () => {
+        setShowImportModal(false);
+        setImportedConfig(null);
+    };
     // ------------------------------- html -------------------------------------------- //
 
     return (
@@ -452,6 +524,47 @@ const TransformPage = () => {
                     </div>
 
                     <div className="flex flex-col items-end p-5 relative mb-1">
+
+
+                        {/* Import Modal */}
+                        <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
+                            <Modal.Header>Import Configuration</Modal.Header>
+                            <Modal.Body>
+                                <div className="space-y-4">
+                                    {/* Input field for config name */}
+                                    <div>
+                                        <label htmlFor="configName" className="block text-sm font-medium text-gray-700">
+                                            Configuration Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="configName"
+                                            value={configName}
+                                            onChange={(e) => setConfigName(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="Enter configuration name"
+                                        />
+                                    </div>
+
+                                    {/* File input for uploading JSON */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Upload JSON</label>
+                                        <input
+                                            type="file"
+                                            accept="application/json"
+                                            onChange={handleFileUpload}
+                                            className="mt-1 block w-full"
+                                        />
+                                    </div>
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={handleImportSubmit} disabled={!importedConfig}>
+                                    Submit
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+
 
                         {/* Modal for showing error messages */}
                         <Modal
@@ -473,6 +586,8 @@ const TransformPage = () => {
                                 </div>
                             </Modal.Body>
                         </Modal>
+
+                        {/* Modal to change the column types */}
                         <Modal
                             show={showColTypeModal}
                             onClose={() => closeColumnTypeModal()}
@@ -532,8 +647,8 @@ const TransformPage = () => {
                                 <Button onClick={() => handleChangeTypes()}>Save</Button>
                             </Modal.Footer>
                         </Modal>
-                        {/* Dataset */}
 
+                        {/* Dataset preview*/}
                         <div className='flex flex-col w-full'>
                             <div className="flex items-center justify-between w-full mb-3">
                                 {nonIdentifyingColumns && nonIdentifyingColumns?.length > 0 ? (
@@ -545,12 +660,25 @@ const TransformPage = () => {
 
                                         < div className="w-1/2"></div>
                                     )}
-                                <button
-                                    onClick={() => setShowModal(true)}
-                                    className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                                    <MdOutlineAdd size={30} />
-                                    <p className='ml-2 text-md'> Add a configuration </p>
-                                </button>
+                                <div className="flex flex-col space-y-4">
+                                    {/* Create Configuration Button */}
+                                    <button
+                                        onClick={() => setShowCreateModal(true)}
+                                        className={buttonClass}
+                                    >
+                                        <MdOutlineAdd size={20} className="mr-2" />
+                                        Create Configuration
+                                    </button>
+
+                                    {/* Import Configuration Button */}
+                                    <button
+                                        onClick={() => setShowImportModal(true)}
+                                        className={buttonClass}
+                                    >
+                                        <MdFileUpload size={20} className="mr-2" />
+                                        <p className='ml-2 text-md'> Import Configuration </p>
+                                    </button>
+                                </div>
                             </div>
 
                             <div className='flex '>
@@ -594,7 +722,7 @@ const TransformPage = () => {
                                     <div className='flex justify-start mt-5 ml-3'>
                                         <button
                                             onClick={handleColumnTypeChange}
-                                            className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer"
+                                            className={buttonClass}
                                         >
                                             <p className='ml-2 text-md'> Edit Metadata </p>
                                         </button>
@@ -751,7 +879,7 @@ const TransformPage = () => {
                                 Apply Transformation
                             </button>
                         </div>
-                        <Modal show={showModal} onClose={() => closeCreateConfigModal()}>
+                        <Modal show={showCreateModal} onClose={() => closeCreateConfigModal()}>
                             <Modal.Body>
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-bold mb-2">New Configuration</h2>
