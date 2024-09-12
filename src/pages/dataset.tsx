@@ -37,13 +37,11 @@ export default function Dataset() {
         'M/d/yyyy',
     ];
 
-    const handleMenuOpen = (id: number | undefined, event: React.MouseEvent) => {
+    const handleMenuOpen = (id: number | undefined, index: number) => {
         if (id) {
-            const rowPosition = event.currentTarget.getBoundingClientRect().bottom;
-            const windowHeight = window.innerHeight;
 
             // If the row is in the bottom 20% of the viewport, show dropdown above
-            if (windowHeight - rowPosition < windowHeight * 0.2) {
+            if (datasetsList.length - index <= 3) {
                 setIsDropdownAbove(true);
             } else {
                 setIsDropdownAbove(false);
@@ -429,7 +427,7 @@ export default function Dataset() {
                                     </Table.HeadCell>
                                 </Table.Head>
                                 <Table.Body className="divide-y">
-                                    {datasetsList.map((dataset) => (
+                                    {datasetsList.map((dataset, index) => (
                                         < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
@@ -440,7 +438,7 @@ export default function Dataset() {
                                             </Table.Cell>
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
                                             < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                                <a onMouseEnter={(event) => handleMenuOpen(dataset.id, event)} className="text-gray-900 hover:text-blue-500">
+                                                <a onMouseEnter={() => handleMenuOpen(dataset.id, index)} className="text-gray-900 hover:text-blue-500">
                                                     <MdMoreHoriz size={20} />
                                                 </a>
                                                 {openMenuId === dataset.id && (
