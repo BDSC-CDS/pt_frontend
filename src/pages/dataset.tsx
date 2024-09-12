@@ -25,6 +25,7 @@ export default function Dataset() {
     const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
+    const [isDropdownAbove, setIsDropdownAbove] = useState(false);
     const [idCol, setIdCol] = useState<string>();
     const acceptedDateFormats = [
         'yyyy-MM-dd',
@@ -36,8 +37,17 @@ export default function Dataset() {
         'M/d/yyyy',
     ];
 
-    const handleMenuOpen = (id: number | undefined) => {
+    const handleMenuOpen = (id: number | undefined, event: React.MouseEvent) => {
         if (id) {
+            const rowPosition = event.currentTarget.getBoundingClientRect().bottom;
+            const windowHeight = window.innerHeight;
+
+            // If the row is in the bottom 20% of the viewport, show dropdown above
+            if (windowHeight - rowPosition < windowHeight * 0.2) {
+                setIsDropdownAbove(true);
+            } else {
+                setIsDropdownAbove(false);
+            }
             setOpenMenuId(id);
         }
     };
@@ -430,15 +440,16 @@ export default function Dataset() {
                                             </Table.Cell>
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
                                             < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                                <a onMouseEnter={() => handleMenuOpen(dataset.id)} className="text-gray-900 hover:text-blue-500">
+                                                <a onMouseEnter={(event) => handleMenuOpen(dataset.id, event)} className="text-gray-900 hover:text-blue-500">
                                                     <MdMoreHoriz size={20} />
                                                 </a>
                                                 {openMenuId === dataset.id && (
-                                                    <div className="dropdown-menu">
-                                                        <ul className="absolute  w-40 bg-white rounded-md shadow-lg z-10">
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                    <div className="dropdown-menu relative">
+                                                        <ul className={`absolute ${isDropdownAbove ? '-top-14' : 'mt-4'
+                                                            } w-35  bg-white rounded-md shadow-lg z-10`}>
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
                                                                 onClick={() => handleTransform(dataset.id)}>Transform</li>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
                                                                 onClick={() => handleDelete(dataset.id)}>Delete</li>
                                                         </ul>
                                                     </div>
