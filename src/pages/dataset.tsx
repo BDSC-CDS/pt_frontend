@@ -301,17 +301,26 @@ export default function Dataset() {
             <Head>
                 <title>Datasets</title>
             </Head>
-            {!isLoggedIn &&
+            {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
-            }
-            {isLoggedIn &&
-                <div className="flex flex-col items-center p-5">
-                    <button
-                        onClick={() => setIsUploadModalOpen(true)}
-                        className="fixed right-10 flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                        <MdOutlineAdd size={30} />
-                        <p className='ml-2 text-sm'> Upload</p>
-                    </button>
+            )}
+            {isLoggedIn && (
+                <div className="flex flex-col p-8">
+                    <div className="flex justify-between items-center mb-4">
+                        <h1 className="text-3xl font-bold">Datasets</h1>
+                        <button
+                            onClick={() => setIsUploadModalOpen(true)}
+                            className="text-white bg-[#306278] hover:bg-[#255362] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
+                        >
+                            <svg className="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            New project
+                        </button>
+
+
+
+                    </div>
                     <Modal show={isUploadModalOpen} onClose={() => closeUploadModals()}>
                         <Modal.Body>
                             <div className="space-y-6">
@@ -413,10 +422,8 @@ export default function Dataset() {
                         </Modal.Footer>
                     </Modal>
 
-
                     {datasetsList.length > 0 ? (
-                        <div className="mt-20 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded">
-
+                        <div className="mt-4 overflow-x-auto w-full border border-gray-200 rounded-lg">
                             <Table hoverable>
                                 <Table.Head>
                                     <Table.HeadCell>Dataset ID</Table.HeadCell>
@@ -433,7 +440,7 @@ export default function Dataset() {
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
                                                 {dataset.id}
                                             </Table.Cell>
-                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900">
                                                 {dataset.datasetName}
                                             </Table.Cell>
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
@@ -452,19 +459,17 @@ export default function Dataset() {
                                                         </ul>
                                                     </div>
                                                 )}
-
                                             </Table.Cell>
-
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
                             </Table>
-                        </div >
+                        </div>
                     ) : (
                         <div className="text-center text-gray-500 mt-20">No datasets yet</div>
                     )}
-                </div >
-            }
+                </div>
+            )}
         </>
     );
 }

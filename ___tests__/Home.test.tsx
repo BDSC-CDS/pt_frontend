@@ -12,10 +12,13 @@ jest.mock('../src/utils/authContext', () => ({
   logout: jest.fn(),
 });
 
+
 describe('Home', () => {
   it('heading', () => {
     render(<Home />)
-    const heading = screen.getByRole('heading', { level: 2, name: /Welcome to the Privacy Toolbox!/i });
+    const heading = screen.getByRole('heading', { level: 1, name: /Welcome to the Privacy Toolbox!/i });
     expect(heading).toBeTruthy();
   })
 })
+
+
