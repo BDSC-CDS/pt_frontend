@@ -1,14 +1,15 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { createConfig, getConfigs, deleteConfig } from "../../../utils/config"
-import { useEffect, useMemo, useState } from 'react';
+import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/config"
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
-import { Button, Modal } from 'flowbite-react';
-import { transformDataset, getMetadata, getDatasetContent } from "../../../utils/dataset";
+import { MdOutlineAdd, MdMoreHoriz, MdFileUpload } from "react-icons/md";
+import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
+import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { Table } from 'flowbite-react';
+import { saveAs } from 'file-saver';
 
 const TransformPage = () => {
 
@@ -22,7 +23,7 @@ const TransformPage = () => {
 
     const [openConfigId, setOpenConfigId] = useState<number | null>(null);
     const [openDetailId, setOpenDetailId] = useState<string | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [hasScrambleField, setHasScrambleField] = useState(false);
     const defaultScrambleFields = `
         sphn:SubjectPseudoIdentifier/sphn:hasIdentifier,
@@ -44,7 +45,6 @@ const TransformPage = () => {
         dateShiftLowrange: -30,
         dateShiftHighrange: 30,
     });
-
     const [hasDateShift, setHasDateShift] = useState(false);
     const [dateShiftRange, setDateShiftRange] = useState({
         low: -30,
@@ -54,16 +54,28 @@ const TransformPage = () => {
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
     const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [idMetadata, setIDMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [filteredMetadata, setFilteredMetadata] = useState<Array<TemplatebackendMetadata>>();
+    const [newMetadata, setNewMetadata] = useState<Array<TemplatebackendMetadata>>([]);
     const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
     const [selectedSubListField, setSelectedSubListField] = useState("");
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
     const [columns, setColumns] = useState<Array<Array<string | undefined> | undefined>>();
+    const [nColumns, setNColumns] = useState(0);
     const [nRows, setNRows] = useState<number>(0);
+    const [totalRows, setTotalRows] = useState<number>(0);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showColTypeModal, setShowColTypeModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [idCol, setIdCol] = useState<string>();
+    const [datasetName, setDatasetName] = useState<string>();
+    const [createdAt, setCreatedAt] = useState<Date>();
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importedConfig, setImportedConfig] = useState<TemplatebackendConfig | null>(null);
+    const [configName, setConfigName] = useState(""); // New state for config name
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const buttonClass = "flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer"
 
     // ----------------------------------- methods --------------------------------- //
     const toggleConfig = (id: number | undefined) => {
@@ -82,24 +94,20 @@ const TransformPage = () => {
         }
     }
 
-    // // filter the configurations to keep only those that match the dataset
-    // const filterConfigs = () => {
-    //     if (!metadata) return; // Ensure metadata is available before filtering
-
-    //     const column_names = metadata.map(item => item.columnName)
-    //     const filteredconfigs = configs.filter(config => {
-    //         // Check if subFieldRegexField, subFieldListField, and scrambleFieldFields meet the conditions
-    //         const isSubFieldRegexFieldValid = !config.hassubFieldRegex || column_names.includes(config.subFieldRegexField);
-    //         const isSubFieldListFieldValid = !config.hassubFieldList || column_names.includes(config.subFieldListField);
-    //         const isScrambleFieldFieldsValid = !config.hasScrambleField ||
-    //             config.scrambleFieldFields?.every(field => column_names.includes(field));
-
-    //         // Keep the config if all conditions are satisfied
-    //         return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
-    //     })
-    //     // set the configurations to those that match the dataset columns
-    //     setConfigs(filteredconfigs)
-    // }
+    // Handle the export logic
+    const handleExportConfig = async (configId: number | undefined) => {
+        if (configId) {
+            try {
+                const response = await exportConfig(configId); // Call backend to get the config as a string
+                if (response?.config) {
+                    const blob = new Blob([response.config], { type: "application/json" });
+                    saveAs(blob, `config_${configId}.json`); // Download the file with the configId as its name
+                }
+            } catch (error) {
+                console.error("Error exporting the configuration", error);
+            }
+        }
+    };
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -159,7 +167,7 @@ const TransformPage = () => {
     }
 
     const closeCreateConfigModal = () => {
-        setShowModal(false);
+        setShowCreateModal(false);
         setHasDateShift(false);
         setHasScrambleField(false);
         setHassubFieldList(false);
@@ -190,11 +198,22 @@ const TransformPage = () => {
         }
     };
 
+    const getDatasetInfo = async () => {
+        const response = await getInfo(datasetId);
+        if (response?.dataset) {
+            setDatasetName(response.dataset.datasetName);
+            setCreatedAt(response.dataset.createdAt);
+        }
+    }
+
     const getDatasetMetadata = async () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
             setMetadata(response.metadata.metadata);
-            const filteredMetadata = response.metadata.metadata.filter(item => (item.type === "int" || item.type === "string"));
+            setNewMetadata(JSON.parse(JSON.stringify(response.metadata.metadata)));
+            const identifierMetadata = response.metadata.metadata.filter(item => (item.identifier === "identifier" || item.identifier === "quasi-identifier"));
+            setIDMetadata(identifierMetadata);
+            const filteredMetadata = response.metadata.metadata.filter(item => ((item.type === "int" || item.type === "float" || item.type === "string") && (item.identifier === "identifier" || item.identifier === "quasi-identifier")));
             setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
                 setSelectedSubListField(filteredMetadata[0].columnName);
@@ -208,6 +227,14 @@ const TransformPage = () => {
                     ['subFieldRegexField']: filteredMetadata[0]?.columnName
                 }));
             }
+            // set the original id column
+            const originalIdCol = response.metadata.metadata.find((meta) => meta.isId)?.columnName;
+            if (originalIdCol) {
+                setIdCol(originalIdCol); // Reset idCol to original identifier column
+            }
+
+            //set the number of columns
+            setNColumns(response.metadata.metadata.length);
         }
     }
 
@@ -226,7 +253,8 @@ const TransformPage = () => {
     };
 
     const getAndProcessDatasetContent = async () => {
-        const response = await getDatasetContent(datasetId, 0, 5);
+        //const response = await getDatasetContent(datasetId, 0, 5);
+        const response = await getDatasetIdentifier(datasetId, 0, 5);
         if (response && response.result?.columns) {
             const result = response.result?.columns.map((col) => {
                 return col.value;
@@ -237,6 +265,9 @@ const TransformPage = () => {
                     setNRows(result[0].length)
                 }
             }
+        }
+        if (response && response.result?.nRows) {
+            setTotalRows(response.result.nRows);
         }
     }
     const handleMenuOpen = (id: number | undefined) => {
@@ -256,6 +287,34 @@ const TransformPage = () => {
         }
     };
 
+    const handleColumnTypeChange = async () => {
+        setShowColTypeModal(true);
+    };
+
+    const setColumnType = (column: string | undefined, type: string) => {
+        if (column && newMetadata) {
+            // Update the newMetadata array
+            const updatedMetadata = newMetadata.map(meta => {
+                if (meta.columnName === column) {
+                    return { ...meta, type: type };
+                }
+                return meta;
+            });
+            setNewMetadata(updatedMetadata); // Update the newMetadata state
+        };
+    };
+    const setColumnIdentifying_ = (column: string | undefined, newIdentifier: string) => {
+        if (column && newMetadata) {
+            const updatedMetadata = newMetadata.map(meta => {
+                if (meta.columnName === column) {
+                    return { ...meta, identifier: newIdentifier };
+                }
+                return meta;
+            });
+            setNewMetadata(updatedMetadata); // Update the newMetadata state
+        }
+    };
+
     useEffect(() => {
         setConfig(prev => ({
             ...prev,
@@ -266,6 +325,7 @@ const TransformPage = () => {
     useEffect(() => {
         if (id) {
             try {
+                getDatasetInfo();
                 getDatasetMetadata();
                 getAndProcessDatasetContent();
                 // handleGetConfigs();
@@ -279,24 +339,17 @@ const TransformPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true);
                 const [metadataResponse, configsResponse] = await Promise.all([
                     getMetadata(datasetId),
                     getConfigs()
                 ]);
 
-                if (metadataResponse?.metadata?.metadata) {
-                    setMetadata(metadataResponse.metadata.metadata);
-                }
-
                 if (configsResponse?.result?.config) {
                     setConfigs(configsResponse.result.config);
                 }
 
-                setIsLoading(false);
             } catch (error) {
                 setErrorMessage("Error fetching data");
-                setIsLoading(false);
             }
         };
 
@@ -305,27 +358,157 @@ const TransformPage = () => {
         }
     }, [datasetId]);
 
-    // Preprocess metadata column names for efficient lookups
-    const columnNamesSet = useMemo(() => {
-        return new Set(metadata?.map(item => item.columnName));
-    }, [metadata]);
-
     // Filter the configurations based on the metadata
     useEffect(() => {
         if (metadata?.length && metadata.length > 0 && configs.length > 0) {
             const filtered = configs.filter(config => {
-                const isSubFieldRegexFieldValid = !config.hassubFieldRegex || columnNamesSet.has(config.subFieldRegexField);
-                const isSubFieldListFieldValid = !config.hassubFieldList || columnNamesSet.has(config.subFieldListField);
-                const isScrambleFieldFieldsValid = !config.hasScrambleField ||
-                    (config.scrambleFieldFields && config.scrambleFieldFields.every(field => columnNamesSet.has(field)));
+                // Check scrambleFieldFields (if present)
+                const isValidScrambleFields = !config.hasScrambleField || (
+                    config.scrambleFieldFields?.every(field => {
+                        const column = metadata.find(meta => meta.columnName === field);
+                        return column?.identifier === 'identifier' || column?.identifier === 'quasi-identifier';
+                    })
+                );
 
-                return isSubFieldRegexFieldValid && isSubFieldListFieldValid && isScrambleFieldFieldsValid;
+                // Check subFieldListField (if present)
+                const isValidSubListField = !config.hassubFieldList || (
+                    config.subFieldListField ? metadata.some(meta =>
+                        meta.columnName === config.subFieldListField &&
+                        (meta.identifier === 'identifier' || meta.identifier === 'quasi-identifier')
+                    ) : true
+                );
+
+                // Check subFieldRegexField (if present)
+                const isValidSubRegexField = !config.hassubFieldRegex || (
+                    config.subFieldRegexField ? metadata.some(meta =>
+                        meta.columnName === config.subFieldRegexField &&
+                        (meta.identifier === 'identifier' || meta.identifier === 'quasi-identifier')
+                    ) : true
+                );
+
+                // Only include configs that pass all these checks
+                return isValidScrambleFields && isValidSubListField && isValidSubRegexField;
             });
 
-            setFilteredConfigs(filtered);
+            setFilteredConfigs(filtered);  // Set the filtered configurations
         }
-    }, [configs, metadata, columnNamesSet]);
+    }, [configs, metadata]);
+
+
+
+    const closeColumnTypeModal = () => {
+        // Close the modal and reset newMetadata back to the original metadata
+        setNewMetadata(JSON.parse(JSON.stringify(metadata))); // Reset to original values
+        const originalIdCol = metadata?.find((meta) => meta.isId)?.columnName;
+        if (originalIdCol) {
+            setIdCol(originalIdCol); // Reset idCol to original identifier column
+        }
+        setShowColTypeModal(false);
+    };
+
+    const handleChangeTypes = async () => {
+        // if the types have not changed from the original types
+        if (!newMetadata || JSON.stringify(newMetadata) === JSON.stringify(metadata)) {
+            closeColumnTypeModal();
+            return;
+        }
+        try {
+
+            const updatedMetadata = newMetadata.map(meta => ({
+                ...meta,
+                isId: meta.columnName === idCol // Ensure that isId is correct before sending
+            }));
+
+            const response = await changeTypesDataset(datasetId, updatedMetadata);
+            // Implement the transformation logic for selected configurations
+            if (response?.id) {
+                router.push("/dataset/" + response.id);
+                closeColumnTypeModal();
+            }
+        } catch (error) {
+            // Safely check if error is an instance of Error
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage('An unexpected error occurred');
+            }
+            setShowErrorModal(true);
+        }
+    }
+
+    const nonIdentifyingColumns = useMemo(() => {
+        return metadata?.filter((meta) => meta.identifier === 'non-identifying');
+    }, [metadata]);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const result = event.target?.result as string;
+                const jsonConfig = JSON.parse(result);
+
+                const newConfig: TemplatebackendConfig = {
+                    configName: configName || "Imported Config",
+                    hasScrambleField: !!jsonConfig.scrambleField,
+                    hasDateShift: !!jsonConfig.dateShift,
+                    hassubFieldList: !!jsonConfig.substituteFieldList,
+                    hassubFieldRegex: !!jsonConfig.substituteFieldRegex,
+
+                    // Scramble Field Mapping
+                    scrambleFieldFields: jsonConfig.scrambleField?.defaultScrambling?.applies_to_fields || [],
+
+                    // Date Shift Mapping
+                    dateShiftLowrange: jsonConfig.dateShift?.defaultDateShift?.low_range || -30,
+                    dateShiftHighrange: jsonConfig.dateShift?.defaultDateShift?.high_range || 30,
+
+                    // Substitute Field List Mapping
+                    subFieldListField: jsonConfig.substituteFieldList?.subIDlist?.applies_to_field || "",
+                    subFieldListSubstitute: jsonConfig.substituteFieldList?.subIDlist?.substitution_list || [],
+                    subFieldListReplacement: jsonConfig.substituteFieldList?.subIDlist?.replacement || "",
+
+                    // Substitute Field Regex Mapping
+                    subFieldRegexField: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.applies_to_field || "",
+                    subFieldRegexRegex: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.regex || "",
+                    subFieldRegexReplacement: jsonConfig.substituteFieldRegex?.substituteFieldRegex?.replacement || ""
+                };
+
+                // Store the imported config in state
+                setImportedConfig(newConfig);
+            } catch (error) {
+                console.error('Error importing configuration:', error);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const handleImportSubmit = async () => {
+        if (!importedConfig) return;
+        try {
+            const response = await createConfig(importedConfig);
+            if (response?.result?.id) {
+                console.log("Config imported successfully!");
+                // You can refresh configs here
+            }
+            setShowImportModal(false); // Close modal after submit
+            handleGetConfigs();
+        } catch (error) {
+            console.error('Error submitting configuration:', error);
+        }
+    };
+
+    const handleOpenFileDialog = () => {
+        fileInputRef.current?.click();
+    };
+
+    const closeImportModal = () => {
+        setShowImportModal(false);
+        setImportedConfig(null);
+    };
     // ------------------------------- html -------------------------------------------- //
+
     return (
         <>
             {!isLoggedIn &&
@@ -333,16 +516,56 @@ const TransformPage = () => {
             }
             {isLoggedIn &&
                 <>
-                    {/* <h1 className='my-5 text-center text-xl font-bold'>Configurations</h1> */}
+                    <div className="bg-gray-100 p-5 ml-8 rounded-lg shadow text-md ">
+                        <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
+                        <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
+                        <p><strong>Number of Rows:</strong> {totalRows}</p>
+                        <p><strong>Number of Columns:</strong> {nColumns} </p>
+                    </div>
 
-                    <div className="flex flex-col items-end p-5 relative mb-10">
-                        {/* <div className='bg-white fixed top-20  right-50'> */}
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                            <MdOutlineAdd size={30} />
-                            <p className='ml-2 text-md'> Add a configuration </p>
-                        </button>
+                    <div className="flex flex-col items-end p-5 relative mb-1">
+
+
+                        {/* Import Modal */}
+                        <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
+                            <Modal.Header>Import Configuration</Modal.Header>
+                            <Modal.Body>
+                                <div className="space-y-4">
+                                    {/* Input field for config name */}
+                                    <div>
+                                        <label htmlFor="configName" className="block text-sm font-medium text-gray-700">
+                                            Configuration Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="configName"
+                                            value={configName}
+                                            onChange={(e) => setConfigName(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="Enter configuration name"
+                                        />
+                                    </div>
+
+                                    {/* File input for uploading JSON */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Upload JSON</label>
+                                        <input
+                                            type="file"
+                                            accept="application/json"
+                                            onChange={handleFileUpload}
+                                            className="mt-1 block w-full"
+                                        />
+                                    </div>
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={handleImportSubmit} disabled={!importedConfig}>
+                                    Submit
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+
+
                         {/* Modal for showing error messages */}
                         <Modal
                             show={showErrorModal}
@@ -364,162 +587,288 @@ const TransformPage = () => {
                             </Modal.Body>
                         </Modal>
 
-                        {/* Dataset */}
-                        <div className='flex w-full'>
-                            <div className=" mt-5 overflow-x-auto w-3/4 h-full border  border-gray-300 rounded ml-3">
-                                <Table hoverable>
-                                    <Table.Head>
-                                        {metadata?.map((meta) =>
-                                            <Table.HeadCell>{meta.columnName}</Table.HeadCell>
-                                        )}
-                                    </Table.Head>
-                                    <Table.Body className="divide-y">
-                                        {Array.from({ length: nRows }, (_, index) => (
-                                            < Table.Row key={index} className="bg-white"
-                                            >
-                                                {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                                {columns?.map((col, colIndex) => (
-
-                                                    <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                        {col?.at(index)}
-                                                    </Table.Cell>
-                                                ))}
-
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table>
-                            </div >
-                            {filteredConfigs.length > 0 ? (
-                                <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
-                                    <div>
-                                        {filteredConfigs?.map((config) => (
-                                            <>
-                                                <div key={config.id} className="mb-4 p-4 py-1 flex items-start">
+                        {/* Modal to change the column types */}
+                        <Modal
+                            show={showColTypeModal}
+                            onClose={() => closeColumnTypeModal()}
+                        >
+                            <Modal.Header>
+                                Change Column Types
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between font-bold">
+                                        <span className="w-1/2">Column Name</span>
+                                        <div className="flex space-x-4 w-1/2">
+                                            <span className="w-1/2">Type</span>
+                                            <span className="w-1/2">Identifier</span>
+                                            <span className="w-1/3">Is Identifier?</span>
+                                        </div>
+                                    </div>
+                                    {newMetadata?.map(meta => (
+                                        <>
+                                            <div key={meta.columnId} className="flex items-center justify-between">
+                                                <span className="w-1/2">{meta.columnName}:</span>
+                                                <div className="flex space-x-4 w-1/2">
+                                                    <select
+                                                        value={meta.type}
+                                                        onChange={(e) => setColumnType(meta.columnName, e.target.value)}
+                                                        className="select select-bordered w-1/2"
+                                                    >
+                                                        <option value="string">String</option>
+                                                        <option value="int">Integer</option>
+                                                        <option value="float">Float</option>
+                                                        <option value="date">Date</option>
+                                                    </select>
+                                                    <select
+                                                        value={meta.identifier}
+                                                        onChange={(e) => setColumnIdentifying_(meta.columnName, e.target.value)}
+                                                        className="select select-bordered w-1/2"
+                                                    >
+                                                        <option value="identifier">Identifier</option>
+                                                        <option value="quasi-identifier">Quasi-identifier</option>
+                                                        <option value="non-identifying">Non-identifying</option>
+                                                    </select>
                                                     <input
-                                                        type="checkbox"
-                                                        checked={selectedConfigId === config.id}
-                                                        onChange={() => handleCheckboxChange(config.id)}
-                                                        className="form-checkbox h-5 w-5 mr-4 mt-2"
+                                                        type="radio"
+                                                        name="identifier-column"  // Radio group name should be the same for all
+                                                        checked={idCol === meta.columnName}
+                                                        onChange={() => setIdCol(meta.columnName)}
+                                                        className="radio radio-bordered"
                                                     />
-                                                    <div className='w-full'>
-                                                        <div className='flex ' onMouseLeave={handleMenuClose}>
-                                                            <button
-                                                                onClick={() => toggleConfig(config.id)}
-                                                                className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
-                                                            >
-                                                                {config.configName || `Configuration ${config.id}`}
-                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
-                                                                    ▼
-                                                                </span>
-                                                            </button>
-                                                            <div className='flex justify-start items-center'>
-                                                                <a
-                                                                    onMouseEnter={() => handleMenuOpen(config.id)}
-
-                                                                    className="text-gray-900 hover:text-blue-500">
-                                                                    <MdMoreHoriz size={20} />
-                                                                </a>
-                                                                {openMenuId === config.id && (
-                                                                    <div className="dropdown-menu">
-                                                                        <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                                                onClick={() => handleDeleteConfig(config.id)}>Delete</li>
-                                                                        </ul>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-
-
-                                                        {openConfigId === config.id && (
-                                                            <div className="mt-2 bg-white p-2">
-                                                                {config.hasScrambleField && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`scramble-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            Scramble Field
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `scramble-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Scramble Field Parameters:</h4>
-                                                                                <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hasDateShift && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            Date Shift
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `dateShift-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Date Shift Parameters:</h4>
-                                                                                <p>Low Range: {config.dateShiftLowrange}</p>
-                                                                                <p>High Range: {config.dateShiftHighrange}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hassubFieldList && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            SubField List Replacement
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `subfieldlist-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Subfield List Replacement Parameters:</h4>
-                                                                                <p>Field: {config.subFieldListField}</p>
-                                                                                <p>Substitute: {config.subFieldListSubstitute}</p>
-                                                                                <p>Replacement: {config.subFieldListReplacement}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                                {config.hassubFieldRegex && (
-                                                                    <>
-                                                                        <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
-                                                                            className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                                            SubField Regex Replacement
-                                                                            <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
-                                                                                ▼
-                                                                            </span>
-                                                                        </button>
-                                                                        {openDetailId === `subfieldregex-${config.id}` && (
-                                                                            <div className="p-2">
-                                                                                <h4 className="font-bold">Subfield Regex Replacement Parameters:</h4>
-                                                                                <p>Field: {config.subFieldRegexField}</p>
-                                                                                <p>Regex: {config.subFieldRegexRegex}</p>
-                                                                                <p>Replacement: {config.subFieldRegexReplacement}</p>
-                                                                            </div>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
                                                 </div>
-                                                <hr className="border-t border-gray-300 my-4" />
-                                            </>
-                                        ))
-                                        }
+                                            </div>
+                                        </>))
+                                    }
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer className='flex justify-between'>
+                                <Button className='bg-gray-400' onClick={() => closeColumnTypeModal()}>Close</Button>
+                                <Button onClick={() => handleChangeTypes()}>Save</Button>
+                            </Modal.Footer>
+                        </Modal>
+
+                        {/* Dataset preview*/}
+                        <div className='flex flex-col w-full'>
+                            <div className="flex items-center justify-between w-full mb-3">
+                                {nonIdentifyingColumns && nonIdentifyingColumns?.length > 0 ? (
+                                    <Alert className="mt-2 ml-3 w-1/2" color="info">
+                                        These are only the identifying and quasi-identifying columns. To change the column types, click <button onClick={handleColumnTypeChange} className='underline'>here</button>.
+                                    </Alert>
+                                ) :
+                                    (
+
+                                        < div className="w-1/2"></div>
+                                    )}
+                                <div className="flex flex-col space-y-4">
+                                    {/* Create Configuration Button */}
+                                    <button
+                                        onClick={() => setShowCreateModal(true)}
+                                        className={buttonClass}
+                                    >
+                                        <MdOutlineAdd size={20} className="mr-2" />
+                                        Create Configuration
+                                    </button>
+
+                                    {/* Import Configuration Button */}
+                                    <button
+                                        onClick={() => setShowImportModal(true)}
+                                        className={buttonClass}
+                                    >
+                                        <MdFileUpload size={20} className="mr-2" />
+                                        <p className='ml-2 text-md'> Import Configuration </p>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className='flex '>
+                                <div className='flex flex-col w-3/4 h-full'>
+                                    <div className=" mt-5 overflow-x-auto w-full h-full border border-gray-300 rounded ml-3">
+                                        <Table hoverable>
+                                            <Table.Head>
+                                                {idMetadata?.map((meta) =>
+                                                    <Table.HeadCell key={meta.columnId}>
+                                                        <Tooltip
+                                                            content={(
+                                                                <div className="text-sm" style={{ textTransform: 'none' }}>
+                                                                    <p><strong>Type:</strong> {meta.type}</p>
+                                                                    <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                                                    <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                                                                </div>
+                                                            )}
+                                                        >
+                                                            <span className="cursor-pointer">{meta.columnName}</span>
+                                                        </Tooltip>
+                                                    </Table.HeadCell>
+                                                )}
+                                            </Table.Head>
+                                            <Table.Body className="divide-y">
+                                                {Array.from({ length: nRows }, (_, index) => (
+                                                    < Table.Row key={index} className="bg-white"
+                                                    >
+                                                        {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
+                                                        {columns?.map((col, colIndex) => (
+
+                                                            <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                                {col?.at(index)}
+                                                            </Table.Cell>
+                                                        ))}
+
+                                                    </Table.Row>
+                                                ))}
+                                            </Table.Body>
+                                        </Table>
+                                    </div >
+                                    <div className='flex justify-start mt-5 ml-3'>
+                                        <button
+                                            onClick={handleColumnTypeChange}
+                                            className={buttonClass}
+                                        >
+                                            <p className='ml-2 text-md'> Edit Metadata </p>
+                                        </button>
                                     </div>
                                 </div>
-                            ) : (
-                                <p className='fixed right-10 text-gray-500 mt-5 '>No configurations yet</p>
-                            )}
+
+                                {/* Configurations */}
+                                {filteredConfigs.length > 0 ? (
+                                    <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
+                                        <div>
+                                            {filteredConfigs?.map((config) => (
+                                                <>
+                                                    <div key={config.id} className="mb-4 p-4 py-1 flex items-start">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedConfigId === config.id}
+                                                            onChange={() => handleCheckboxChange(config.id)}
+                                                            className="form-checkbox h-5 w-5 mr-4 mt-2"
+                                                        />
+                                                        <div className='w-full'>
+                                                            <div className='flex ' onMouseLeave={handleMenuClose}>
+                                                                <button
+                                                                    onClick={() => toggleConfig(config.id)}
+                                                                    className="w-full text-left  p-2 font-semibold text-md focus:outline-none"
+                                                                >
+                                                                    {config.configName || `Configuration ${config.id}`}
+                                                                    <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openConfigId === config.id ? 'rotate-0' : 'rotate-180'}`}>
+                                                                        ▼
+                                                                    </span>
+                                                                </button>
+                                                                <div className='flex justify-start items-center'>
+                                                                    <a
+                                                                        onMouseEnter={() => handleMenuOpen(config.id)}
+
+                                                                        className="text-gray-900 hover:text-blue-500">
+                                                                        <MdMoreHoriz size={20} />
+                                                                    </a>
+                                                                    {openMenuId === config.id && (
+                                                                        <div className="dropdown-menu">
+                                                                            <ul className="absolute right-4 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                                                                <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                                    onClick={() => handleDeleteConfig(config.id)}>
+                                                                                    Delete
+                                                                                </li>
+                                                                                <li
+                                                                                    className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                                                    onClick={() => handleExportConfig(config.id)}
+                                                                                >
+                                                                                    Export
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+
+                                                            {openConfigId === config.id && (
+                                                                <div className="mt-2 bg-white p-2">
+                                                                    {config.hasScrambleField && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`scramble-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                Scramble Field
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `scramble-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `scramble-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Parameters:</h4>
+                                                                                    <p>Fields: {config.scrambleFieldFields?.join(', ')}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hasDateShift && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                Date Shift
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `dateShift-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Parameters:</h4>
+                                                                                    <p>Low Range: {config.dateShiftLowrange}</p>
+                                                                                    <p>High Range: {config.dateShiftHighrange}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hassubFieldList && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`subfieldlist-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                SubField List Replacement
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldlist-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `subfieldlist-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Parameters:</h4>
+                                                                                    <p>Field: {config.subFieldListField}</p>
+                                                                                    <p>Substitute: {config.subFieldListSubstitute}</p>
+                                                                                    <p>Replacement: {config.subFieldListReplacement}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                    {config.hassubFieldRegex && (
+                                                                        <>
+                                                                            <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
+                                                                                className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
+                                                                                SubField Regex Replacement
+                                                                                <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? 'rotate-0' : 'rotate-180'}`}>
+                                                                                    ▼
+                                                                                </span>
+                                                                            </button>
+                                                                            {openDetailId === `subfieldregex-${config.id}` && (
+                                                                                <div className="p-2">
+                                                                                    <h4 className="font-bold">Parameters:</h4>
+                                                                                    <p>Field: {config.subFieldRegexField}</p>
+                                                                                    <p>Regex: {config.subFieldRegexRegex}</p>
+                                                                                    <p>Replacement: {config.subFieldRegexReplacement}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <hr className="border-t border-gray-300 my-4" />
+                                                </>
+                                            ))
+                                            }
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className='fixed right-10 text-gray-500 mt-5 '>No configurations yet</p>
+                                )}
+                            </div>
                         </div>
                         <div className="p-4 fixed bottom-10 right-0 max-w-xs">
                             <button
@@ -530,7 +879,7 @@ const TransformPage = () => {
                                 Apply Transformation
                             </button>
                         </div>
-                        <Modal show={showModal} onClose={() => closeCreateConfigModal()}>
+                        <Modal show={showCreateModal} onClose={() => closeCreateConfigModal()}>
                             <Modal.Body>
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-bold mb-2">New Configuration</h2>

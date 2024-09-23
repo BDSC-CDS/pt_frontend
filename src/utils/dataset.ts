@@ -1,12 +1,12 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, TemplatebackendChangeTypesDatasetRequest, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
+import { DatasetServiceGetDatasetIdentifierRequest } from '../internal/client/index';
 import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
-
 
 /**
  * Function to store a new dataset.
@@ -15,16 +15,16 @@ import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
  * @param dataset The content of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
-export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string) => {
+export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string, id_col: string) => {
     const d: DatasetServiceStoreDatasetRequest = {
         body: {
             datasetName: dataset_name,
             dataset: dataset,
             types: types,
             identifiers: identifiers,
+            isId: id_col,
         }
     };
-    console.log("REQUEST SENT: ", d.body)
 
     try {
         const response = await apiClientDataset.datasetServiceStoreDataset(d, getAuthInitOverrides());
@@ -50,6 +50,19 @@ export const listDatasets = async (offset?: number, limit?: number) => {
     }
 };
 
+export const getInfo = async (id: number) => {
+    const request: DatasetServiceGetDatasetInfoRequest = {
+        id: id
+    }
+
+    try {
+        const response = await apiClientDataset.datasetServiceGetDatasetInfo(request, getAuthInitOverrides());
+        return response;
+    } catch (error) {
+        console.log("Error getting info: " + error);
+    }
+}
+
 export const getMetadata = async (id: number) => {
     const request: DatasetServiceGetDatasetMetadataRequest = {
         id: id
@@ -59,7 +72,7 @@ export const getMetadata = async (id: number) => {
         const response = await apiClientDataset.datasetServiceGetDatasetMetadata(request, getAuthInitOverrides());
         return response;
     } catch (error) {
-        console.log("Error getting metadata:" + error);
+        console.log("Error getting metadata: " + error);
     }
 };
 
@@ -78,6 +91,24 @@ export const getDatasetContent = async (id: number, offset?: number, limit?: num
         return response;
     } catch (error) {
         console.log("Error getting the dataset content:" + error);
+    }
+};
+
+export const getDatasetIdentifier = async (id: number, offset?: number, limit?: number) => {
+    const request: DatasetServiceGetDatasetIdentifierRequest = {
+        id: id
+    };
+    if (offset) {
+        request.offset = offset;
+    }
+    if (limit) {
+        request.limit = limit;
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceGetDatasetIdentifier(request, getAuthInitOverrides());
+        return response;
+    } catch (error) {
+        console.log("Error getting the dataset identifying content:" + error);
     }
 };
 
@@ -116,5 +147,20 @@ export const revertDataset = async (dataset_id: number) => {
         return response;
     } catch (error) {
         console.log("Error reverting the dataset:" + error);
+    }
+}
+
+export const changeTypesDataset = async (dataset_id: number, metadata: Array<TemplatebackendMetadata>) => {
+    const request: DatasetServiceChangeTypesDatasetRequest = {
+        body: {
+            datasetId: dataset_id,
+            metadata: metadata
+        }
+    }
+    try {
+        const response = await apiClientDataset.datasetServiceChangeTypesDataset(request, getAuthInitOverrides())
+        return response;
+    } catch (error) {
+        console.log("Error changing the types of the dataset:" + error);
     }
 }

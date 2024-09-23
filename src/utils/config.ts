@@ -1,7 +1,7 @@
 import apiClientConfig from './apiClientConfig';
 import { getAuthInitOverrides } from './authContext'
 
-import { ConfigServiceCreateConfigRequest, TemplatebackendConfig, ConfigServiceDeleteConfigRequest } from '../internal/client/index';
+import { ConfigServiceCreateConfigRequest, TemplatebackendConfig, ConfigServiceDeleteConfigRequest, ConfigServiceExportConfigRequest } from '../internal/client/index';
 
 
 
@@ -35,5 +35,17 @@ export const deleteConfig = async (config_id: number) => {
         return response; // Returning the response from the API.
     } catch (error) {
         console.log("Error deleting a config:" + error);
+    }
+};
+
+export const exportConfig = async (config_id: number) => {
+    const request: ConfigServiceExportConfigRequest = {
+        id: config_id
+    }
+    try {
+        const response = await apiClientConfig.configServiceExportConfig(request, getAuthInitOverrides());
+        return response; // Returning the response from the API.
+    } catch (error) {
+        console.log("Error exporting a config:" + error);
     }
 };

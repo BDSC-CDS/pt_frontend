@@ -44,6 +44,29 @@ paths:
       tags:
         - Authentication
       x-openapi-router-controller: authentication_controller
+  /api/rest/v1/config/export/{id}:
+    get:
+      summary: Export a configuration as json (SPHN Connector format)
+      description: This endpoint returns the JSON of a configuration
+      operationId: ConfigService_ExportConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendExportConfigReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Configuration
+      x-openapi-router-controller: config_generator_controller
   /api/rest/v1/configs:
     get:
       summary: Get configuration files
@@ -402,6 +425,62 @@ paths:
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/identifier/{id}:
+    get:
+      summary: Get Dataset Content filtered by identifying and quasi identifying columns
+      description: This endpoint allow getting a specific user's Dataset Content filtered by identifying and quasi identifying columns
+      operationId: DatasetService_GetDatasetIdentifier
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendGetDatasetContentReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/info/{id}:
+    get:
+      summary: Get Dataset Info
+      description: This endpoint allow getting a specific user's Dataset info
+      operationId: DatasetService_GetDatasetInfo
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendGetDatasetInfoReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
   /api/v1/dataset/metadata/{id}:
     get:
       summary: Get Dataset Metadata
@@ -468,6 +547,29 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/templatebackendTransformDatasetRequest"
+      tags:
+        - Dataset
+      x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/types:
+    post:
+      summary: Change the types of a dataset
+      description: This endpoint changes the types of a dataset
+      operationId: DatasetService_ChangeTypesDataset
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/templatebackendChangeTypesDatasetReply"
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: "#/definitions/rpcStatus"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/templatebackendChangeTypesDatasetRequest"
       tags:
         - Dataset
       x-openapi-router-controller: dataset_controller
@@ -790,6 +892,23 @@ definitions:
     properties:
       token:
         type: string
+  templatebackendChangeTypesDatasetReply:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+  templatebackendChangeTypesDatasetRequest:
+    type: object
+    properties:
+      datasetId:
+        type: integer
+        format: int64
+      metadata:
+        type: array
+        items:
+          type: object
+          $ref: "#/definitions/templatebackendMetadata"
   templatebackendColumn:
     type: object
     properties:
@@ -1004,6 +1123,11 @@ definitions:
         $ref: "#/definitions/templatebackendDeleteUserResult"
   templatebackendDeleteUserResult:
     type: object
+  templatebackendExportConfigReply:
+    type: object
+    properties:
+      config:
+        type: string
   templatebackendGetConfigsReply:
     type: object
     properties:
@@ -1033,6 +1157,11 @@ definitions:
       nRows:
         type: integer
         format: int64
+  templatebackendGetDatasetInfoReply:
+    type: object
+    properties:
+      dataset:
+        $ref: "#/definitions/templatebackendDataset"
   templatebackendGetDatasetMetadataReply:
     type: object
     properties:
@@ -1160,6 +1289,8 @@ definitions:
         type: string
       identifier:
         type: string
+      isId:
+        type: boolean
   templatebackendQuestionnaire:
     type: object
     properties:
@@ -1356,6 +1487,8 @@ definitions:
       types:
         type: string
       identifiers:
+        type: string
+      isId:
         type: string
     title: Create a Dataset
   templatebackendStoreDatasetResult:

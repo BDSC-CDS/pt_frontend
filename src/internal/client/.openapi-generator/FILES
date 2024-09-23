@@ -13,6 +13,8 @@ models/RpcStatus.ts
 models/TemplatebackendAuditLog.ts
 models/TemplatebackendAuthenticationReply.ts
 models/TemplatebackendAuthenticationResult.ts
+models/TemplatebackendChangeTypesDatasetReply.ts
+models/TemplatebackendChangeTypesDatasetRequest.ts
 models/TemplatebackendColumn.ts
 models/TemplatebackendConfig.ts
 models/TemplatebackendCreateConfigReply.ts
@@ -38,10 +40,12 @@ models/TemplatebackendDeleteDatasetResult.ts
 models/TemplatebackendDeleteQuestionnaireReply.ts
 models/TemplatebackendDeleteQuestionnaireResult.ts
 models/TemplatebackendDeleteUserReply.ts
+models/TemplatebackendExportConfigReply.ts
 models/TemplatebackendGetConfigsReply.ts
 models/TemplatebackendGetConfigsResult.ts
 models/TemplatebackendGetDatasetContentReply.ts
 models/TemplatebackendGetDatasetContentResult.ts
+models/TemplatebackendGetDatasetInfoReply.ts
 models/TemplatebackendGetDatasetMetadataReply.ts
 models/TemplatebackendGetDatasetMetadataResult.ts
 models/TemplatebackendGetHelloReply.ts
