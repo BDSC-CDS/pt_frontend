@@ -20,27 +20,22 @@ export default function SideMenu() {
 
     return (
         // <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
-        <div className="w-70 top-14 sticky h-full bg-white">
+        <div className="w-75 h-100 top-14 sticky h-full bg-white">
 
-            <Sidebar aria-label="Sidebar with content separator example" className="w-90 border rounded">
+            <Sidebar aria-label="Sidebar with content separator example" className="w-90 border pt-10 rounded">
                 <div>
                     <Sidebar.Items>
-                        <Sidebar.ItemGroup>
-                            <Sidebar.Item href="/" className="text-semibold">
-                                <p className="font-bold text-lg"> Privacy Toolbox</p>
-                            </Sidebar.Item>
-                        </Sidebar.ItemGroup>
 
-                        <Sidebar.ItemGroup>
-                            <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiPresentationChartBar />
-                                <p className='ml-1'> Qualitative Risk Assessment</p>
-                            </Link>
-                            <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiPresentationChartBar />
-                                <p className='ml-1'> Quantitative Risk Assessment</p>
-                            </Link>
-                        </Sidebar.ItemGroup>
+                        <Sidebar.Collapse icon={HiPresentationChartBar} theme={customTheme.collapse} label="Risk Assessment">
+                                <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                    <HiPresentationChartBar />
+                                    <p className='ml-1'> Qualitative Risk Assessment</p>
+                                </Link>
+                                <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                    <HiPresentationChartBar />
+                                    <p className='ml-1'> Quantitative Risk Assessment</p>
+                                </Link>
+                        </Sidebar.Collapse>
 
                         <Sidebar.ItemGroup>
                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
