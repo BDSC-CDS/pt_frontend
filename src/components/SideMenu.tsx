@@ -20,7 +20,7 @@ export default function SideMenu() {
 
     return (
         // <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
-        <div className="w-64 top-14 fixed h-full bg-white">
+        <div className="w-70 top-14 fixed h-full bg-white">
 
             <Sidebar aria-label="Sidebar with content separator example" className="w-90 border rounded">
                 <div>
@@ -30,21 +30,33 @@ export default function SideMenu() {
                                 <p className="font-bold text-lg"> Privacy Toolbox</p>
                             </Sidebar.Item>
                         </Sidebar.ItemGroup>
+
                         <Sidebar.ItemGroup>
                             <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiPresentationChartBar />
-                                <p className='ml-1'> Risk Assessment</p>
+                                <p className='ml-1'> Qualitative Risk Assessment</p>
                             </Link>
+                            <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                <HiPresentationChartBar />
+                                <p className='ml-1'> Quantitative Risk Assessment</p>
+                            </Link>
+                        </Sidebar.ItemGroup>
+
+                        <Sidebar.ItemGroup>
                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiDatabase />
                                 <p className='ml-1'> Datasets</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiShoppingBag />
+                                <p className='ml-1'> Tabular DeID </p>
+                            </Link>
+                            <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                <HiShoppingBag />
                                 <p className='ml-1'> Synthetic Data Generation</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                <HiArrowSmRight />
+                                <HiShoppingBag />
                                 <p className='ml-1'> Text DeID</p>
                             </Link>
                         </Sidebar.ItemGroup>
