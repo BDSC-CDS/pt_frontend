@@ -20,7 +20,7 @@ export default function SideMenu() {
 
     return (
         // <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
-        <div className="w-70 top-14 fixed h-full bg-white">
+        <div className="w-70 top-14 sticky h-full bg-white">
 
             <Sidebar aria-label="Sidebar with content separator example" className="w-90 border rounded">
                 <div>
