@@ -350,7 +350,7 @@ export default function Dataset() {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-                    <Modal show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
+                    <Modal size='7xl' show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
                         <Modal.Header>
                             Data information
                         </Modal.Header>
@@ -374,22 +374,22 @@ export default function Dataset() {
                                         </Table.Body>
                                     </Table>
                                 </div>
-                                <div className="flex items-center justify-between font-bold">
-                                    <span className="w-1/2">Column Name</span>
-                                    <div className="flex space-x-4 w-1/2">
-                                        <span className="w-1/2">Type</span>
-                                        <span className="w-1/2">Identifier</span>
-                                        <span className="w-1/3">Is Identifier?</span>
+                                <div className="flex items-center font-bold">
+                                    <span className="w-1/4">Column Name</span>
+                                    <div className="flex space-x-4 w-3/4">
+                                        <span className="w-1/4">Type</span>
+                                        <span className="w-1/4">Identifier</span>
+                                        <span className="w-1/4">Is Identifier?</span>
                                     </div>
                                 </div>
                                 {Object.keys(columnTypes).map((column, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <span className="w-1/2">{column}:</span>
-                                        <div className="flex space-x-4 w-1/2">
+                                        <span className="w-1/4">{column}</span>
+                                        <div className="flex items-center space-x-4 w-3/4">
                                             <select
                                                 value={columnTypes[column]}
                                                 onChange={(e) => setColumnType(column, e.target.value)}
-                                                className="select select-bordered w-1/2"
+                                                className="select select-bordered w-1/4"
                                             >
                                                 <option value="string">String</option>
                                                 <option value="int">Integer</option>
@@ -399,19 +399,21 @@ export default function Dataset() {
                                             <select
                                                 value={columnIdentifying[column]}
                                                 onChange={(e) => setColumnIdentifying_(column, e.target.value)}
-                                                className="select select-bordered w-1/2"
+                                                className="select select-bordered w-1/4"
                                             >
                                                 <option value="identifier">Identifier</option>
                                                 <option value="quasi-identifier">Quasi-identifier</option>
                                                 <option value="non-identifying">Non-identifying</option>
                                             </select>
-                                            <input
-                                                type="radio"
-                                                name="identifier-column"  // Radio group name should be the same for all
-                                                checked={idCol === column}
-                                                onChange={() => setIdCol(column)}
-                                                className="radio radio-bordered"
-                                            />
+                                            <div className="pl-10 justify-center">
+                                                <input
+                                                    type="radio"
+                                                    name="identifier-column"
+                                                    checked={idCol === column}
+                                                    onChange={() => setIdCol(column)}
+                                                    className="radio radio-bordered"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

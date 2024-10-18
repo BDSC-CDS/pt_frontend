@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Header from '../components/Header';
 import Link from "next/link";
-import { BiCalculator, BiMessageSquareDetail, BiLayer } from 'react-icons/bi';
+import { BiCalculator, BiMessageSquareDetail, BiLayer, BiSolidReport, BiSolidRuler } from 'react-icons/bi';
 import { GrDocumentLocked } from "react-icons/gr";
 
 /**
@@ -39,11 +39,35 @@ export default function Home() {
                             className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
                         >
                             <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiCalculator size={"3em"} className="text-[#306278]" />
+                                <BiSolidReport size={"3em"} className="text-[#306278]" />
                             </div>
-                            <h3 className="text-lg font-semibold">Risk Assessment</h3>
+                            <h3 className="text-lg font-semibold">Qualitative Risk Assessment</h3>
                             <p className="text-sm text-gray-600 mt-2">Analyze and assess risk levels in your data.</p>
                         </Link>
+                        <a
+                            href="https://new-link.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
+                        >
+                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
+                                <BiCalculator size={"3em"} className="text-[#306278]" />
+                            </div>
+                            <h3 className="text-lg font-semibold">Quantitative Risk Assessment</h3>
+                            <p className="text-sm text-gray-600 mt-2">Placeholder text</p>
+                        </a>
+                        <a
+                            href="https://new-link.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
+                        >
+                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
+                                <BiSolidRuler size={"3em"} className="text-[#306278]" />
+                            </div>
+                            <h3 className="text-lg font-semibold">Rule-Based De-identification</h3>
+                            <p className="text-sm text-gray-600 mt-2">Placeholder text</p>
+                        </a>
                         <a
                             href="https://create.t3.gg/"
                             target="_blank"

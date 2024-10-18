@@ -23,7 +23,7 @@ export const Layout: FunctionComponent<Props> = ({ children }) => {
                 <div className='flex flex-1'>
                     <SideMenu />
                     {/* <main className="ml-[280px] flex-1 flex flex-col container mr-auto"> */}
-                    <main className="flex-1 ml-64 mt-14 mb-12 p-5 ">
+                    <main className="flex-1 ml-10 mt-14 mb-12 p-5 ">
                         {children}
                     </main>
                 </div>
