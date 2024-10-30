@@ -9,6 +9,7 @@ import {
     BiSolidRuler,
 } from "react-icons/bi";
 import { GrDocumentLocked } from "react-icons/gr";
+import { ReactNode } from "react";
 
 /**
  * Home component that represents the main page of the application.
@@ -110,9 +111,19 @@ export default function Home() {
 }
 
 /**
+ * Props for the ToolCard component.
+ */
+interface ToolCardProps {
+    href: string;
+    icon: ReactNode;
+    title: string;
+    description: string;
+}
+
+/**
  * ToolCard component for rendering each tool as a card.
  */
-function ToolCard({ href, icon, title, description }) {
+function ToolCard({ href, icon, title, description }: ToolCardProps) {
     return (
         <Link
             href={href}
