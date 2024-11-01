@@ -1,8 +1,15 @@
 import Head from "next/head";
-import Header from '../components/Header';
+import Header from "../components/Header";
 import Link from "next/link";
-import { BiCalculator, BiMessageSquareDetail, BiLayer, BiSolidReport, BiSolidRuler } from 'react-icons/bi';
+import {
+    BiCalculator,
+    BiMessageSquareDetail,
+    BiLayer,
+    BiSolidReport,
+    BiSolidRuler,
+} from "react-icons/bi";
 import { GrDocumentLocked } from "react-icons/gr";
+import { ReactNode } from "react";
 
 /**
  * Home component that represents the main page of the application.
@@ -21,80 +28,112 @@ export default function Home() {
                     <h1 className="text-3xl font-bold">Welcome to the Privacy Toolbox!</h1>
                 </div>
                 <section>
-                    <div className="flex items-start mb-12"> {/* Increased bottom margin */}
-                        <p className="text-md w-3/5">
+                    {/* Intro Text Section without image */}
+                    <div className="mb-12">
+                        <p className="text-md">
                             Our mission is to advance the field of biomedical data research by harnessing the expertise of the SPHN DeID task force and translating their recommendations into a dynamic, adaptable platform. Our goal is to revolutionize the process of risk assessment and de-identification for biomedical datasets, streamlining it for research purposes.
 
                             In pursuit of this objective, we are committed to developing an automated de-identification tool that not only ensures transparency but also provides a clear understanding of risk levels. This innovation promises to be a valuable asset for researchers, regulatory authorities, and Data Protection Officers (DPOs) alike.
 
                             Join us on this exciting journey towards enhanced biomedical data privacy and research efficiency.
                         </p>
-                        <div className="ml-6 w-2/5 flex justify-center">
-                            <GrDocumentLocked size={"12em"} style={{ color: '#306278' }} />
+                    </div>
+                    {/* Tabular Data Section */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-semibold">Tabular Data</h2>
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                            <ToolCard
+                                href="/risk_assessment"
+                                icon={<BiMessageSquareDetail size="3em" />}
+                                title="Questionnaire"
+                                description="TEXT"
+                            />
+                            <ToolCard
+                                href="/tools/formal_risk_assessment"
+                                icon={<BiCalculator size="3em" />}
+                                title="Formal Risk Assessment"
+                                description="TEXT"
+                            />
+                            <ToolCard
+                                href="/dataset"
+                                icon={<BiSolidRuler size="3em" />}
+                                title="Rule-Based De-identification"
+                                description="TEXT"
+                            />
+                            <ToolCard
+                                href="/formal_deid"
+                                icon={<BiSolidReport size="3em" />}
+                                title="Formal De-identification"
+                                description="TEXT"
+                            />
+                            <ToolCard
+                                href="/synthetic_data"
+                                icon={<BiLayer size="3em" />}
+                                title="Synthetic Data"
+                                description="TEXT"
+                            />
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
-                        <Link
-                            href="/risk_assessment"
-                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
-                        >
-                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiSolidReport size={"3em"} className="text-[#306278]" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Qualitative Risk Assessment</h3>
-                            <p className="text-sm text-gray-600 mt-2">Analyze and assess risk levels in your data.</p>
-                        </Link>
-                        <a
-                            href="https://new-link.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
-                        >
-                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiCalculator size={"3em"} className="text-[#306278]" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Quantitative Risk Assessment</h3>
-                            <p className="text-sm text-gray-600 mt-2">Placeholder text</p>
-                        </a>
-                        <a
-                            href="https://new-link.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
-                        >
-                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiSolidRuler size={"3em"} className="text-[#306278]" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Rule-Based De-identification</h3>
-                            <p className="text-sm text-gray-600 mt-2">Placeholder text</p>
-                        </a>
-                        <a
-                            href="https://create.t3.gg/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
-                        >
-                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiMessageSquareDetail size={"3em"} className="text-[#306278]" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Text DeID</h3>
-                            <p className="text-sm text-gray-600 mt-2">Automate text de-identification with ease.</p>
-                        </a>
-                        <a
-                            href="https://create.t3.gg/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
-                        >
-                            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                                <BiLayer size={"3em"} className="text-[#306278]" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Synthetic Data Generation</h3>
-                            <p className="text-sm text-gray-600 mt-2">Generate synthetic data for research purposes.</p>
-                        </a>
+                    {/* Text Data Section */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-semibold">Text Data</h2>
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                            <ToolCard
+                                href="/risk_assessment"
+                                icon={<BiMessageSquareDetail size="3em" />}
+                                title="Questionnaire"
+                                description="TEXT"
+                            />
+                            <ToolCard
+                                href="/text_deid"
+                                icon={<BiSolidRuler size="3em" />}
+                                title="Text De-identification"
+                                description="TEXT"
+                            />
+                        </div>
+                    </div>
+                    {/* Image Data Section */}
+                    <div>
+                        <h2 className="text-2xl font-semibold">Image Data</h2>
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                            <ToolCard
+                                href="/risk_assessment"
+                                icon={<GrDocumentLocked size="3em" />}
+                                title="Image De-identification"
+                                description="TEXT"
+                            />
+                        </div>
                     </div>
                 </section>
             </div>
         </>
+    );
+}
+
+/**
+ * Props for the ToolCard component.
+ */
+interface ToolCardProps {
+    href: string;
+    icon: ReactNode;
+    title: string;
+    description: string;
+}
+
+/**
+ * ToolCard component for rendering each tool as a card.
+ */
+function ToolCard({ href, icon, title, description }: ToolCardProps) {
+    return (
+        <Link
+            href={href}
+            className="flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105"
+        >
+            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
+                {icon}
+            </div>
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <p className="text-sm text-gray-600 mt-2">{description}</p>
+        </Link>
     );
 }
