@@ -347,24 +347,24 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         tabs.forEach((tab) => {
             if (tab.title === "Results") return; // Skip the summary tab
 
-            // Title styling: bold, size 14
+            // Page break check
             if (cursorY + 10 > pageHeight - margin) {
                 pdf.addPage();
                 cursorY = margin + headerHeight;
                 pageNumber++;
                 addFooter(pageNumber);
             }
+
+            // Tab Title: Bold, Size 14
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(14);
             pdf.text(`Tab: ${tab.title}`, margin, cursorY);
             cursorY += 10;
 
-            // Reset font for body text: normal, size 12
-            pdf.setFont("helvetica", "normal");
-            pdf.setFontSize(12);
-
+            // Questions and Answers
             const tabQuestions = questions[tab.title] || [];
             tabQuestions.forEach((question, questionIndex) => {
+                // Page break check
                 if (cursorY + 15 > pageHeight - margin) {
                     pdf.addPage();
                     cursorY = margin + headerHeight;
@@ -372,13 +372,15 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     addFooter(pageNumber);
                 }
 
-                // Add question: normal text, size 12
+                // Question: Normal, Size 12
+                pdf.setFont("helvetica", "normal");
+                pdf.setFontSize(12);
                 const questionText = `${questionIndex + 1}. ${question.questionDescription}`;
                 const questionLines = pdf.splitTextToSize(questionText, pageWidth - 2 * margin);
                 pdf.text(questionLines, margin, cursorY);
                 cursorY += questionLines.length * 6;
 
-                // Add answer: italic text, size 12
+                // Answer: Italic, Size 12
                 pdf.setFont("helvetica", "italic");
                 const selectedAnswer = question.answers.find((a) => a.selected);
                 const answerText = selectedAnswer
@@ -387,12 +389,10 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 const answerLines = pdf.splitTextToSize(answerText, pageWidth - 2 * margin);
                 pdf.text(answerLines, margin + 10, cursorY);
                 cursorY += answerLines.length * 6 + 5;
-
-                // Reset font for next question
-                pdf.setFont("helvetica", "normal");
             });
 
-            cursorY += 5; // Add spacing after each tab
+            // Add spacing between tabs
+            cursorY += 5;
         });
 
 
