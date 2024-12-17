@@ -299,7 +299,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         };
     
         // Function to add footer with title and page number
-        const addFooter = (pageNumber) => {
+        const addFooter = (pageNumber: number) => {
             pdf.setFont("helvetica", "italic");
             pdf.setFontSize(10);
             pdf.setTextColor("#000000");
