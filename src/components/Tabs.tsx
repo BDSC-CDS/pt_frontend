@@ -303,7 +303,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             pdf.setFont("helvetica", "italic");
             pdf.setFontSize(10);
             pdf.setTextColor("#000000");
-            pdf.text("Privacy Toolbox Questionnaire Report", margin, pageHeight - 10);
+            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${saveName}`, margin, pageHeight - 10); 
             pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
         };
 
@@ -324,6 +324,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             cursorY += 10;
 
             const summaryContent = [
+                `Project Title: ${saveName}`,
                 `Total Questions Answered: ${reportData.totalQuestionsAnswered}`,
                 `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
                 `Missing Data Sections: ${reportData.missingDataSections.length > 0
