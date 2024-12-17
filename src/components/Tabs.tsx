@@ -259,18 +259,18 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         const pageHeight = pdf.internal.pageSize.getHeight();
         const headerHeight = 20; // Header height in mm
         let cursorY = margin + headerHeight; // Starting Y position for text
-    
+
         // Function to add the header with logo on the left (only on the first page)
         const addHeader = async (firstPage = false) => {
             if (!firstPage) return;
-    
+
             pdf.setFillColor("#306278");
             pdf.rect(0, 0, pageWidth, headerHeight, "F");
-    
+
             // Fetch the logo as Base64
             const response = await fetch("/sphn-logo-white.png"); // Keep the existing path
             const blob = await response.blob();
-    
+
             const reader = new FileReader();
             reader.readAsDataURL(blob);
             return new Promise((resolve) => {
@@ -286,18 +286,18 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                         logoWidth,
                         logoHeight
                     );
-    
+
                     // Add the title "Privacy Toolbox" next to the logo
                     pdf.setFont("helvetica", "bold");
                     pdf.setFontSize(14);
                     pdf.setTextColor("#FFFFFF");
                     pdf.text("Privacy Toolbox", margin + logoWidth + 5, headerHeight / 1.5);
-    
+
                     resolve(null);
                 };
             });
         };
-    
+
         // Function to add footer with title and page number
         const addFooter = (pageNumber: number) => {
             pdf.setFont("helvetica", "italic");
@@ -306,59 +306,63 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             pdf.text("Privacy Toolbox Questionnaire Report", margin, pageHeight - 10);
             pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
         };
-    
+
         let pageNumber = 1;
-    
+
         // Add header to the first page
         await addHeader(true);
         addFooter(pageNumber);
-    
+
         // Step 1: Add Summary
         pdf.setFontSize(12);
         pdf.setFont("helvetica", "normal");
-    
+
         const summaryTab = tabs.find((tab) => tab.title === "Results");
         if (summaryTab) {
             pdf.setFont("helvetica", "bold");
             pdf.text("Summary", margin, cursorY);
             cursorY += 10;
-    
+
             const summaryContent = [
                 `Total Questions Answered: ${reportData.totalQuestionsAnswered}`,
                 `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
-                `Missing Data Sections: ${
-                    reportData.missingDataSections.length > 0
-                        ? reportData.missingDataSections.join(", ")
-                        : "None"
+                `Missing Data Sections: ${reportData.missingDataSections.length > 0
+                    ? reportData.missingDataSections.join(", ")
+                    : "None"
                 }`,
                 `Overall Completion Rate: ${reportData.overallCompletionRate}`,
                 `Current Risk Score: ${(currentRiskPc * 100).toFixed(2)}%`,
             ];
-    
+
             summaryContent.forEach((line) => {
                 const wrappedLines = pdf.splitTextToSize(line, pageWidth - 2 * margin);
                 pdf.text(wrappedLines, margin, cursorY);
                 cursorY += wrappedLines.length * 6;
             });
-    
+
             cursorY += 10;
         }
-    
+
         // Step 2: Add Questions and Answers
         tabs.forEach((tab) => {
             if (tab.title === "Results") return; // Skip the summary tab
-    
+
+            // Title styling: bold, size 14
             if (cursorY + 10 > pageHeight - margin) {
                 pdf.addPage();
                 cursorY = margin + headerHeight;
                 pageNumber++;
                 addFooter(pageNumber);
             }
-    
             pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(14);
             pdf.text(`Tab: ${tab.title}`, margin, cursorY);
             cursorY += 10;
-    
+
+            // Reset font for body text: normal, size 12
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(12);
+
             const tabQuestions = questions[tab.title] || [];
             tabQuestions.forEach((question, questionIndex) => {
                 if (cursorY + 15 > pageHeight - margin) {
@@ -367,34 +371,36 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     pageNumber++;
                     addFooter(pageNumber);
                 }
-    
-                pdf.setFont("helvetica", "normal");
-                const questionLines = pdf.splitTextToSize(
-                    `${questionIndex + 1}. ${question.questionDescription}`,
-                    pageWidth - 2 * margin
-                );
+
+                // Add question: normal text, size 12
+                const questionText = `${questionIndex + 1}. ${question.questionDescription}`;
+                const questionLines = pdf.splitTextToSize(questionText, pageWidth - 2 * margin);
                 pdf.text(questionLines, margin, cursorY);
                 cursorY += questionLines.length * 6;
-    
+
+                // Add answer: italic text, size 12
+                pdf.setFont("helvetica", "italic");
                 const selectedAnswer = question.answers.find((a) => a.selected);
                 const answerText = selectedAnswer
                     ? `Answer: ${selectedAnswer.answerDescription}`
                     : "Answer: Not Answered";
-    
-                pdf.setFont("helvetica", "italic");
                 const answerLines = pdf.splitTextToSize(answerText, pageWidth - 2 * margin);
                 pdf.text(answerLines, margin + 10, cursorY);
                 cursorY += answerLines.length * 6 + 5;
+
+                // Reset font for next question
+                pdf.setFont("helvetica", "normal");
             });
-    
-            cursorY += 5;
+
+            cursorY += 5; // Add spacing after each tab
         });
-    
+
+
         // Save the PDF
         pdf.save("questions-and-answers-with-summary-and-header.pdf");
     };
-    
-    
+
+
 
     const exportConfig = () => {
         const txt = `{
@@ -411,68 +417,68 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
     }
 
     const report_tab =
-    <div key="report" className="p-4 bg-white shadow rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
-        <div className="mb-2">
-            <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
-        </div>
-        <div className="mb-2">
-            <strong>Sections Completed:</strong> {reportData.sectionsCompleted.join(', ')}
-        </div>
-        <div className="mb-2">
-            <strong>Missing Data Sections:</strong> {reportData.missingDataSections.join(', ') || 'None'}
-        </div>
-        <div className="mb-2">
-            <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
-        </div>
-        <div className="mb-2">
-            <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
-        </div>
-        <hr className="my-4" />
-        <h3 className="text-lg font-semibold mb-2">Top 5 High-Risk Questions</h3>
-        <div>
-            {(() => {
-                // Gather all questions into a single array with their tab
-                let allQuestions: { tab: string; question: Question; risk: number }[] = [];
-                Object.keys(questions).forEach((tab) => {
-                    questions[tab]?.forEach((question) => {
-                        const selectedAnswer = question.answers.find((answer) => answer.selected);
-                        if (selectedAnswer) {
-                            const risk = selectedAnswer.riskLevel * question.riskWeight;
-                            allQuestions.push({ tab, question, risk });
-                        }
+        <div key="report" className="p-4 bg-white shadow rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
+            <div className="mb-2">
+                <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
+            </div>
+            <div className="mb-2">
+                <strong>Sections Completed:</strong> {reportData.sectionsCompleted.join(', ')}
+            </div>
+            <div className="mb-2">
+                <strong>Missing Data Sections:</strong> {reportData.missingDataSections.join(', ') || 'None'}
+            </div>
+            <div className="mb-2">
+                <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
+            </div>
+            <div className="mb-2">
+                <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
+            </div>
+            <hr className="my-4" />
+            <h3 className="text-lg font-semibold mb-2">Top 5 High-Risk Questions</h3>
+            <div>
+                {(() => {
+                    // Gather all questions into a single array with their tab
+                    let allQuestions: { tab: string; question: Question; risk: number }[] = [];
+                    Object.keys(questions).forEach((tab) => {
+                        questions[tab]?.forEach((question) => {
+                            const selectedAnswer = question.answers.find((answer) => answer.selected);
+                            if (selectedAnswer) {
+                                const risk = selectedAnswer.riskLevel * question.riskWeight;
+                                allQuestions.push({ tab, question, risk });
+                            }
+                        });
                     });
-                });
 
-                // Sort questions by risk descending and take the top 5
-                const topQuestions = allQuestions
-                    .sort((a, b) => b.risk - a.risk)
-                    .slice(0, 5);
+                    // Sort questions by risk descending and take the top 5
+                    const topQuestions = allQuestions
+                        .sort((a, b) => b.risk - a.risk)
+                        .slice(0, 5);
 
-                // Render top 5 high-risk questions with their tabs
-                return topQuestions.map(({ tab, question, risk }, index) => (
-                    <div key={question.questionId} className="mb-4">
-                        <p className="text-sm">
-                            <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
-                        </p>
-                        <p className="text-xs text-gray-500">
-                            Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
-                        </p>
-                    </div>
-                ));
-            })()}
-        </div>
-        <div className="flex flex-row mt-4">
-            <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                <FaFilePdf />
-                <p className='ml-2 text-sm'> Export PDF</p>
-            </span>
-            <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                <GrDocumentConfig />
-                <p className='ml-2 text-sm'> Export connector configuration</p>
-            </span>
-        </div>
-    </div>;
+                    // Render top 5 high-risk questions with their tabs
+                    return topQuestions.map(({ tab, question, risk }, index) => (
+                        <div key={question.questionId} className="mb-4">
+                            <p className="text-sm">
+                                <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
+                            </p>
+                        </div>
+                    ));
+                })()}
+            </div>
+            <div className="flex flex-row mt-4">
+                <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                    <FaFilePdf />
+                    <p className='ml-2 text-sm'> Export PDF</p>
+                </span>
+                <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                    <GrDocumentConfig />
+                    <p className='ml-2 text-sm'> Export connector configuration</p>
+                </span>
+            </div>
+        </div>;
 
     const tabs: Tabs = Object.keys(questions).map((tab, n) => ({
         id: (n + 1).toString(),
@@ -562,41 +568,41 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             </Modal>
             <div id="all-tabs" className='p-5'>
                 {activeTab !== '8' && (
-                <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                    <h1 className='mt-4 text-md font-semibold flex flex-row'>
-                        Current score
-                        <button
-                            onMouseEnter={() => setRiskPopoverDisplayed(true)}
-                            onMouseLeave={() => setRiskPopoverDisplayed(false)}
-                            className="ml-3 flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
-                            ?
-                        </button>
-                    </h1>
-                    <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
-                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
+                    <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
+                        <h1 className='mt-4 text-md font-semibold flex flex-row'>
+                            Current score
+                            <button
+                                onMouseEnter={() => setRiskPopoverDisplayed(true)}
+                                onMouseLeave={() => setRiskPopoverDisplayed(false)}
+                                className="ml-3 flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                ?
+                            </button>
+                        </h1>
+                        <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
+                            <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
+                            </div>
+                            <div className="px-3 py-2">
+                                Current risk {currentRisk}<br />
+                                Current risk (%) {(currentRiskPc * 100).toFixed(2) + "%"}<br />
+                                Max. possible risk {maxRisk}<br />
+                                Min. possible risk {minRisk}<br />
+                            </div>
+                            <div data-popper-arrow></div>
                         </div>
-                        <div className="px-3 py-2">
-                            Current risk {currentRisk}<br />
-                            Current risk (%) {(currentRiskPc * 100).toFixed(2) + "%"}<br />
-                            Max. possible risk {maxRisk}<br />
-                            Min. possible risk {minRisk}<br />
-                        </div>
-                        <div data-popper-arrow></div>
-                    </div>
 
-                    {/* currentRisk {currentRisk}<br />
+                        {/* currentRisk {currentRisk}<br />
                     currentRiskPc {currentRiskPc}<br />
                     maxRisk {maxRisk}<br />
                     minRisk {minRisk}<br /> */}
-                    <GaugeChart id="gauge-chart2"
-                        nrOfLevels={20}
-                        cornerRadius={0}
-                        percent={currentRiskPc}
-                        textColor='black'
-                        animate={false}
-                    />
-                </div>
+                        <GaugeChart id="gauge-chart2"
+                            nrOfLevels={20}
+                            cornerRadius={0}
+                            percent={currentRiskPc}
+                            textColor='black'
+                            animate={false}
+                        />
+                    </div>
                 )}
                 {/* <TabsComponent questions={questions} /> */}
 
