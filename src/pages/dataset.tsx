@@ -284,8 +284,6 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
-            // const config_id = 1;
-            // const response = await transformDataset(id, config_id);
             router.push(`/transform/${id}`);
         }
     };
@@ -293,6 +291,11 @@ export default function Dataset() {
         if (id) {
             const response = await deleteDataset(id);
             getListDatasets();
+        }
+    };
+    const handleOpenDeidentificationNotebook = async (id: number | undefined) => {
+        if (id) {
+            router.push(`/deidentification-notebook/${id}`);
         }
     };
 
@@ -453,11 +456,13 @@ export default function Dataset() {
                                                 {openMenuId === dataset.id && (
                                                     <div className="dropdown-menu relative">
                                                         <ul className={`absolute ${isDropdownAbove ? '-top-14' : 'mt-4'
-                                                            } w-35  bg-white rounded-md shadow-lg z-10`}>
+                                                            } w-64  bg-white rounded-md shadow-lg z-10`}>
                                                             <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
                                                                 onClick={() => handleTransform(dataset.id)}>Transform</li>
                                                             <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
                                                                 onClick={() => handleDelete(dataset.id)}>Delete</li>
+                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                                                                onClick={() => handleOpenDeidentificationNotebook(dataset.id)}>Open in Jupyterhub for deidentification</li>
                                                         </ul>
                                                     </div>
                                                 )}

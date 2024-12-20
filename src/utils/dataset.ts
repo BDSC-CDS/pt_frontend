@@ -5,6 +5,7 @@ import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetReques
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
+import { DatasetServiceGetDatasetJupyterhubRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetIdentifierRequest } from '../internal/client/index';
 import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
 
@@ -71,6 +72,19 @@ export const getMetadata = async (id: number) => {
     try {
         const response = await apiClientDataset.datasetServiceGetDatasetMetadata(request, getAuthInitOverrides());
         return response;
+    } catch (error) {
+        console.log("Error getting metadata: " + error);
+    }
+};
+
+export const getDeidentificationNotebookURL = async (id: number) => {
+    const request: DatasetServiceGetDatasetJupyterhubRequest = {
+        id: id
+    };
+
+    try {
+        const response = await apiClientDataset.datasetServiceGetDatasetJupyterhub(request, getAuthInitOverrides());
+        return response?.result?.url;
     } catch (error) {
         console.log("Error getting metadata: " + error);
     }
