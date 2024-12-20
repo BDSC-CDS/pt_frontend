@@ -6,4 +6,5 @@ export * from './ConfigurationApi';
 export * from './DatasetApi';
 export * from './IndexApi';
 export * from './QuestionnaireApi';
+export * from './RiskAssessmentApi';
 export * from './UsersApi';

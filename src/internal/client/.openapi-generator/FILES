@@ -4,9 +4,11 @@ apis/ConfigurationApi.ts
 apis/DatasetApi.ts
 apis/IndexApi.ts
 apis/QuestionnaireApi.ts
+apis/RiskAssessmentApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
+models/ApiHttpBody.ts
 models/IndexServiceCreateHelloRequest.ts
 models/ProtobufAny.ts
 models/RpcStatus.ts
@@ -46,6 +48,8 @@ models/TemplatebackendGetConfigsResult.ts
 models/TemplatebackendGetDatasetContentReply.ts
 models/TemplatebackendGetDatasetContentResult.ts
 models/TemplatebackendGetDatasetInfoReply.ts
+models/TemplatebackendGetDatasetJupyterhubReply.ts
+models/TemplatebackendGetDatasetJupyterhubResult.ts
 models/TemplatebackendGetDatasetMetadataReply.ts
 models/TemplatebackendGetDatasetMetadataResult.ts
 models/TemplatebackendGetHelloReply.ts
@@ -54,6 +58,8 @@ models/TemplatebackendGetQuestionnaireReply.ts
 models/TemplatebackendGetQuestionnaireResult.ts
 models/TemplatebackendGetReplyReply.ts
 models/TemplatebackendGetReplyResult.ts
+models/TemplatebackendGetRiskAssessmentReply.ts
+models/TemplatebackendGetRiskAssessmentResult.ts
 models/TemplatebackendGetUserMeReply.ts
 models/TemplatebackendGetUserMeResult.ts
 models/TemplatebackendGetUserReply.ts
