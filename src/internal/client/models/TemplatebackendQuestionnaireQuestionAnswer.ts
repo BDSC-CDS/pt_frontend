@@ -46,6 +46,12 @@ export interface TemplatebackendQuestionnaireQuestionAnswer {
     riskLevel?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof TemplatebackendQuestionnaireQuestionAnswer
+     */
+    highRisk?: boolean;
+    /**
+     * 
      * @type {Array<TemplatebackendQuestionnaireQuestionAnswerRulePrefill>}
      * @memberof TemplatebackendQuestionnaireQuestionAnswer
      */
@@ -86,6 +92,7 @@ export function TemplatebackendQuestionnaireQuestionAnswerFromJSONTyped(json: an
         'id': !exists(json, 'id') ? undefined : json['id'],
         'text': !exists(json, 'text') ? undefined : json['text'],
         'riskLevel': !exists(json, 'riskLevel') ? undefined : json['riskLevel'],
+        'highRisk': !exists(json, 'highRisk') ? undefined : json['highRisk'],
         'rulePrefills': !exists(json, 'rulePrefills') ? undefined : ((json['rulePrefills'] as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerRulePrefillFromJSON)),
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
@@ -104,6 +111,7 @@ export function TemplatebackendQuestionnaireQuestionAnswerToJSON(value?: Templat
         'id': value.id,
         'text': value.text,
         'riskLevel': value.riskLevel,
+        'highRisk': value.highRisk,
         'rulePrefills': value.rulePrefills === undefined ? undefined : ((value.rulePrefills as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerRulePrefillToJSON)),
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),

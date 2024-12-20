@@ -15,12 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
+  ApiHttpBody,
   RpcStatus,
   TemplatebackendChangeTypesDatasetReply,
   TemplatebackendChangeTypesDatasetRequest,
   TemplatebackendDeleteDatasetReply,
   TemplatebackendGetDatasetContentReply,
   TemplatebackendGetDatasetInfoReply,
+  TemplatebackendGetDatasetJupyterhubReply,
   TemplatebackendGetDatasetMetadataReply,
   TemplatebackendListDatasetsReply,
   TemplatebackendRevertDatasetReply,
@@ -31,6 +33,8 @@ import type {
   TemplatebackendTransformDatasetRequest,
 } from '../models/index';
 import {
+    ApiHttpBodyFromJSON,
+    ApiHttpBodyToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
     TemplatebackendChangeTypesDatasetReplyFromJSON,
@@ -43,6 +47,8 @@ import {
     TemplatebackendGetDatasetContentReplyToJSON,
     TemplatebackendGetDatasetInfoReplyFromJSON,
     TemplatebackendGetDatasetInfoReplyToJSON,
+    TemplatebackendGetDatasetJupyterhubReplyFromJSON,
+    TemplatebackendGetDatasetJupyterhubReplyToJSON,
     TemplatebackendGetDatasetMetadataReplyFromJSON,
     TemplatebackendGetDatasetMetadataReplyToJSON,
     TemplatebackendListDatasetsReplyFromJSON,
@@ -75,6 +81,12 @@ export interface DatasetServiceGetDatasetContentRequest {
     limit?: number;
 }
 
+export interface DatasetServiceGetDatasetDataframeRequest {
+    id: number;
+    offset?: number;
+    limit?: number;
+}
+
 export interface DatasetServiceGetDatasetIdentifierRequest {
     id: number;
     offset?: number;
@@ -82,6 +94,10 @@ export interface DatasetServiceGetDatasetIdentifierRequest {
 }
 
 export interface DatasetServiceGetDatasetInfoRequest {
+    id: number;
+}
+
+export interface DatasetServiceGetDatasetJupyterhubRequest {
     id: number;
 }
 
@@ -231,6 +247,50 @@ export class DatasetApi extends runtime.BaseAPI {
     }
 
     /**
+     * This endpoint allow getting a specific user\'s Dataset as a Pandas Dataframe in Parquet format
+     * Get Dataset Dataframe
+     */
+    async datasetServiceGetDatasetDataframeRaw(requestParameters: DatasetServiceGetDatasetDataframeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiHttpBody>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetDataframe.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/dataframe/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiHttpBodyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset as a Pandas Dataframe in Parquet format
+     * Get Dataset Dataframe
+     */
+    async datasetServiceGetDatasetDataframe(requestParameters: DatasetServiceGetDatasetDataframeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiHttpBody> {
+        const response = await this.datasetServiceGetDatasetDataframeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * This endpoint allow getting a specific user\'s Dataset Content filtered by identifying and quasi identifying columns
      * Get Dataset Content filtered by identifying and quasi identifying columns
      */
@@ -307,6 +367,42 @@ export class DatasetApi extends runtime.BaseAPI {
      */
     async datasetServiceGetDatasetInfo(requestParameters: DatasetServiceGetDatasetInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetDatasetInfoReply> {
         const response = await this.datasetServiceGetDatasetInfoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset as a Jupyterhub link
+     * Get Dataset Jupyterhub
+     */
+    async datasetServiceGetDatasetJupyterhubRaw(requestParameters: DatasetServiceGetDatasetJupyterhubRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetDatasetJupyterhubReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetJupyterhub.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/jupyterhub/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendGetDatasetJupyterhubReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset as a Jupyterhub link
+     * Get Dataset Jupyterhub
+     */
+    async datasetServiceGetDatasetJupyterhub(requestParameters: DatasetServiceGetDatasetJupyterhubRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetDatasetJupyterhubReply> {
+        const response = await this.datasetServiceGetDatasetJupyterhubRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

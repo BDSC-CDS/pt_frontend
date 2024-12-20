@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './ApiHttpBody';
 export * from './IndexServiceCreateHelloRequest';
 export * from './ProtobufAny';
 export * from './RpcStatus';
@@ -39,6 +40,8 @@ export * from './TemplatebackendGetConfigsResult';
 export * from './TemplatebackendGetDatasetContentReply';
 export * from './TemplatebackendGetDatasetContentResult';
 export * from './TemplatebackendGetDatasetInfoReply';
+export * from './TemplatebackendGetDatasetJupyterhubReply';
+export * from './TemplatebackendGetDatasetJupyterhubResult';
 export * from './TemplatebackendGetDatasetMetadataReply';
 export * from './TemplatebackendGetDatasetMetadataResult';
 export * from './TemplatebackendGetHelloReply';
@@ -47,6 +50,8 @@ export * from './TemplatebackendGetQuestionnaireReply';
 export * from './TemplatebackendGetQuestionnaireResult';
 export * from './TemplatebackendGetReplyReply';
 export * from './TemplatebackendGetReplyResult';
+export * from './TemplatebackendGetRiskAssessmentReply';
+export * from './TemplatebackendGetRiskAssessmentResult';
 export * from './TemplatebackendGetUserMeReply';
 export * from './TemplatebackendGetUserMeResult';
 export * from './TemplatebackendGetUserReply';
