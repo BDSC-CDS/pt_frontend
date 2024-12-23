@@ -92,6 +92,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
         computeCurrentRisk();
         computeCurrentReport();
+        setTotalHighRiskAnswers(computeHighRiskCount());
     }
 
     const computeHighRiskCount = () => {
@@ -100,8 +101,8 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         Object.keys(questions).forEach((tab) => {
             questions[tab]?.forEach((question) => {
                 // Count answers with highRisk = false
-                const isLowRiskSelected = question.answers.some((answer) => answer.selected && !answer.highRisk);
-                if (isLowRiskSelected) {
+                const isHighRiskSelected = question.answers.some((answer) => answer.selected && answer.highRisk);
+                if (isHighRiskSelected) {
                     totalHighRiskAnswers += 1;
                 }
             });
@@ -111,10 +112,6 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
     };
 
     const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
-
-    useEffect(() => {
-        setTotalHighRiskAnswers(computeHighRiskCount());
-    }, [questions]);
 
     const getQuestionsForTab = (tab: string) => {
         return (
@@ -141,26 +138,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                             </select>
                         </form>
                         {/* Warning Message for High-Risk Answer */}
-                        {question.answers.some((answer) => answer.selected && answer.highRisk) ? (
-                            <div className="mt-2 text-red-500 text-sm font-medium">
-                                <svg
-                                    className="inline w-5 h-5 text-red-500 mr-2"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                    />
-                                </svg>
-                                You've selected a high-risk answer!
-                            </div>
-                        ) : (
+                        {question.answers.some((answer) => answer.selected && answer.highRisk) && (
                             <div className="mt-2 text-red-500 text-sm font-medium">
                                 <svg
                                     className="inline w-5 h-5 text-red-500 mr-2"
