@@ -253,28 +253,155 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
     const [exportInProgress, setExportInProgress] = useState(false);
 
     const exportPDF = async () => {
-        setExportInProgress(true);
-    }
-    useEffect(() => {
-        if (!exportInProgress) return;
-        (async () => {
+        const pdf = new jsPDF('p', 'mm', 'a4'); // A4 page size
+        const margin = 10; // Margin in mm
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const headerHeight = 20; // Header height in mm
+        let cursorY = margin + headerHeight; // Starting Y position for text
 
-            const input = document.getElementById('all-tabs');
-            if (!input) return;
+        // Function to add the header with logo on the left (only on the first page)
+        const addHeader = async (firstPage = false) => {
+            if (!firstPage) return;
 
-            const canvas = await html2canvas(input);
-            const imgData = canvas.toDataURL('image/png');
-            // window.open(imgData, '_blank');
-            const pdf = new jsPDF();
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            // pdf.output('dataurlnewwindow');
-            pdf.save("download.pdf");
-            setExportInProgress(false);
-        })();
-    }, [exportInProgress])
+            pdf.setFillColor("#306278");
+            pdf.rect(0, 0, pageWidth, headerHeight, "F");
+
+            // Fetch the logo as Base64
+            const response = await fetch("/sphn-logo-white.png"); // Keep the existing path
+            const blob = await response.blob();
+
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            return new Promise((resolve) => {
+                reader.onloadend = () => {
+                    const base64Logo = reader.result as string;
+                    const logoWidth = 15;
+                    const logoHeight = 10;
+                    pdf.addImage(
+                        base64Logo,
+                        "PNG",
+                        margin, // Left align the logo
+                        (headerHeight - logoHeight) / 2, // Center vertically within the header
+                        logoWidth,
+                        logoHeight
+                    );
+
+                    // Add the title "Privacy Toolbox" next to the logo
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setFontSize(14);
+                    pdf.setTextColor("#FFFFFF");
+                    pdf.text("Privacy Toolbox", margin + logoWidth + 5, headerHeight / 1.5);
+
+                    resolve(null);
+                };
+            });
+        };
+
+        // Function to add footer with title and page number
+        const addFooter = (pageNumber: number) => {
+            pdf.setFont("helvetica", "italic");
+            pdf.setFontSize(10);
+            pdf.setTextColor("#000000");
+            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${saveName}`, margin, pageHeight - 10); 
+            pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
+        };
+
+        let pageNumber = 1;
+
+        // Add header to the first page
+        await addHeader(true);
+        addFooter(pageNumber);
+
+        // Step 1: Add Summary
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "normal");
+
+        const summaryTab = tabs.find((tab) => tab.title === "Results");
+        if (summaryTab) {
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Summary", margin, cursorY);
+            cursorY += 10;
+
+            const summaryContent = [
+                `Project Title: ${saveName}`,
+                `Total Questions Answered: ${reportData.totalQuestionsAnswered}`,
+                `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
+                `Missing Data Sections: ${reportData.missingDataSections.length > 0
+                    ? reportData.missingDataSections.join(", ")
+                    : "None"
+                }`,
+                `Overall Completion Rate: ${reportData.overallCompletionRate}`,
+                `Current Risk Score: ${(currentRiskPc * 100).toFixed(2)}%`,
+            ];
+
+            summaryContent.forEach((line) => {
+                const wrappedLines = pdf.splitTextToSize(line, pageWidth - 2 * margin);
+                pdf.text(wrappedLines, margin, cursorY);
+                cursorY += wrappedLines.length * 6;
+            });
+
+            cursorY += 10;
+        }
+
+        // Step 2: Add Questions and Answers
+        tabs.forEach((tab) => {
+            if (tab.title === "Results") return; // Skip the summary tab
+
+            // Page break check
+            if (cursorY + 10 > pageHeight - margin) {
+                pdf.addPage();
+                cursorY = margin + headerHeight;
+                pageNumber++;
+                addFooter(pageNumber);
+            }
+
+            // Tab Title: Bold, Size 14
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(14);
+            pdf.text(`Tab: ${tab.title}`, margin, cursorY);
+            cursorY += 10;
+
+            // Questions and Answers
+            const tabQuestions = questions[tab.title] || [];
+            tabQuestions.forEach((question, questionIndex) => {
+                // Page break check
+                if (cursorY + 15 > pageHeight - margin) {
+                    pdf.addPage();
+                    cursorY = margin + headerHeight;
+                    pageNumber++;
+                    addFooter(pageNumber);
+                }
+
+                // Question: Normal, Size 12
+                pdf.setFont("helvetica", "normal");
+                pdf.setFontSize(12);
+                const questionText = `${questionIndex + 1}. ${question.questionDescription}`;
+                const questionLines = pdf.splitTextToSize(questionText, pageWidth - 2 * margin);
+                pdf.text(questionLines, margin, cursorY);
+                cursorY += questionLines.length * 6;
+
+                // Answer: Italic, Size 12
+                pdf.setFont("helvetica", "italic");
+                const selectedAnswer = question.answers.find((a) => a.selected);
+                const answerText = selectedAnswer
+                    ? `Answer: ${selectedAnswer.answerDescription}`
+                    : "Answer: Not Answered";
+                const answerLines = pdf.splitTextToSize(answerText, pageWidth - 2 * margin);
+                pdf.text(answerLines, margin + 10, cursorY);
+                cursorY += answerLines.length * 6 + 5;
+            });
+
+            // Add spacing between tabs
+            cursorY += 5;
+        });
+
+
+        // Save the PDF
+        pdf.save("questions-and-answers-with-summary-and-header.pdf");
+    };
+
+
 
     const exportConfig = () => {
         const txt = `{
@@ -305,7 +432,44 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             <div className="mb-2">
                 <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
             </div>
-            <div className="flex flex-row">
+            <div className="mb-2">
+                <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
+            </div>
+            <hr className="my-4" />
+            <h3 className="text-lg font-semibold mb-2">Top 5 High-Risk Questions</h3>
+            <div>
+                {(() => {
+                    // Gather all questions into a single array with their tab
+                    let allQuestions: { tab: string; question: Question; risk: number }[] = [];
+                    Object.keys(questions).forEach((tab) => {
+                        questions[tab]?.forEach((question) => {
+                            const selectedAnswer = question.answers.find((answer) => answer.selected);
+                            if (selectedAnswer) {
+                                const risk = selectedAnswer.riskLevel * question.riskWeight;
+                                allQuestions.push({ tab, question, risk });
+                            }
+                        });
+                    });
+
+                    // Sort questions by risk descending and take the top 5
+                    const topQuestions = allQuestions
+                        .sort((a, b) => b.risk - a.risk)
+                        .slice(0, 5);
+
+                    // Render top 5 high-risk questions with their tabs
+                    return topQuestions.map(({ tab, question, risk }, index) => (
+                        <div key={question.questionId} className="mb-4">
+                            <p className="text-sm">
+                                <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
+                            </p>
+                        </div>
+                    ));
+                })()}
+            </div>
+            <div className="flex flex-row mt-4">
                 <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <FaFilePdf />
                     <p className='ml-2 text-sm'> Export PDF</p>
@@ -315,7 +479,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     <p className='ml-2 text-sm'> Export connector configuration</p>
                 </span>
             </div>
-        </div>
+        </div>;
 
     const tabs: Tabs = Object.keys(questions).map((tab, n) => ({
         id: (n + 1).toString(),
@@ -404,42 +568,43 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 </Modal.Body>
             </Modal>
             <div id="all-tabs" className='p-5'>
-                <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                    <h1 className='mt-4 text-md font-semibold flex flex-row'>
-                        Current score
-                        <button
-                            onMouseEnter={() => setRiskPopoverDisplayed(true)}
-                            onMouseLeave={() => setRiskPopoverDisplayed(false)}
-                            className="ml-3 flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
-                            ?
-                        </button>
-                    </h1>
-                    <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
-                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
+                {activeTab !== '8' && (
+                    <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
+                        <h1 className='mt-4 text-md font-semibold flex flex-row'>
+                            Current score
+                            <button
+                                onMouseEnter={() => setRiskPopoverDisplayed(true)}
+                                onMouseLeave={() => setRiskPopoverDisplayed(false)}
+                                className="ml-3 flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                ?
+                            </button>
+                        </h1>
+                        <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
+                            <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
+                            </div>
+                            <div className="px-3 py-2">
+                                Current risk {currentRisk}<br />
+                                Current risk (%) {(currentRiskPc * 100).toFixed(2) + "%"}<br />
+                                Max. possible risk {maxRisk}<br />
+                                Min. possible risk {minRisk}<br />
+                            </div>
+                            <div data-popper-arrow></div>
                         </div>
-                        <div className="px-3 py-2">
-                            Current risk {currentRisk}<br />
-                            Current risk (%) {(currentRiskPc * 100).toFixed(2) + "%"}<br />
-                            Max. possible risk {maxRisk}<br />
-                            Min. possible risk {minRisk}<br />
-                        </div>
-                        <div data-popper-arrow></div>
-                    </div>
 
-                    {/* currentRisk {currentRisk}<br />
+                        {/* currentRisk {currentRisk}<br />
                     currentRiskPc {currentRiskPc}<br />
                     maxRisk {maxRisk}<br />
                     minRisk {minRisk}<br /> */}
-                    <GaugeChart id="gauge-chart2"
-                        nrOfLevels={20}
-                        cornerRadius={0}
-                        percent={currentRiskPc}
-                        textColor='black'
-                        animate={false}
-                    />
-                </div>
-
+                        <GaugeChart id="gauge-chart2"
+                            nrOfLevels={20}
+                            cornerRadius={0}
+                            percent={currentRiskPc}
+                            textColor='black'
+                            animate={false}
+                        />
+                    </div>
+                )}
                 {/* <TabsComponent questions={questions} /> */}
 
                 <ul className="flex items-stretch w-full">

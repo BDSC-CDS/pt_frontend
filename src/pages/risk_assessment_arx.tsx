@@ -10,8 +10,9 @@ import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
 import { useAuth } from '~/utils/authContext';
 import { DateTime } from 'luxon';
+import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
 
-export default function Dataset() {
+export default function RiskAssessmentArx() {
     interface ColumnTypes {
         [key: string]: string;
     }
@@ -284,6 +285,8 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
+            // const config_id = 1;
+            // const response = await transformDataset(id, config_id);
             router.push(`/transform/${id}`);
         }
     };
@@ -293,16 +296,38 @@ export default function Dataset() {
             getListDatasets();
         }
     };
-    const handleOpenDeidentificationNotebook = async (id: number | undefined) => {
+
+    const handleRiskAssessment = async (id: number | undefined) => {
         if (id) {
-            router.push(`/deidentification-notebook/${id}`);
+            const response = await getRiskAssessment(id);
+            // Assuming `response` contains the risk assessment JSON
+            if (response) {
+                // Convert the response JSON to a string
+                const jsonContent = JSON.stringify(response, null, 2);
+            
+                // Create a Blob and URL for the JSON
+                const blob = new Blob([jsonContent], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+            
+                // Create a temporary anchor element to trigger the download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `risk_assessment_${id}.json`; // Customize the file name
+                document.body.appendChild(a);
+                a.click();
+            
+                // Clean up
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
         }
     };
 
     return (
         <>
             <Head>
-                <title>Datasets</title>
+                <title>Risk Assessment using ARX</title>
             </Head>
             {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
@@ -310,7 +335,7 @@ export default function Dataset() {
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold">Datasets</h1>
+                        <h1 className="text-3xl font-bold">Risk Assessment using ARX</h1>
                         <button
                             onClick={() => setIsUploadModalOpen(true)}
                             className="text-white bg-[#306278] hover:bg-[#255362] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
@@ -450,22 +475,14 @@ export default function Dataset() {
                                             </Table.Cell>
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
                                             < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                                <a onMouseEnter={() => handleMenuOpen(dataset.id, index)} className="text-gray-900 hover:text-blue-500">
-                                                    <MdMoreHoriz size={20} />
-                                                </a>
-                                                {openMenuId === dataset.id && (
-                                                    <div className="dropdown-menu relative">
-                                                        <ul className={`absolute ${isDropdownAbove ? '-top-14' : 'mt-4'
-                                                            } w-64  bg-white rounded-md shadow-lg z-10`}>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleTransform(dataset.id)}>Transform</li>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleDelete(dataset.id)}>Delete</li>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleOpenDeidentificationNotebook(dataset.id)}>Open in Jupyterhub for deidentification</li>
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                                <div className="button-container">
+                                                    <button
+                                                        className="px-4 py-2 text-sm text-white bg-[#306278] hover:bg-[#255362] rounded-md focus:outline-none"
+                                                        onClick={() => handleRiskAssessment(dataset.id)}
+                                                    >
+                                                        Risk Assessment
+                                                    </button>
+                                                </div>
                                             </Table.Cell>
                                         </Table.Row>
                                     ))}
@@ -480,3 +497,33 @@ export default function Dataset() {
         </>
     );
 }
+// Function to show a popup
+const showPopup = (content: string) => {
+    const popup = document.createElement("div");
+    popup.style.position = "fixed";
+    popup.style.top = "20%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.padding = "20px";
+    popup.style.backgroundColor = "white";
+    popup.style.border = "1px solid #ccc";
+    popup.style.zIndex = "1000";
+    popup.style.overflowY = "auto";
+    popup.style.maxHeight = "80%";
+    popup.style.width = "50%";
+    popup.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+
+    const contentPre = document.createElement("pre");
+    contentPre.textContent = content;
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Close";
+    closeButton.style.marginTop = "10px";
+    closeButton.onclick = () => {
+        document.body.removeChild(popup);
+    };
+
+    popup.appendChild(contentPre);
+    popup.appendChild(closeButton);
+    document.body.appendChild(popup);
+};

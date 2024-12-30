@@ -49,7 +49,7 @@ export default function Home() {
                                 description="TEXT"
                             />
                             <ToolCard
-                                href="/tools/formal_risk_assessment"
+                                href="/risk_assessment_arx"
                                 icon={<BiCalculator size="3em" />}
                                 title="Formal Risk Assessment"
                                 description="TEXT"
