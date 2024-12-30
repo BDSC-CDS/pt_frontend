@@ -1,7 +1,7 @@
 import { Sidebar } from 'flowbite-react';
 import Link from 'next/link';
-import { BiBuoy } from 'react-icons/bi';
-import { HiArrowSmRight, HiDatabase, HiInbox, HiShoppingBag, HiPresentationChartBar, HiOutlineCog, HiLockClosed } from 'react-icons/hi';
+import { BiBuoy, BiCalculator, BiMessageSquareDetail, BiSolidReport, BiSolidRuler } from 'react-icons/bi';
+import { HiDatabase, HiInbox, HiShoppingBag, HiPresentationChartBar, HiOutlineCog, HiLockClosed, HiCog } from 'react-icons/hi';
 import { HiClipboardDocumentList } from 'react-icons/hi2';
 import { useAuth } from '~/utils/authContext';
 import type { CustomFlowbiteTheme } from "flowbite-react";
@@ -22,57 +22,71 @@ export default function SideMenu() {
         // <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
         <div className="w-75 h-100 top-14 sticky h-full bg-white">
 
-            <Sidebar aria-label="Sidebar with content separator example" className="w-90 border pt-10 rounded">
+            <Sidebar aria-label="Sidebar" className="w-90 border pt-10 rounded">
                 <div>
                     <Sidebar.Items>
-
-                        <Sidebar.Collapse icon={HiPresentationChartBar} theme={customTheme.collapse} label="Risk Assessment">
+                        <Sidebar.ItemGroup>
+                            <Sidebar.Collapse icon={HiPresentationChartBar} theme={customTheme.collapse} label="Risk Assessment">
                                 <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                    <HiPresentationChartBar />
-                                    <p className='ml-1'> Qualitative Risk Assessment</p>
+                                    <BiMessageSquareDetail />
+                                    <p className='ml-1'>Qualitative Risk Assessment</p>
                                 </Link>
                                 <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                                    <HiPresentationChartBar />
-                                    <p className='ml-1'> Quantitative Risk Assessment</p>
+                                    <BiCalculator />
+                                    <p className='ml-1'>Formal Risk Assessment</p>
                                 </Link>
-                        </Sidebar.Collapse>
+                            </Sidebar.Collapse>
+                        </Sidebar.ItemGroup>
+
+                        <Sidebar.ItemGroup>
+                            <Sidebar.Collapse icon={HiCog} theme={customTheme.collapse} label="De-identification">
+                                <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                    <BiSolidRuler />
+                                    <p className='ml-1'>Rule-based De-identification</p>
+                                </Link>
+                                <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                                    <BiSolidReport />
+                                    <p className='ml-1'>Formal De-identification</p>
+                                </Link>
+                            </Sidebar.Collapse>
+                        </Sidebar.ItemGroup>
 
                         <Sidebar.ItemGroup>
                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiDatabase />
-                                <p className='ml-1'> Datasets</p>
+                                <p className='ml-1'>Datasets</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiShoppingBag />
-                                <p className='ml-1'> Tabular DeID </p>
+                                <p className='ml-1'>Tabular DeID</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiShoppingBag />
-                                <p className='ml-1'> Synthetic Data Generation</p>
+                                <p className='ml-1'>Synthetic Data Generation</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiShoppingBag />
-                                <p className='ml-1'> Text DeID</p>
+                                <p className='ml-1'>Text DeID</p>
                             </Link>
                         </Sidebar.ItemGroup>
                         <Sidebar.ItemGroup className="mt-10">
                             <Sidebar.Collapse className={`${!isAdmin ? "hidden" : ""}`} icon={HiOutlineCog} theme={customTheme.collapse} label="Admin">
                                 <Link href="/admin/questionnaire" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
                                     <HiClipboardDocumentList />
-                                    <p className='ml-1'> Questionnaires</p>
+                                    <p className='ml-1'>Questionnaires</p>
                                 </Link>
                                 <Link href="/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
                                     <HiLockClosed />
-                                    <p className='ml-1'> Audit Log</p>
+                                    <p className='ml-1'>Audit Log</p>
                                 </Link>
                             </Sidebar.Collapse>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiInbox />
-                                <p className='ml-1'> Documentation</p>
+                                <p className='ml-1'>Documentation</p>
                             </Link>
                             <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <BiBuoy />
-                                <p className='ml-1'> Settings</p>
+                                <p className='ml-1'>Settings</p>
                             </Link>
                         </Sidebar.ItemGroup>
                     </Sidebar.Items>
