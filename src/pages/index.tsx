@@ -23,29 +23,15 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <div className="flex flex-col p-8">
-                <Header />
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold">Welcome to the Privacy Toolbox!</h1>
-                </div>
-                <section>
-                    {/* Intro Text Section without image */}
-                    <div className="mb-12">
-                        <p className="text-md">
-                            Our mission is to advance the field of biomedical data research by harnessing the expertise of the SPHN DeID task force and translating their recommendations into a dynamic, adaptable platform. Our goal is to revolutionize the process of risk assessment and de-identification for biomedical datasets, streamlining it for research purposes.
-
-                            In pursuit of this objective, we are committed to developing an automated de-identification tool that not only ensures transparency but also provides a clear understanding of risk levels. This innovation promises to be a valuable asset for researchers, regulatory authorities, and Data Protection Officers (DPOs) alike.
-
-                            Join us on this exciting journey towards enhanced biomedical data privacy and research efficiency.
-                        </p>
-                    </div>
-                    {/* Tabular Data Section */}
+                <section>                    
+                    {/* Risk Assessment Section */}
                     <div className="mb-8">
-                        <h2 className="text-2xl font-semibold">Tabular Data</h2>
+                        <h2 className="text-2xl font-semibold">Risk Assessment</h2>
                         <div className="grid grid-cols-3 gap-4 mt-4">
                             <ToolCard
                                 href="/risk_assessment"
                                 icon={<BiMessageSquareDetail size="3em" />}
-                                title="Questionnaire"
+                                title="Qualitative Risk Assessment"
                                 description="TEXT"
                             />
                             <ToolCard
@@ -54,10 +40,16 @@ export default function Home() {
                                 title="Formal Risk Assessment"
                                 description="TEXT"
                             />
+                        </div>
+                    </div>
+                    {/* De-Identification Section */}
+                    <div>
+                        <h2 className="text-2xl font-semibold">De-Identification</h2>
+                        <div className="grid grid-cols-3 gap-4 mt-4">
                             <ToolCard
                                 href="/dataset"
                                 icon={<BiSolidRuler size="3em" />}
-                                title="Rule-Based De-identification"
+                                title="Rule-based De-identification"
                                 description="TEXT"
                             />
                             <ToolCard
@@ -69,37 +61,7 @@ export default function Home() {
                             <ToolCard
                                 href="/synthetic_data"
                                 icon={<BiLayer size="3em" />}
-                                title="Synthetic Data"
-                                description="TEXT"
-                            />
-                        </div>
-                    </div>
-                    {/* Text Data Section */}
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-semibold">Text Data</h2>
-                        <div className="grid grid-cols-3 gap-4 mt-4">
-                            <ToolCard
-                                href="/risk_assessment"
-                                icon={<BiMessageSquareDetail size="3em" />}
-                                title="Questionnaire"
-                                description="TEXT"
-                            />
-                            <ToolCard
-                                href="/text_deid"
-                                icon={<BiSolidRuler size="3em" />}
-                                title="Text De-identification"
-                                description="TEXT"
-                            />
-                        </div>
-                    </div>
-                    {/* Image Data Section */}
-                    <div>
-                        <h2 className="text-2xl font-semibold">Image Data</h2>
-                        <div className="grid grid-cols-3 gap-4 mt-4">
-                            <ToolCard
-                                href="/risk_assessment"
-                                icon={<GrDocumentLocked size="3em" />}
-                                title="Image De-identification"
+                                title="Synthetic Data Generation"
                                 description="TEXT"
                             />
                         </div>
