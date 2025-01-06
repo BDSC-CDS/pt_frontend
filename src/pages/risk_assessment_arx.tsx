@@ -3,7 +3,7 @@ import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
-import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
+import { storeDataset, listDatasets, deleteDataset, getMetadata } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import { Button, Modal } from 'flowbite-react';
@@ -283,13 +283,6 @@ export default function RiskAssessmentArx() {
         }
     };
 
-    const handleTransform = async (id: number | undefined) => {
-        if (id) {
-            // const config_id = 1;
-            // const response = await transformDataset(id, config_id);
-            router.push(`/transform/${id}`);
-        }
-    };
     const handleDelete = async (id: number | undefined) => {
         if (id) {
             const response = await deleteDataset(id);
@@ -297,37 +290,37 @@ export default function RiskAssessmentArx() {
         }
     };
 
+
     const handleRiskAssessment = async (id: number | undefined) => {
-        if (id) {
+        if (id) { 
             const response = await getRiskAssessment(id);
-            // Assuming `response` contains the risk assessment JSON
-            if (response) {
-                // Convert the response JSON to a string
-                const jsonContent = JSON.stringify(response, null, 2);
             
-                // Create a Blob and URL for the JSON
+            // Handle successful response
+            if (response) {
+                
+                const jsonContent = JSON.stringify(response, null, 2);
                 const blob = new Blob([jsonContent], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
-            
-                // Create a temporary anchor element to trigger the download
+                
+                // Trigger file download
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `risk_assessment_${id}.json`; // Customize the file name
+                a.download = `risk_assessment_${id}.json`;
                 document.body.appendChild(a);
                 a.click();
-            
-                // Clean up
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+            } else {
+                alert("No quasi-identifiers have been defined for this dataset.");
             }
-
         }
+
     };
 
     return (
         <>
             <Head>
-                <title>Risk Assessment using ARX</title>
+                <title>Quantitative Risk Assessment</title>
             </Head>
             {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
@@ -335,49 +328,8 @@ export default function RiskAssessmentArx() {
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold">Risk Assessment using ARX</h1>
-                        <button
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className="text-white bg-[#306278] hover:bg-[#255362] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
-                        >
-                            <svg className="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            New project
-                        </button>
-
-
-
+                        <h1 className="text-3xl font-bold">Quantitative Risk Assessment</h1>
                     </div>
-                    <Modal show={isUploadModalOpen} onClose={() => closeUploadModals()}>
-                        <Modal.Body>
-                            <div className="space-y-6">
-                                <h2 className="text-lg  mb-2">Upload CSV File</h2>
-                                {/*<input
-                                    type="text"
-                                    placeholder="Enter filename"
-                                    value={fileName}
-                                    onChange={(e) => setFileName(e.target.value)}
-                                    className="input input-bordered w-full max-w-xs"
-                                />*/}
-                                <input type="file" accept=".csv" onChange={handleFileUpload} />
-
-                            </div>
-                            <button className='mt-4 bg-gray-400 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'
-                                onClick={() => processCSV()}
-                            >
-                                Submit
-                            </button>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button onClick={() => {
-                                closeUploadModals();
-                                router.push('dataset');
-                            }}>
-                                Cancel
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
                     <Modal size='7xl' show={isTypeModalOpen} onClose={() => setIsTypeModalOpen(false)}>
                         <Modal.Header>
                             Data information
@@ -458,7 +410,7 @@ export default function RiskAssessmentArx() {
                                 <Table.Head>
                                     <Table.HeadCell>Dataset ID</Table.HeadCell>
                                     <Table.HeadCell>Dataset name</Table.HeadCell>
-                                    <Table.HeadCell>Date created</Table.HeadCell>
+                                    <Table.HeadCell>Quasi-Identifiers</Table.HeadCell>
                                     <Table.HeadCell>
                                         <span className="sr-only">Edit</span>
                                     </Table.HeadCell>
@@ -473,7 +425,9 @@ export default function RiskAssessmentArx() {
                                             <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900">
                                                 {dataset.datasetName}
                                             </Table.Cell>
-                                            <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
+                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900">
+                                                {"Not Yet Implemented"}
+                                            </Table.Cell>
                                             < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
                                                 <div className="button-container">
                                                     <button
@@ -497,33 +451,3 @@ export default function RiskAssessmentArx() {
         </>
     );
 }
-// Function to show a popup
-const showPopup = (content: string) => {
-    const popup = document.createElement("div");
-    popup.style.position = "fixed";
-    popup.style.top = "20%";
-    popup.style.left = "50%";
-    popup.style.transform = "translate(-50%, -50%)";
-    popup.style.padding = "20px";
-    popup.style.backgroundColor = "white";
-    popup.style.border = "1px solid #ccc";
-    popup.style.zIndex = "1000";
-    popup.style.overflowY = "auto";
-    popup.style.maxHeight = "80%";
-    popup.style.width = "50%";
-    popup.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-
-    const contentPre = document.createElement("pre");
-    contentPre.textContent = content;
-
-    const closeButton = document.createElement("button");
-    closeButton.textContent = "Close";
-    closeButton.style.marginTop = "10px";
-    closeButton.onclick = () => {
-        document.body.removeChild(popup);
-    };
-
-    popup.appendChild(contentPre);
-    popup.appendChild(closeButton);
-    document.body.appendChild(popup);
-};
