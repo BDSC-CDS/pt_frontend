@@ -30,11 +30,11 @@ export default function SideMenu() {
                             </Link>
                     </Sidebar.ItemGroup> 
                     <Sidebar.ItemGroup>
-                            <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                            <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiPresentationChartBar />
                                 <p className='ml-1'> Qualitative Assessment</p>
                             </Link>
-                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                             <Link href="/risk_assessment_arx" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiPresentationChartBar />
                                 <p className='ml-1'> Quantitative Assessment</p>
                             </Link>
@@ -44,7 +44,7 @@ export default function SideMenu() {
                                 <HiShieldCheck />
                                 <p className='ml-1'> Rule-Based de-identification</p>
                             </Link>
-                             <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                             <Link href="/formal_deid" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                                 <HiShieldCheck />
                                 <p className='ml-1'> Formal de-identification</p>
                             </Link>
