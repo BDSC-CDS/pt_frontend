@@ -23,6 +23,7 @@ export interface Questions {
 export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questions => {
 
   const questions: Questions = {};
+
   q.questions?.forEach(question => {
     if (!question.tab) return;
 
@@ -38,7 +39,7 @@ export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questi
         answerId: answer.id?.toString() || "",
         answerDescription: answer.text || "",
         ethicsApproval: false,
-        highRisk: false,
+        highRisk: answer.highRisk || false,
         riskLevel: answer.riskLevel || 0,
         selected: false,
       })) || [],
