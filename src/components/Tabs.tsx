@@ -92,47 +92,77 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
         computeCurrentRisk();
         computeCurrentReport();
+        setTotalHighRiskAnswers(computeHighRiskCount());
     }
+
+    const computeHighRiskCount = () => {
+        let totalHighRiskAnswers = 0;
+
+        Object.keys(questions).forEach((tab) => {
+            questions[tab]?.forEach((question) => {
+                // Count answers with highRisk = false
+                const isHighRiskSelected = question.answers.some((answer) => answer.selected && answer.highRisk);
+                if (isHighRiskSelected) {
+                    totalHighRiskAnswers += 1;
+                }
+            });
+        });
+
+        return totalHighRiskAnswers;
+    };
+
+    const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
 
     const getQuestionsForTab = (tab: string) => {
-        // <div className={tab != activeTab ? "hidden" : ""}>
         return (
             <div>
-                {
-                    questions[tab]?.map((question) => (
-                        <div key={question.questionId} className='flex items-center'>
-                            <form className="w-1/2 my-4" key={question.questionId}>
-                                <label className="block mb-2 text-sm font-medium text-gray-900">
-                                    {question.questionDescription}
-                                </label>
-                                <select
-                                    id={question.questionId}
-                                    className={`bg-gray-50  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${isQuestionAnswered(question) ? 'border-green-400' : 'border-red-400'}`}
-                                    value={getSelectedAnswer(question)}
-                                    onChange={e => setSelectedAnswer(question, e.target.value)}
+                {questions[tab]?.map((question) => (
+                    <div key={question.questionId} className="flex flex-col my-4">
+                        <form className="w-1/2">
+                            <label className="block mb-2 text-sm font-medium text-gray-900">
+                                {question.questionDescription}
+                            </label>
+                            <select
+                                id={question.questionId}
+                                className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
+                                    }`}
+                                value={getSelectedAnswer(question)}
+                                onChange={(e) => setSelectedAnswer(question, e.target.value)}
+                            >
+                                <option>Select an option</option>
+                                {question.answers.map((answer) => (
+                                    <option key={answer.answerId} value={answer.answerId}>
+                                        {answer.answerDescription}
+                                    </option>
+                                ))}
+                            </select>
+                        </form>
+                        {/* Warning Message for High-Risk Answer */}
+                        {question.answers.some((answer) => answer.selected && answer.highRisk) && (
+                            <div className="mt-2 text-red-500 text-sm font-medium">
+                                <svg
+                                    className="inline w-5 h-5 text-red-500 mr-2"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
                                 >
-                                    <option>Select an option</option>
-                                    {question.answers.map((answer) => (
-                                        <option key={answer.answerId} value={answer.answerId} className='w-1/2'>
-                                            {answer.answerDescription}
-                                        </option>
-                                    ))}
-                                </select>
-                            </form>
-                            <div className="relative group cursor-pointer ml-6 mt-6">
-                                <span className="w-6 h-6 flex items-center justify-center bg-gray-400 text-white rounded-full text-sm font-bold">?</span>
-                                <div className="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
-                                    <span className="relative z-10 p-2 w-40 text-xs leading-none text-white whitespace-no-wrap bg-gray-700 shadow-lg rounded-md">This is a tooltip.</span>
-                                    <div className="w-3 h-3 -mt-2 -ml-20 rotate-45 bg-gray-700"></div>
-                                </div>
+                                    <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
+                                </svg>
+                                You've selected a high-risk answer!
                             </div>
-                        </div>
-                    ))
-                }
+                        )}
+                    </div>
+                ))}
             </div>
         );
-    }
-
+    };
 
     const getRiskBounds = () => {
         let allQuestions: Question[] = [];
@@ -303,7 +333,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             pdf.setFont("helvetica", "italic");
             pdf.setFontSize(10);
             pdf.setTextColor("#000000");
-            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${saveName}`, margin, pageHeight - 10); 
+            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${saveName}`, margin, pageHeight - 10);
             pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
         };
 
@@ -333,6 +363,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 }`,
                 `Overall Completion Rate: ${reportData.overallCompletionRate}`,
                 `Current Risk Score: ${(currentRiskPc * 100).toFixed(2)}%`,
+                `Total High Risk Answers: ${totalHighRiskAnswers}`,
             ];
 
             summaryContent.forEach((line) => {
@@ -435,8 +466,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             <div className="mb-2">
                 <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
             </div>
+            <div className="mb-2 text-red-500">
+                <strong>High-Risk Answers:</strong> {totalHighRiskAnswers}
+            </div>
             <hr className="my-4" />
-            <h3 className="text-lg font-semibold mb-2">Top 5 High-Risk Questions</h3>
+            <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
             <div>
                 {(() => {
                     // Gather all questions into a single array with their tab
