@@ -19,8 +19,7 @@ export default function SideMenu() {
 
 
     return (
-        // <div className="fixed top-20 left-0 h-3/4 z-10 text-neutral-950">
-        <div className="w-75 h-100 top-14 sticky h-full bg-white">
+        <div className="w-72 top-14 sticky h-full bg-white">
 
             <Sidebar aria-label="Sidebar" className="w-90 border pt-10 rounded">
                 <div>
