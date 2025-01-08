@@ -30,9 +30,7 @@ export default function Dataset() {
     const [csvString, setCsvString] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
-    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
-    const [isDropdownAbove, setIsDropdownAbove] = useState(false);
     const [idCol, setIdCol] = useState<string>();
     
     const acceptedDateFormats = [
