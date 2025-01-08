@@ -90,18 +90,18 @@ const DataTable = <T extends {}>({
                     </Table.Head>
 
                     {/* DataTable Body */}
-                    <Table.Body className="divide-y">
+                    <Table.Body className={`divide-y ${onRowClick?"cursor-pointer":""}`}>
                         {data.map((row, rowIndex) => (
                             <Table.Row 
                                 key={rowIndex} 
                                 onClick={() => onRowClick?.(row)} 
-                                className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer"
+                                className="bg-white dark:border-gray-700 dark:bg-gray-800"
                             >
                                 {/* Render data row cells */}
                                 {columns.map((col, colIndex) => (
                                     <Table.Cell 
                                         key={"cell"+rowIndex+colIndex}
-                                        className="cursor-pointer"
+                                        className=""
                                     >
                                         {renderCell(row[col.name as keyof T])}
                                     </Table.Cell>
@@ -110,7 +110,7 @@ const DataTable = <T extends {}>({
                                 {/* Render actions tooltip */}
                                 { actions && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="relative cursor-pointer group">
+                                        <div className="relative group">
                                             <MdMoreHoriz size={20}/>
                                             <ListGroup className="fixed z-50 hidden group-hover:block">
                                                 {actions.map((action, actionIndex) => (
