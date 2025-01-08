@@ -1,7 +1,6 @@
 
 import { Table } from 'flowbite-react';
 import Head from 'next/head';
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useRouter } from 'next/router';
 import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
 import { useEffect, useState } from 'react';
@@ -11,10 +10,21 @@ import Papa from "papaparse";
 import { useAuth } from '~/utils/authContext';
 import { DateTime } from 'luxon';
 
+import DataTable from '../components/DataTable';
+
+interface ColumnTypes {
+    [key: string]: string;
+}
+
 export default function Dataset() {
-    interface ColumnTypes {
-        [key: string]: string;
-    }
+
+    // Authentication
+    const isLoggedIn = useAuth();
+
+    // Routing
+    const router = useRouter();
+
+    // States
     const [datasetsList, setDatasetsList] = useState<Array<TemplatebackendDataset>>([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isTypeModalOpen, setIsTypeModalOpen] = useState(false);
@@ -22,11 +32,11 @@ export default function Dataset() {
     const [csvString, setCsvString] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
-    const { isLoggedIn } = useAuth();
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
     const [isDropdownAbove, setIsDropdownAbove] = useState(false);
     const [idCol, setIdCol] = useState<string>();
+    
     const acceptedDateFormats = [
         'yyyy-MM-dd',
         'MM/dd/yyyy',
@@ -36,25 +46,6 @@ export default function Dataset() {
         'dd-MM-yyyy',
         'M/d/yyyy',
     ];
-
-    const handleMenuOpen = (id: number | undefined, index: number) => {
-        if (id) {
-
-            // If the row is in the bottom 20% of the viewport, show dropdown above
-            if (datasetsList.length - index <= 3) {
-                setIsDropdownAbove(true);
-            } else {
-                setIsDropdownAbove(false);
-            }
-            setOpenMenuId(id);
-        }
-    };
-
-    const handleMenuClose = () => {
-        setOpenMenuId(null);
-        getListDatasets();
-
-    };
 
     const getListDatasets = async (offset?: number, limit?: number) => {
         // Call API
@@ -81,6 +72,8 @@ export default function Dataset() {
             alert("Error listing the datasets")
         }
     }, []);
+
+    
 
     const getUniqueFileName = (baseFileName: string, datasetsList: TemplatebackendDataset[]): string => {
         let uniqueFileName = baseFileName;
@@ -154,8 +147,8 @@ export default function Dataset() {
                 ).join('\\n');
                 // set variable
                 setCsvString(csvString);
-                // Set preview (first 5 rows)
-                setCsvPreview([headers, ...result.data.slice(0, 3).map(row => headers.map(header => (row as Record<string, any>)[header] || ''))]);
+                // Set preview (first 4 rows)
+                setCsvPreview([headers, ...result.data.slice(0, 4).map(row => headers.map(header => (row as Record<string, any>)[header] || ''))]);
 
             },
             header: true,
@@ -274,8 +267,8 @@ export default function Dataset() {
         setFileName('');
         getListDatasets();
     };
-    const router = useRouter();
 
+    // Event handlers
     const handleRowClick = (id: number | undefined) => {
         if (id) {
             router.push(`/dataset/${id}`);
@@ -287,12 +280,14 @@ export default function Dataset() {
             router.push(`/transform/${id}`);
         }
     };
+
     const handleDelete = async (id: number | undefined) => {
         if (id) {
             const response = await deleteDataset(id);
             getListDatasets();
         }
     };
+
     const handleOpenDeidentificationNotebook = async (id: number | undefined) => {
         if (id) {
             router.push(`/deidentification-notebook/${id}`);
@@ -320,10 +315,8 @@ export default function Dataset() {
                             </svg>
                             New project
                         </button>
-
-
-
                     </div>
+
                     <Modal show={isUploadModalOpen} onClose={() => closeUploadModals()}>
                         <Modal.Body>
                             <div className="space-y-6">
@@ -358,26 +351,23 @@ export default function Dataset() {
                             Data information
                         </Modal.Header>
                         <Modal.Body>
-                            <div className="space-y-4">
-                                <div className="mb-4">
-                                    <Table className="text-xs border border-slate-400 rounded">
-                                        <Table.Head>
-                                            {csvPreview[0]?.map((header, index) => (
-                                                <Table.HeadCell className="text-xs" key={index}>{header}</Table.HeadCell>
-                                            ))}
-                                        </Table.Head>
-                                        <Table.Body>
-                                            {csvPreview.slice(1).map((row, rowIndex) => (
-                                                <Table.Row key={rowIndex}>
-                                                    {row.map((cell, cellIndex) => (
-                                                        <Table.Cell key={cellIndex} className='py-1'>{cell}</Table.Cell>
-                                                    ))}
-                                                </Table.Row>
-                                            ))}
-                                        </Table.Body>
-                                    </Table>
-                                </div>
-                                <div className="flex items-center font-bold">
+                            <div className="space-y-4 flex flex-col justify-center">
+                                {csvPreview[0] && csvPreview.length > 0 && (
+                                    <DataTable 
+                                        data={csvPreview.slice(1).map((row, index) => {
+                                            const rowData: {[key: string]: string}= {};
+                                            row.forEach((cell, index) => {
+                                                rowData[`column-${index}`] = cell; // Map each cell value to the corresponding column name
+                                            });
+                                            return rowData;
+                                        })}
+                                        columns={csvPreview[0].map((header, index) => ({
+                                            name: `column-${index}`,
+                                            header: header
+                                        }))}
+                                    />
+                                )}
+                                <div className="flex font-bold">
                                     <span className="w-1/4">Column Name</span>
                                     <div className="flex space-x-4 w-3/4">
                                         <span className="w-1/4">Type</span>
@@ -420,58 +410,29 @@ export default function Dataset() {
                                         </div>
                                     </div>
                                 ))}
-                            </div>
+                            </div>  
                         </Modal.Body>
                         <Modal.Footer>
                             <Button onClick={() => submitCSVToBackend()}>Save</Button>
                         </Modal.Footer>
                     </Modal>
 
+                    {/* Dataset table */}
                     {datasetsList.length > 0 ? (
-                        <div className="mt-4 overflow-x-auto w-full border border-gray-200 rounded-lg">
-                            <Table hoverable>
-                                <Table.Head>
-                                    <Table.HeadCell>Dataset ID</Table.HeadCell>
-                                    <Table.HeadCell>Dataset name</Table.HeadCell>
-                                    <Table.HeadCell>Date created</Table.HeadCell>
-                                    <Table.HeadCell>
-                                        <span className="sr-only">Edit</span>
-                                    </Table.HeadCell>
-                                </Table.Head>
-                                <Table.Body className="divide-y">
-                                    {datasetsList.map((dataset, index) => (
-                                        < Table.Row key={dataset.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                        >
-                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900 dark:text-white" >
-                                                {dataset.id}
-                                            </Table.Cell>
-                                            <Table.Cell onClick={() => handleRowClick(dataset.id)} className="whitespace-nowrap font-medium text-gray-900">
-                                                {dataset.datasetName}
-                                            </Table.Cell>
-                                            <Table.Cell onClick={() => handleRowClick(dataset.id)}> {dataset.createdAt ? new Date(dataset.createdAt).toLocaleDateString() : 'Date not available'}</Table.Cell>
-                                            < Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                                <a onMouseEnter={() => handleMenuOpen(dataset.id, index)} className="text-gray-900 hover:text-blue-500">
-                                                    <MdMoreHoriz size={20} />
-                                                </a>
-                                                {openMenuId === dataset.id && (
-                                                    <div className="dropdown-menu relative">
-                                                        <ul className={`absolute ${isDropdownAbove ? '-top-14' : 'mt-4'
-                                                            } w-64  bg-white rounded-md shadow-lg z-10`}>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleTransform(dataset.id)}>Transform</li>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleDelete(dataset.id)}>Delete</li>
-                                                            <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                                                                onClick={() => handleOpenDeidentificationNotebook(dataset.id)}>Open in Jupyterhub for deidentification</li>
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table>
-                        </div>
+                        <DataTable 
+                            data={datasetsList}
+                            columns={[
+                                {name:"id", header:"Dataset ID"},
+                                {name:"datasetName", header:"Dataset Name"},
+                                {name:"createdAt", header:"Created At"},
+                            ]}
+                            onRowClick={(row: TemplatebackendDataset) => handleRowClick(row.id)}
+                            actions={[
+                                {name:"Transform", callback: (row) => handleTransform(row.id)},
+                                {name:"Formal DeID", callback: (row) => handleOpenDeidentificationNotebook(row.id)},
+                                {name:"Delete", callback: (row) => handleDelete(row.id)},
+                            ]}
+                        />
                     ) : (
                         <div className="text-center text-gray-500 mt-20">No datasets yet</div>
                     )}
