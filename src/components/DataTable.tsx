@@ -1,0 +1,137 @@
+import { warn } from "console";
+import { Button, CustomFlowbiteTheme, Dropdown, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
+import { ReactNode } from "react";
+import { MdMoreHoriz } from "react-icons/md";
+
+
+interface DataTableProps<T> {
+    data: T[],
+    columns: {
+        name: string;
+        header: string;
+    }[],
+    onRowClick?: (row: T) => void;
+    actions?: {
+        name: string;
+        callback: (row: T) => void;
+    }[];
+};
+
+// Utility function to render cell values
+const renderCell = (value: any): React.ReactNode => {
+    if (value instanceof Date) {
+      return value.toLocaleDateString(); // Format Date if it's a Date object
+    }
+    return value; // Otherwise, return the value as is
+  };
+
+const customTheme: CustomFlowbiteTheme = {
+    "table": {
+        "root": {
+            "base": "w-full text-left text-sm text-gray-500 dark:text-gray-400",
+            "shadow": "absolute left-0 top-0 -z-10 h-full w-full rounded-lg bg-white drop-shadow-md dark:bg-black",
+            "wrapper": "relative"
+        },
+        "body": {
+            "base": "group/body",
+            "cell": {
+            "base": "px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg"
+            }
+        },
+        "head": {
+            "base": "group/head text-xs uppercase text-gray-700 dark:text-gray-400",
+            "cell": {
+            "base": "bg-gray-50 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-gray-700"
+            }
+        },
+        "row": {
+            "base": "group/row",
+            "hovered": "hover:bg-gray-100 dark:hover:bg-gray-600",
+            "striped": "odd:bg-white even:bg-gray-50 odd:dark:bg-gray-800 even:dark:bg-gray-700"
+        }
+    },
+    "listGroup": {
+        "root": {
+            "base": "list-none rounded-lg border border-gray-200 bg-white text-right text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+        },
+        "item": {
+            "base": "[&>*]:first:rounded-t-lg [&>*]:last:rounded-b-lg [&>*]:last:border-b-0",
+            "link": {
+                "base": "flex w-full items-center border-b border-gray-200 px-4 py-2 dark:border-gray-600",
+                "active": {
+                    "off": "hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:text-white dark:focus:ring-gray-500",
+                    "on": "text-white dark:bg-gray-800"
+                },
+                "icon": "mr-2 h-4 w-4 fill-current"
+            }
+        }
+    }
+}
+
+
+const DataTable = <T extends {}>({ 
+    data,
+    columns,
+    onRowClick,
+    actions,
+}: DataTableProps<T>): JSX.Element => {
+    return (
+        <Flowbite theme={{theme: customTheme}}>
+            <div className="w-full border overflow-x-auto border-gray-200 rounded-lg">
+                <Table hoverable={!!onRowClick}>
+                    {/* DataTable Header */}
+                    <Table.Head>
+                        {columns.map((col, colIndex) => (
+                            <Table.HeadCell key={col.name}>
+                                {col.header}
+                            </Table.HeadCell>
+                        ))}
+                        {actions && <Table.HeadCell />}
+                    </Table.Head>
+
+                    {/* DataTable Body */}
+                    <Table.Body className="divide-y">
+                        {data.map((row, rowIndex) => (
+                            <Table.Row 
+                                key={rowIndex} 
+                                onClick={() => onRowClick?.(row)} 
+                                className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer"
+                            >
+                                {/* Render data row cells */}
+                                {columns.map((col, colIndex) => (
+                                    <Table.Cell 
+                                        key={"cell"+rowIndex+colIndex}
+                                        className="cursor-pointer"
+                                    >
+                                        {renderCell(row[col.name as keyof T])}
+                                    </Table.Cell>
+                                ))}
+                                
+                                {/* Render actions tooltip */}
+                                { actions && (
+                                    <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
+                                        <div className="relative cursor-pointer group">
+                                            <MdMoreHoriz size={20}/>
+                                            <ListGroup className="fixed z-50 hidden group-hover:block">
+                                                {actions.map((action, actionIndex) => (
+                                                    <ListGroup.Item
+                                                        key={"action" + actionIndex}
+                                                        onClick={() => action.callback(row)}
+                                                    >
+                                                        {action.name}
+                                                    </ListGroup.Item>
+                                                ))}
+                                            </ListGroup>
+                                        </div>
+                                    </Table.Cell>
+                                )}
+                            </Table.Row>
+                        ))}
+                    </Table.Body>
+                </Table>
+            </div>
+        </Flowbite>
+    );
+}
+
+export default DataTable;
