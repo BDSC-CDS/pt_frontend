@@ -1,5 +1,3 @@
-
-import { Table } from 'flowbite-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { storeDataset, listDatasets, deleteDataset } from "../utils/dataset"
