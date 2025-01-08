@@ -1,29 +1,5 @@
-import { warn } from "console";
-import { Button, CustomFlowbiteTheme, Dropdown, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
-import { ReactNode } from "react";
+import { CustomFlowbiteTheme, Flowbite, ListGroup, Table } from "flowbite-react";
 import { MdMoreHoriz } from "react-icons/md";
-
-
-interface DataTableProps<T> {
-    data: T[],
-    columns: {
-        name: string;
-        header: string;
-    }[],
-    onRowClick?: (row: T) => void;
-    actions?: {
-        name: string;
-        callback: (row: T) => void;
-    }[];
-};
-
-// Utility function to render cell values
-const renderCell = (value: any): React.ReactNode => {
-    if (value instanceof Date) {
-      return value.toLocaleDateString(); // Format Date if it's a Date object
-    }
-    return value; // Otherwise, return the value as is
-  };
 
 const customTheme: CustomFlowbiteTheme = {
     "table": {
@@ -67,6 +43,27 @@ const customTheme: CustomFlowbiteTheme = {
         }
     }
 }
+
+interface DataTableProps<T> {
+    data: T[],
+    columns: {
+        name: string;
+        header: string;
+    }[],
+    onRowClick?: (row: T) => void;
+    actions?: {
+        name: string;
+        callback: (row: T) => void;
+    }[];
+};
+
+// Utility function to render cell values
+const renderCell = (value: any): React.ReactNode => {
+    if (value instanceof Date) {
+      return value.toLocaleDateString(); // Format Date if it's a Date object
+    }
+    return value; // Otherwise, return the value as is
+};
 
 
 const DataTable = <T extends {}>({ 
