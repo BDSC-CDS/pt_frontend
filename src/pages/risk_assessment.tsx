@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Table, Modal, Button } from 'flowbite-react';
 import Head from 'next/head';
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
-import Link from 'next/link';
-import TimeAgo from 'react-timeago';
 import { useRouter } from 'next/router';
 import { TemplatebackendQuestionnaireReply } from '../internal/client/index';
 import { listReplies } from "../utils/questionnaire";
 import { useAuth } from '~/utils/authContext';
+import DataTable from '~/components/DataTable';
 
 export default function RiskAssessment() {
-    const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>([]);
-    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-    const [isDropdownAbove, setIsDropdownAbove] = useState(false);
-    const router = useRouter();
+    // Authentication
     const { isLoggedIn } = useAuth();
+
+    // Routing
+    const router = useRouter();
+
+    // States
+    const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>([]);
 
     const loadReplies = async () => {
         const replies = await listReplies();
@@ -38,40 +38,25 @@ export default function RiskAssessment() {
         }
     }, []);
 
-    const handleMenuOpen = (id: number | undefined, index: number) => {
-        if (id) {
-            // Show dropdown above if in the bottom 20% of the list
-            if (replies.length - index <= 3) {
-                setIsDropdownAbove(true);
-            } else {
-                setIsDropdownAbove(false);
-            }
-            setOpenMenuId(id);
-        }
-    };
-
-    const handleMenuClose = () => {
-        setOpenMenuId(null);
-    };
-
+    // Event handlers
     const handleRowClick = (id: number | undefined) => {
         if (id) {
             router.push(`/questionnaire/${id}`);
         }
-    };
+    };    
 
     return (
         <>
             <Head>
-                <title>Risk Assessment</title>
+                <title>Qualitative Risk Assessment</title>
             </Head>
             {!isLoggedIn && (
-                <p className='m-8'> Please log in to consult your risk assessments.</p>
+                <p className='m-8'>Please log in to consult your risk assessments.</p>
             )}
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold">Risk Assessment</h1>
+                        <h1 className="text-3xl font-bold">Qualitative Risk Assessment</h1>
                         <button
                             onClick={() => router.push('/questionnaire/new')}
                             className="text-white bg-[#306278] hover:bg-[#255362] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
@@ -83,46 +68,22 @@ export default function RiskAssessment() {
                         </button>
                     </div>
 
-                    <div className="mt-4 overflow-x-auto w-full border border-gray-200 rounded-lg">
-                        <Table hoverable>
-                            <Table.Head>
-                                <Table.HeadCell>Name</Table.HeadCell>
-                                <Table.HeadCell>Status</Table.HeadCell>
-                                <Table.HeadCell>Date created</Table.HeadCell>
-                                <Table.HeadCell>
-                                    <span className="sr-only">Edit</span>
-                                </Table.HeadCell>
-                            </Table.Head>
-                            <Table.Body className="divide-y">
-                                {replies?.map((reply, index) => (
-                                    <Table.Row key={reply.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => handleRowClick(reply.id || 0)}>
-                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                            {reply.projectName}
-                                        </Table.Cell>
-                                        <Table.Cell>Finished</Table.Cell>
-                                        <Table.Cell><TimeAgo date={reply.createdAt || ''} /></Table.Cell>
-                                        <Table.Cell className="flex justify-start items-center" onMouseLeave={handleMenuClose}>
-                                            <a onMouseEnter={() => handleMenuOpen(reply.id, index)} className="text-gray-900 hover:text-blue-500">
-                                                <MdMoreHoriz size={20} />
-                                            </a>
-                                            {openMenuId === reply.id && (
-                                                <div className="dropdown-menu relative">
-                                                    <ul className={`absolute ${isDropdownAbove ? '-top-14' : 'mt-4'
-                                                        } w-35 bg-white rounded-md shadow-lg z-10`}>
-                                                        {/* Empty dropdown */}
-                                                        <li className="block cursor-default px-4 py-2 text-sm text-gray-700">
-                                                            {/* Empty option */}
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            )}
-                                        </Table.Cell>
-                                    </Table.Row>
-                                ))}
-                            </Table.Body>
-                        </Table>
-                    </div>
+                    {/* Questionnaire replies table */}
+                    {replies.length > 0 ? (
+                        <DataTable 
+                            data={replies}
+                            columns={[
+                                {name:"id", header:"ID"},
+                                {name:"projectName", header:"Project Name"},
+                                {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
+                                {name:"createdAt", header:"Created At"},
+                            ]}
+                            onRowClick={(row) => handleRowClick(row.id)}
+                            actions={undefined}
+                        />
+                    ) : (
+                        <div className="text-center text-gray-500 mt-20">No questionnaire replies yet.</div>
+                    )}
                 </div>
             )}
         </>
