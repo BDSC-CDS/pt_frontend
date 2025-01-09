@@ -422,7 +422,7 @@ export default function Dataset() {
                                 {name:"datasetName", header:"Dataset Name"},
                                 {name:"createdAt", header:"Created At"},
                             ]}
-                            onRowClick={(row: TemplatebackendDataset) => handleRowClick(row.id)}
+                            onRowClick={(row) => handleRowClick(row.id)}
                             actions={[
                                 {name:"Transform", callback: (row) => handleTransform(row.id)},
                                 {name:"Formal DeID", callback: (row) => handleOpenDeidentificationNotebook(row.id)},
