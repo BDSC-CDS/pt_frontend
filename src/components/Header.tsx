@@ -13,7 +13,7 @@ export default function Header() {
                 <nav className="flex justify-between items-center h-full">
                     <Link href="/">
                         <div className="flex items-center">
-                            <div style={logoStyle} className="w-16 h-14 my-auto ml-10 m-2 bg-no-repeat bg-contain bg-center"></div>
+                            <div style={logoStyle} className="w-16 h-14 my-auto ml-5 m-2 bg-no-repeat bg-contain bg-center"></div>
                             <p className="font-bold text-lg w-40">Privacy Toolbox</p>
                         </div>
                     </Link>
