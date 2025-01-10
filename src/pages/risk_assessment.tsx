@@ -79,7 +79,7 @@ export default function RiskAssessment() {
                                 {name:"createdAt", header:"Created At"},
                             ]}
                             onRowClick={(row) => handleRowClick(row.id)}
-                            actions={undefined}
+                            actions={undefined} // NOT IMPLEMENTED: DELETE REPLY
                         />
                     ) : (
                         <div className="text-center text-gray-500 mt-20">No questionnaire replies yet.</div>
