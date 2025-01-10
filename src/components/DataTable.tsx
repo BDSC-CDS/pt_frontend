@@ -18,7 +18,7 @@ const customTheme: CustomFlowbiteTheme = {
         "head": {
             "base": "group/head text-xs uppercase text-gray-700 dark:text-gray-400",
             "cell": {
-            "base": "bg-gray-50 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-gray-700"
+                "base": "bg-gray-50 px-6 py-3 group-first/head:first:rounded-tl-lg group-first/head:last:rounded-tr-lg dark:bg-gray-700"
             }
         },
         "row": {
@@ -116,9 +116,9 @@ const DataTable = <T extends {}>({
                                 {/* Render actions tooltip */}
                                 { actions && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="relative group">
+                                        <div className="group">
                                             <MdMoreHoriz size={20}/>
-                                            <ListGroup className="fixed z-50 hidden group-hover:block">
+                                            <ListGroup className="fixed z-50 hidden group-hover:block -translate-x-1/2 ml-2">
                                                 {actions.map((action, actionIndex) => (
                                                     <ListGroup.Item
                                                         key={"action" + actionIndex}
