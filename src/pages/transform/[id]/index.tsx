@@ -8,8 +8,8 @@ import { useAuth } from '~/utils/authContext';
 import { MdOutlineAdd, MdMoreHoriz, MdFileUpload } from "react-icons/md";
 import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
-import { Table } from 'flowbite-react';
 import { saveAs } from 'file-saver';
+import DataTable from '~/components/DataTable';
 
 const TransformPage = () => {
 
@@ -173,12 +173,14 @@ const TransformPage = () => {
         setHassubFieldList(false);
         setHassubFieldRegex(false);
     }
+
     const handleCheckboxChange = (configId: number | undefined) => {
         if (configId) {
             setSelectedConfigId(prev => prev === configId ? null : configId);
 
         }
     };
+
     const applyTransformation = async (configId: number | null) => {
         if (!configId) return;
         try {
@@ -657,7 +659,6 @@ const TransformPage = () => {
                                     </Alert>
                                 ) :
                                     (
-
                                         < div className="w-1/2"></div>
                                     )}
                                 <div className="flex flex-col space-y-4">
@@ -681,45 +682,35 @@ const TransformPage = () => {
                                 </div>
                             </div>
 
-                            <div className='flex '>
-                                <div className='flex flex-col w-3/4 h-full'>
-                                    <div className=" mt-5 overflow-x-auto w-full h-full border border-gray-300 rounded ml-3">
-                                        <Table hoverable>
-                                            <Table.Head>
-                                                {idMetadata?.map((meta) =>
-                                                    <Table.HeadCell key={meta.columnId}>
-                                                        <Tooltip
-                                                            content={(
-                                                                <div className="text-sm" style={{ textTransform: 'none' }}>
-                                                                    <p><strong>Type:</strong> {meta.type}</p>
-                                                                    <p><strong>Identifier:</strong> {meta.identifier}</p>
-                                                                    <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
-                                                                </div>
-                                                            )}
-                                                        >
-                                                            <span className="cursor-pointer">{meta.columnName}</span>
-                                                        </Tooltip>
-                                                    </Table.HeadCell>
-                                                )}
-                                            </Table.Head>
-                                            <Table.Body className="divide-y">
-                                                {Array.from({ length: nRows }, (_, index) => (
-                                                    < Table.Row key={index} className="bg-white"
-                                                    >
-                                                        {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                                        {columns?.map((col, colIndex) => (
-
-                                                            <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                                {col?.at(index)}
-                                                            </Table.Cell>
-                                                        ))}
-
-                                                    </Table.Row>
-                                                ))}
-                                            </Table.Body>
-                                        </Table>
-                                    </div >
-                                    <div className='flex justify-start mt-5 ml-3'>
+                            <div className="flex mt-5 gap-5">
+                                <div className="flex flex-col w-3/4 h-full gap-5">
+                                    {/* Dataset table preview */}
+                                    {metadata && columns && columns[0] ? (
+                                        <DataTable 
+                                            data={columns[0].map((_, rowIndex) => {
+                                                let row: Record<string, any> = {}
+                                                metadata.forEach((meta, colIndex) => {
+                                                    row[`column${meta.columnId}`] = columns[colIndex]?.[rowIndex]
+                                                })
+                                                return row
+                                            })}
+                                            columns={metadata?.map((meta, index) => ({
+                                                name: `column${meta.columnId}`, 
+                                                header: meta.columnName?meta.columnName:`column${index}`,
+                                                tooltip: (
+                                                    <div className="text-sm" style={{ textTransform: 'none' }}>
+                                                        <p><strong>Type:</strong> {meta.type}</p>
+                                                        <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                                        <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                                                    </div>
+                                                )
+                                            }))}
+                                        />
+                                    ) : (
+                                        <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
+                                    )}
+                                    
+                                    <div className='flex justify-start '>
                                         <button
                                             onClick={handleColumnTypeChange}
                                             className={buttonClass}
@@ -731,7 +722,7 @@ const TransformPage = () => {
 
                                 {/* Configurations */}
                                 {filteredConfigs.length > 0 ? (
-                                    <div className="mt-5 ml-10 overflow-auto w-1/3 rounded  border border-gray-300 pt-4">
+                                    <div className="overflow-auto w-1/3 rounded-lg border border-gray-300 pt-4">
                                         <div>
                                             {filteredConfigs?.map((config) => (
                                                 <>

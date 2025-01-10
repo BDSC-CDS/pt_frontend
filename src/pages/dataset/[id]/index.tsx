@@ -1,16 +1,22 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import TabsComponent from '../../../components/Tabs';
-import dynamic from "next/dynamic";
-import { Table, Tooltip } from 'flowbite-react';
 import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
 import { useEffect, useState } from 'react';
-import { TemplatebackendColumn, TemplatebackendMetadata } from '~/internal/client';
+import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
+import DataTable from '~/components/DataTable';
 
 const DatasetPage = () => {
+    // Athentication
+    const { isLoggedIn } = useAuth();
+
+    // Routing
+    const router = useRouter();
+    const { id } = router.query; // Get the dynamic part of the URL
+    const datasetId = Number(id);
+
+    // States
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [columns, setColumns] = useState<Array<Array<string | undefined> | undefined>>();
     const [nRows, setNRows] = useState<number>(0);
@@ -19,10 +25,6 @@ const DatasetPage = () => {
     const [currentRows, setCurrentRows] = useState<number>(0); // Number of rows in the current page
     // const [pageInput, setPageInput] = useState<number>(page + 1);
 
-    const router = useRouter();
-    const { id } = router.query; // Get the dynamic part of the URL
-    const datasetId = Number(id);
-    const { isLoggedIn } = useAuth();
 
     // Fetch metadata
     const getDatasetMetadata = async () => {
@@ -45,6 +47,18 @@ const DatasetPage = () => {
         }
     }
 
+    useEffect(() => {
+        if (id) {
+            try {
+                getDatasetMetadata();
+                getAndProcessDatasetContent();
+            } catch (error) {
+                alert("Error getting the data");
+            }
+        }
+    }, [id, page, limit]);
+
+    // Event handlers
     const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPage = e.target.value === '' ? '' : parseInt(e.target.value, 10);
         if (newPage === '' || (newPage > 0 && newPage <= Math.ceil(nRows / limit))) {
@@ -80,21 +94,10 @@ const DatasetPage = () => {
         }
     };
 
-    useEffect(() => {
-        if (id) {
-            try {
-                getDatasetMetadata();
-                getAndProcessDatasetContent();
-            } catch (error) {
-                alert("Error getting the data");
-            }
-        }
-    }, [id, page, limit]);
-
     return (
         <>
             {!isLoggedIn &&
-                <p className='m-8'> Please log in to consult your datasets.</p>
+                <p className='m-8'>Please log in to consult your datasets.</p>
             }
             {isLoggedIn &&
                 <>
@@ -102,45 +105,32 @@ const DatasetPage = () => {
                         <button onClick={handleTransform} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Transform </button>
                         <button onClick={handleReverse} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Reverse </button>
                     </div>
-                    <div className="mt-5 overflow-x-auto w-full outline outline-offset-2 outline-gray-300 rounded ml-3">
-                        <Table hoverable>
-                            <Table.Head>
-                                {metadata?.map((meta) =>
-                                    <Table.HeadCell key={meta.columnId}>
-                                        <Tooltip
-                                            content={(
-                                                <div className="text-sm" style={{ textTransform: 'none' }}>
-                                                    <p><strong>Type:</strong> {meta.type}</p>
-                                                    <p><strong>Identifier:</strong> {meta.identifier}</p>
-                                                    <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
-                                                </div>
-                                            )}
-                                        >
-                                            <span className="cursor-pointer">{meta.columnName}</span>
-                                        </Tooltip>
-                                    </Table.HeadCell>
-                                )}
 
-                            </Table.Head>
-                            <Table.Body className="divide-y">
-
-                                {Array.from({ length: currentRows }, (_, index) => (
-                                    < Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 cursor-pointer"
-                                    >
-                                        {/* Display each cell in a row. Assuming you need multiple cells per row here, adjust accordingly */}
-                                        {columns?.map((col, colIndex) => (
-
-                                            <Table.Cell key={colIndex} className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                {col?.at(index)}
-                                            </Table.Cell>
-                                        ))}
-
-                                    </Table.Row>
-                                ))}
-                            </Table.Body>
-                        </Table>
-                    </div >
-
+                    {/* Dataset table view */}
+                    {metadata && columns && columns[0] ? (
+                        <DataTable 
+                            data={columns[0].map((_, rowIndex) => {
+                                let row: Record<string, any> = {}
+                                metadata.forEach((meta, colIndex) => {
+                                    row[`column${meta.columnId}`] = columns[colIndex]?.[rowIndex]
+                                })
+                                return row
+                            })}
+                            columns={metadata?.map((meta, index) => ({
+                                name: `column${meta.columnId}`, 
+                                header: meta.columnName?meta.columnName:`column${index}`,
+                                tooltip: (
+                                    <div className="text-sm" style={{ textTransform: 'none' }}>
+                                        <p><strong>Type:</strong> {meta.type}</p>
+                                        <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                        <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                                    </div>
+                                )
+                            }))}
+                        />
+                    ) : (
+                        <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
+                    )}
 
                     {/* Pagination Controls */}
                     <div className='flex justify-center items-center  space-x-2 mt-4 '>
@@ -170,24 +160,6 @@ const DatasetPage = () => {
                             Next
                         </button>
                     </div>
-                    {/* Page Number Input */}
-                    {/* <div className="flex justify-end items-center space-x-2 mt-2">
-                        <input
-                            type="number"
-                            min="1"
-                            max={Math.ceil(nRows / limit)}
-                            value={pageInput}
-                            onChange={handlePageInputChange}
-                            className="border rounded w-16 p-1 text-center"
-                        />
-                        <button
-                            className="bg-gray-500 text-white p-2 rounded"
-                            onClick={handleGoToPage}
-                        >
-                            Go to Page
-                        </button>
-                    </div> */}
-
                 </>
             }
         </>
