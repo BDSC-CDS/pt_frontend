@@ -1,4 +1,5 @@
-import { CustomFlowbiteTheme, Flowbite, ListGroup, Table } from "flowbite-react";
+import { CustomFlowbiteTheme, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
+import { ReactNode } from "react";
 import { MdMoreHoriz } from "react-icons/md";
 
 const customTheme: CustomFlowbiteTheme = {
@@ -49,6 +50,7 @@ interface DataTableProps<T> {
     columns: {
         name: string;
         header: string;
+        tooltip?: ReactNode;
     }[],
     onRowClick?: (row: T) => void;
     actions?: {
@@ -82,7 +84,12 @@ const DataTable = <T extends {}>({
                     <Table.Head>
                         {columns.map((col, colIndex) => (
                             <Table.HeadCell key={col.name}>
-                                {col.header}
+                                {col.tooltip && (
+                                    <Tooltip content={col.tooltip}>
+                                        <span className="cursor-pointer">{col.header}</span>
+                                    </Tooltip>
+                                )}
+                                {!col.tooltip && col.header}
                             </Table.HeadCell>
                         ))}
                         {actions && <Table.HeadCell />}
