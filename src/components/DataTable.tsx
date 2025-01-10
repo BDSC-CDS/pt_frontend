@@ -11,7 +11,7 @@ const customTheme: CustomFlowbiteTheme = {
         "body": {
             "base": "group/body",
             "cell": {
-            "base": "px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg"
+                "base": "px-6 py-4 group-first/body:group-first/row:first:rounded-tl-lg group-first/body:group-first/row:last:rounded-tr-lg group-last/body:group-last/row:first:rounded-bl-lg group-last/body:group-last/row:last:rounded-br-lg truncate"
             }
         },
         "head": {
@@ -72,6 +72,8 @@ const DataTable = <T extends {}>({
     onRowClick,
     actions,
 }: DataTableProps<T>): JSX.Element => {
+    console.log(data)
+    console.log(columns)
     return (
         <Flowbite theme={{theme: customTheme}}>
             <div className="w-full border overflow-x-auto border-gray-200 rounded-lg">
