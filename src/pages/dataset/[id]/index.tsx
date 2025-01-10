@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { Table, Tooltip } from 'flowbite-react';
 import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
