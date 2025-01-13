@@ -58,11 +58,11 @@ export default function SideMenu() {
                             <BiSolidReport />
                             <p className='ml-1'> Formal de-identification</p>
                         </Link>
-                        <Link href="/" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
+                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
                             <BiLayer />
                             <p className='ml-1'> Synthetic Data</p>
                         </Link>
-                        <Link href="/" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
+                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
                             <BiSolidDetail />
                             <p className='ml-1'> Text de-identification</p>
                         </Link>

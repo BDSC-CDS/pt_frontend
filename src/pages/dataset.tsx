@@ -7,7 +7,7 @@ import { Button, Modal } from 'flowbite-react';
 import Papa from "papaparse";
 import { useAuth } from '~/utils/authContext';
 import { DateTime } from 'luxon';
-
+import DatasetSelector from '~/components/DatasetSelector';
 import DataTable from '../components/DataTable';
 
 interface ColumnTypes {
@@ -32,7 +32,7 @@ export default function Dataset() {
     const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
     const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
     const [idCol, setIdCol] = useState<string>();
-    
+
     const acceptedDateFormats = [
         'yyyy-MM-dd',
         'MM/dd/yyyy',
@@ -69,7 +69,7 @@ export default function Dataset() {
         }
     }, []);
 
-    
+
 
     const getUniqueFileName = (baseFileName: string, datasetsList: TemplatebackendDataset[]): string => {
         let uniqueFileName = baseFileName;
@@ -290,6 +290,12 @@ export default function Dataset() {
         }
     };
 
+    const handleAssessRisk = async (id: number | undefined) => {
+        if (id) {
+            router.push(`/risk_assessment_arx/${id}`);
+        }
+    };
+
     return (
         <>
             <Head>
@@ -349,9 +355,9 @@ export default function Dataset() {
                         <Modal.Body>
                             <div className="space-y-4 flex flex-col justify-center">
                                 {csvPreview[0] && csvPreview.length > 0 && (
-                                    <DataTable 
+                                    <DataTable
                                         data={csvPreview.slice(1).map((row, index) => {
-                                            const rowData: {[key: string]: string}= {};
+                                            const rowData: { [key: string]: string } = {};
                                             row.forEach((cell, index) => {
                                                 rowData[`column-${index}`] = cell; // Map each cell value to the corresponding column name
                                             });
@@ -406,32 +412,22 @@ export default function Dataset() {
                                         </div>
                                     </div>
                                 ))}
-                            </div>  
+                            </div>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button onClick={() => submitCSVToBackend()}>Save</Button>
                         </Modal.Footer>
                     </Modal>
 
-                    {/* Dataset table */}
-                    {datasetsList.length > 0 ? (
-                        <DataTable 
-                            data={datasetsList}
-                            columns={[
-                                {name:"id", header:"Dataset ID"},
-                                {name:"datasetName", header:"Dataset Name"},
-                                {name:"createdAt", header:"Created At"},
-                            ]}
-                            onRowClick={(row) => handleRowClick(row.id)}
-                            actions={[
-                                {name:"Transform", callback: (row) => handleTransform(row.id)},
-                                {name:"Formal DeID", callback: (row) => handleOpenDeidentificationNotebook(row.id)},
-                                {name:"Delete", callback: (row) => handleDelete(row.id)},
-                            ]}
-                        />
-                    ) : (
-                        <div className="text-center text-gray-500 mt-20">No datasets yet</div>
-                    )}
+                    <DatasetSelector
+                        // onRowClick={(id) => handleRowClick(id)}
+                        actions={[
+                            { name: "Rule-based DeID", callback: (id) => handleTransform(id) },
+                            { name: "Formal DeID", callback: (id) => handleOpenDeidentificationNotebook(id) },
+                            { name: "Assess risk", callback: (id) => handleAssessRisk(id) },
+                            { name: "Delete", callback: (id) => handleDelete(id) },
+                        ]}
+                    />
                 </div>
             )}
         </>
