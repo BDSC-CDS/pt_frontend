@@ -59,18 +59,7 @@ export default function RiskAssessmentArx() {
             // Handle successful response
             if (response) {
                 
-                const jsonContent = JSON.stringify(response, null, 2);
-                const blob = new Blob([jsonContent], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                // Trigger file download
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `risk_assessment_${id}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                router.push(`/risk_assessment_arx/${id}`);
             } else {
                 alert("No quasi-identifiers have been defined for this dataset.");
             }
