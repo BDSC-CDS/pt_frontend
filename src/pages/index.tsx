@@ -16,74 +16,75 @@ import { ReactNode } from "react";
  */
 export default function Home() {
     return (
-        <>
+        <> 
             <Head>
                 <title>Privacy Toolbox</title>
                 <meta name="description" content="A frontend template based on the T3 app" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-                <Header />
-                <div className="flex flex-col justify-center items-center text-center mb-12">
-                    <h1 className="text-5xl font-extrabold text-gray-800">Privacy Toolbox</h1>
-                    <h2 className="text-xl text-gray-600 mt-2">
-                        Secure Your Sensitive Data with Confidence
-                    </h2>
+
+            {/* Title */}
+            <div className="flex flex-col justify-center items-start mb-12">
+                <h1 className="text-4xl font-extrabold text-gray-800">Privacy Toolbox</h1>
+                <div className="text-lg text-gray-600 mt-2">
+                    Secure Your Sensitive Data with Confidence
                 </div>
-                <section>
-                    {/* Risk Assessment Section */}
-                    <div className="mb-12">
-                        <h2 className="text-3xl font-semibold text-gray-800 border-b-2 border-gray-300 pb-2">
-                            Risk Assessment
-                        </h2>
-                        <p className="text-gray-600 mt-2">
-                            Evaluate and understand the privacy risks in your datasets.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                            <ToolCard
-                                href="/risk_assessment"
-                                icon={<BiMessageSquareDetail size="3em" />}
-                                title="Qualitative Risk Assessment"
-                                description="Assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire."
-                            />
-                            <ToolCard
-                                href="/risk_assessment_arx"
-                                icon={<BiCalculator size="3em" />}
-                                title="Formal Risk Assessment"
-                                description="Perform detailed and formal privacy assessments of your datasets."
-                            />
-                        </div>
-                    </div>
-                    {/* De-identification Section */}
-                    <div className="mb-12">
-                        <h2 className="text-3xl font-semibold text-gray-800 border-b-2 border-gray-300 pb-2">
-                            De-identification
-                        </h2>
-                        <p className="text-gray-600 mt-2">
-                            Protect sensitive information while preserving data utility.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                            <ToolCard
-                                href="/dataset"
-                                icon={<BiSolidRuler size="3em" />}
-                                title="Rule-Based De-identification"
-                                description="Apply basic rules to transform and de-identify your data."
-                            />
-                            <ToolCard
-                                href="/formal_deid"
-                                icon={<BiSolidReport size="3em" />}
-                                title="Formal De-identification"
-                                description="Use advanced techniques to anonymize datasets."
-                            />
-                            <ToolCard
-                                href="#" // Set to null or undefined to disable navigation
-                                icon={<BiLayer size="3em" />}
-                                title="Synthetic Data"
-                                description="Generate synthetic data for secure sharing and analysis."
-                                disabled={true} // Pass a disabled prop
-                            />
-                        </div>
-                    </div>
-                </section>
+            </div>
+
+            {/* Risk Assessment Section */}
+            <div className="mb-12">
+                <h2 className="text-3xl font-semibold text-gray-800 border-b-2 border-gray-300 pb-2">
+                    Risk Assessment
+                </h2>
+                <p className="text-gray-600 mt-2">
+                    Evaluate and understand the privacy risks in your datasets.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <ToolCard
+                        href="/risk_assessment"
+                        icon={<BiMessageSquareDetail size="3em" />}
+                        title="Qualitative Risk Assessment"
+                        description="Assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire."
+                    />
+                    <ToolCard
+                        href="/risk_assessment_arx"
+                        icon={<BiCalculator size="3em" />}
+                        title="Formal Risk Assessment"
+                        description="Perform detailed and formal privacy assessments of your datasets."
+                    />
+                </div>
+            </div>
+
+            {/* De-identification Section */}
+            <div className="mb-12">
+                <h2 className="text-3xl font-semibold text-gray-800 border-b-2 border-gray-300 pb-2">
+                    De-identification
+                </h2>
+                <p className="text-gray-600 mt-2">
+                    Protect sensitive information while preserving data utility.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <ToolCard
+                        href="/dataset"
+                        icon={<BiSolidRuler size="3em" />}
+                        title="Rule-Based De-identification"
+                        description="Apply basic rules to transform and de-identify your data."
+                    />
+                    <ToolCard
+                        href="/formal_deid"
+                        icon={<BiSolidReport size="3em" />}
+                        title="Formal De-identification"
+                        description="Use advanced techniques to anonymize datasets."
+                    />
+                    <ToolCard
+                        href="#" // Set to null or undefined to disable navigation
+                        icon={<BiLayer size="3em" />}
+                        title="Synthetic Data"
+                        description="Generate synthetic data for secure sharing and analysis."
+                        disabled={true} // Pass a disabled prop
+                    />
+                </div>
+            </div>
         </>
     );
 }
@@ -133,7 +134,7 @@ function ToolCard({
             <h3 className="text-lg font-semibold">{title}</h3>
             <p className="text-sm text-gray-600 mt-2">{description}</p>
             {disabled && (
-                <p className="mt-2 text-sm text-center text-red-500">
+                <p className="mt-2 text-sm text-center">
                     Not Yet Implemented
                 </p>
             )}

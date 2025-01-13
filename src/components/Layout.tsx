@@ -14,25 +14,23 @@ type Props = {
 
 export const Layout: FunctionComponent<Props> = ({ children }) => {
     return (
-        <div className='flex min-h-screen bg-white'>
+        <>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" />
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"></link>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"/>
+
             <AuthProvider>
-                <Header />
-                <div className='flex flex-1'>
-                    <SideMenu />
-                    {/* <main className="ml-[280px] flex-1 flex flex-col container mr-auto"> */}
-                    <main className="flex-1 ml-10 mt-14 mb-12 p-5 ">
-                        {children}
-                    </main>
+                <div className="min-h-screen">
+                    <Header />
+                    <div className="flex h-screen pt-14 pb-12">
+                        <SideMenu />
+                        <main className="flex-1 px-10 py-5 overflow-x-auto">
+                            {children}
+                        </main>
+                    </div>
+                    <FooterMenu />
                 </div>
-                {/* <div className='h-14'></div> */}
-
-                {/* <div className='h-14'></div> */}
-                <FooterMenu />
             </AuthProvider>
-
-        </div>
+        </>
     );
 }
