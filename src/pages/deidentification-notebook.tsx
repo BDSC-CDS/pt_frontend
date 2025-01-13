@@ -4,22 +4,21 @@ import { useRouter } from 'next/router';
 import { useAuth } from '~/utils/authContext';
 import DatasetSelector from '~/components/DatasetSelector';
 
-export default function RuleBasedDeid() {
+export default function DeidentificationNotebook() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
 
     const handle = async (id: number | undefined) => {
         if (id) {
-            router.push(`/rule-based-deid/${id}`);
+            router.push(`/deidentification-notebook/${id}`);
         }
-
     };
 
     return (
         <>
             <Head>
-                <title>Rule-Based De-identification</title>
+                <title>Formal de-identification</title>
             </Head>
             {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
@@ -31,7 +30,7 @@ export default function RuleBasedDeid() {
                     </div>
                     <div className="flex justify-between items-center mb-4">
                         <p>
-                            On this page you can transform a dataset by applying various rules such as date shifting, replying identifiers etc...
+                            On this page will be able to formally deidentify your dataset by using a Jupyter notbook preloaded with your dataset and a library to deidentify using ARX.
                         </p>
                     </div>
                     <div className="flex justify-between items-center mb-4">

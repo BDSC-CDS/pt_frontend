@@ -5,6 +5,15 @@ import { getMetadata, getDatasetContent, revertDataset, getInfo } from "../../..
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
+import {
+    BiCalculator,
+    BiMessageSquareDetail,
+    BiLayer,
+    BiSolidReport,
+    BiSolidRuler,
+    BiUndo,
+    BiSolidDetail,
+} from "react-icons/bi";
 import DataTable from '~/components/DataTable';
 
 const DatasetPage = () => {
@@ -98,6 +107,16 @@ const DatasetPage = () => {
             router.push(`/rule-based-deid/${datasetId}`);
         }
     };
+    const handleRiskAssess = async () => {
+        if (datasetId) {
+            router.push(`/risk_assessment_arx/${datasetId}`);
+        }
+    };
+    const handleDeidentify = async () => {
+        if (datasetId) {
+            router.push(`/deidentification-notebook/${datasetId}`);
+        }
+    };
     const handleReverse = async () => {
         if (datasetId) {
             const response = await revertDataset(datasetId);
@@ -116,21 +135,39 @@ const DatasetPage = () => {
             }
             {isLoggedIn &&
                 <>
-                    <div className="bg-gray-100 p-5 ml-8 rounded-lg shadow text-md ">
+                    <div className="bg-gray-100 p-5 rounded-lg shadow text-md ">
                         <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
                         <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
                         <p><strong>Number of Rows:</strong> {nRows}</p>
                         <p><strong>Number of Columns:</strong> {nColumns} </p>
                     </div>
+                    <br />
 
-                    <div className='flex justify-center items-center'>
-                        <button onClick={handleTransform} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Transform </button>
-                        <button onClick={handleReverse} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Reverse </button>
+
+                    Action you can perform with this dataset:
+
+                    <div className="inline-flex rounded-md shadow-sm pl-8 pb-8" role="group">
+                        <button onClick={handleTransform} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <BiSolidRuler className="w-3 h-3 me-2" />
+                            Rule based-deidentification
+                        </button>
+                        <button onClick={handleReverse} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <BiUndo className="w-3 h-3 me-2" />
+                            Reverse transformation
+                        </button>
+                        <button onClick={handleRiskAssess} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <BiCalculator className="w-3 h-3 me-2" />
+                            Assess risk of reidentification
+                        </button>
+                        <button onClick={handleDeidentify} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <BiSolidReport className="w-3 h-3 me-2" />
+                            Deidentify in a notebook using ARX
+                        </button>
                     </div>
 
                     {/* Dataset table view */}
                     {metadata && columns && columns[0] ? (
-                        <DataTable 
+                        <DataTable
                             data={columns[0].map((_, rowIndex) => {
                                 let row: Record<string, any> = {}
                                 metadata.forEach((meta, colIndex) => {
@@ -139,8 +176,8 @@ const DatasetPage = () => {
                                 return row
                             })}
                             columns={metadata?.map((meta, index) => ({
-                                name: `column${meta.columnId}`, 
-                                header: meta.columnName?meta.columnName:`column${index}`,
+                                name: `column${meta.columnId}`,
+                                header: meta.columnName ? meta.columnName : `column${index}`,
                                 tooltip: (
                                     <div className="text-sm" style={{ textTransform: 'none' }}>
                                         <p><strong>Type:</strong> {meta.type}</p>
