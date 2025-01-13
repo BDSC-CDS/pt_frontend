@@ -273,7 +273,7 @@ export default function Dataset() {
 
     const handleTransform = async (id: number | undefined) => {
         if (id) {
-            router.push(`/transform/${id}`);
+            router.push(`/rule-based-deid/${id}`);
         }
     };
 

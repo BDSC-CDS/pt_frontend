@@ -41,7 +41,7 @@ export default function SideMenu() {
                     </Sidebar.ItemGroup> 
 
                     <Sidebar.ItemGroup>
-                        <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                        <Link href="/rule-based-deid" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiShieldCheck />
                             <p className='ml-1'> Rule-Based de-identification</p>
                         </Link>

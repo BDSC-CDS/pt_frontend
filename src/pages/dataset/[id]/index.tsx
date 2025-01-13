@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { getMetadata, getDatasetContent, revertDataset } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent, revertDataset, getInfo } from "../../../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
@@ -20,9 +20,12 @@ const DatasetPage = () => {
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [columns, setColumns] = useState<Array<Array<string | undefined> | undefined>>();
     const [nRows, setNRows] = useState<number>(0);
+    const [nColumns, setNColumns] = useState(0);
     const [page, setPage] = useState(0);
     const [limit, setLimit] = useState(10); // Rows per page
     const [currentRows, setCurrentRows] = useState<number>(0); // Number of rows in the current page
+    const [datasetName, setDatasetName] = useState<string>();
+    const [createdAt, setCreatedAt] = useState<Date>();
     // const [pageInput, setPageInput] = useState<number>(page + 1);
 
 
@@ -31,6 +34,9 @@ const DatasetPage = () => {
         const response = await getMetadata(datasetId);
         if (response) {
             setMetadata(response.metadata?.metadata)
+            if (response?.metadata?.metadata) {
+                setNColumns(response.metadata?.metadata.length);
+            }
         }
     }
 
@@ -47,10 +53,19 @@ const DatasetPage = () => {
         }
     }
 
+    const getDatasetInfo = async () => {
+        const response = await getInfo(datasetId);
+        if (response?.dataset) {
+            setDatasetName(response.dataset.datasetName);
+            setCreatedAt(response.dataset.createdAt);
+        }
+    }
+
     useEffect(() => {
         if (id) {
             try {
                 getDatasetMetadata();
+                getDatasetInfo();
                 getAndProcessDatasetContent();
             } catch (error) {
                 alert("Error getting the data");
@@ -80,7 +95,7 @@ const DatasetPage = () => {
 
     const handleTransform = async () => {
         if (datasetId) {
-            router.push(`/transform/${datasetId}`);
+            router.push(`/rule-based-deid/${datasetId}`);
         }
     };
     const handleReverse = async () => {
@@ -101,6 +116,13 @@ const DatasetPage = () => {
             }
             {isLoggedIn &&
                 <>
+                    <div className="bg-gray-100 p-5 ml-8 rounded-lg shadow text-md ">
+                        <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
+                        <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
+                        <p><strong>Number of Rows:</strong> {nRows}</p>
+                        <p><strong>Number of Columns:</strong> {nColumns} </p>
+                    </div>
+
                     <div className='flex justify-center items-center'>
                         <button onClick={handleTransform} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Transform </button>
                         <button onClick={handleReverse} className=' w-40 m-5 ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer'> Reverse </button>

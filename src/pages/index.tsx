@@ -65,7 +65,7 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <ToolCard
-                        href="/dataset"
+                        href="/rule-based-deid"
                         icon={<BiSolidRuler size="3em" />}
                         title="Rule-Based De-identification"
                         description="Apply basic rules to transform and de-identify your data."
