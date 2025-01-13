@@ -16,7 +16,6 @@ jest.mock('../src/utils/authContext', () => ({
 describe('Home', () => {
   it('heading', () => {
     render(<Home />)
-
     const heading = screen.getByRole('heading', { level: 1, name: /Privacy Toolbox/i });
     expect(heading).toBeTruthy();
   })
