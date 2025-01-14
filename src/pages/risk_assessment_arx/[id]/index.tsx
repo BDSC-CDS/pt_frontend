@@ -91,13 +91,5 @@ const RiskAssessmentPage = () => {
     );
 };
 
-// <GaugeChart id="gauge-chart2"
-//                             nrOfLevels={20}
-//                             cornerRadius={0}
-//                             percent={currentRiskPc}
-//                             textColor='black'
-//                             animate={false}
-//                         />
-
 export default RiskAssessmentPage;
 
