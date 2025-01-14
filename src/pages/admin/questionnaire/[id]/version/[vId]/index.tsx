@@ -8,7 +8,7 @@ import { getQuestionnaire, createQuestionnaireVersion } from "../../../../../../
 import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
-import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON } from '~/internal/client';
+import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
 
 
@@ -191,6 +191,16 @@ export default function Questionnaire() {
             [fieldName]: updatedValue
         }));
     };
+
+    const handleAnswerInputChange = (index: number, updatedValue: any, fieldName: keyof TemplatebackendQuestionnaireQuestionAnswer) => {
+        const updatedAnswers = questionToEdit?.answers || []
+        updatedAnswers[index] = {
+            ...updatedAnswers[index],
+            [fieldName]: updatedValue
+        }
+
+        handleInputChange(updatedAnswers, "answers")
+    }
 
     const saveEditedQuestion = () => {
         setOpenEditQuestionModal(false);
@@ -513,13 +523,8 @@ export default function Questionnaire() {
                                                                                 placeholder="Answer"
                                                                                 required
                                                                                 value={{...questionToEdit}?.answers?.[n]?.text || ""}
-                                                                                onChange={(event) => {
-                                                                                    let newAnswers = questionToEdit?.answers || []
-                                                                                    if(newAnswers[n]){
-                                                                                        newAnswers[n].text = event.target.value
-                                                                                    }
-                                                                                    setQuestionToEdit({...questionToEdit, answers: newAnswers})
-                                                                                }}
+                                                                                
+                                                                                onChange={(event) =>handleAnswerInputChange(n, event.target.value, "text")}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
@@ -529,13 +534,7 @@ export default function Questionnaire() {
                                                                             <CounterInput
                                                                                 placeholder="10"
                                                                                 initValue={questionToEdit?.answers?.[n]?.riskLevel || 0}
-                                                                                onChange={(value) => {
-                                                                                    let newAnswers = questionToEdit?.answers || []
-                                                                                    if(newAnswers[n]){
-                                                                                        newAnswers[n].riskLevel = value
-                                                                                    }
-                                                                                    setQuestionToEdit({...questionToEdit, answers: newAnswers})
-                                                                                }}
+                                                                                onChange={(value) =>handleAnswerInputChange(n, value, "riskLevel")}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
@@ -544,13 +543,7 @@ export default function Questionnaire() {
                                                                         <Table.Cell>
                                                                             <ToggleSwitch 
                                                                                 checked={questionToEdit?.answers?.[n]?.highRisk || false}
-                                                                                onChange={(value) => {
-                                                                                    let newAnswers = questionToEdit?.answers || []
-                                                                                    if(newAnswers[n]){
-                                                                                        newAnswers[n].highRisk = value
-                                                                                    }
-                                                                                    setQuestionToEdit({...questionToEdit, answers: newAnswers})
-                                                                                }}
+                                                                                onChange={(value) =>handleAnswerInputChange(n, value, "highRisk")}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
