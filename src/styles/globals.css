@@ -31,7 +31,6 @@ table tbody td {
     vertical-align: middle;
 }
 
-
 .container {
     max-width: 1200px;
     width: 100%;
@@ -77,3 +76,10 @@ table tbody td {
     color: #333;
 }
 
+/* revert to default for .markdown and children*/
+.markdown {
+    all: revert;
+}
+.markdown *{
+    all: revert;
+}

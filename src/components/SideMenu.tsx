@@ -5,6 +5,15 @@ import { HiDatabase, HiInbox, HiPresentationChartBar, HiOutlineCog, HiLockClosed
 import { HiClipboardDocumentList } from 'react-icons/hi2';
 import { useAuth } from '~/utils/authContext';
 import type { CustomFlowbiteTheme } from "flowbite-react";
+import {
+    BiCalculator,
+    BiMessageSquareDetail,
+    BiLayer,
+    BiSolidReport,
+    BiSolidRuler,
+    BiUndo,
+    BiSolidDetail,
+} from "react-icons/bi";
 
 export default function SideMenu() {
     const { isAdmin } = useAuth();
@@ -35,23 +44,27 @@ export default function SideMenu() {
                             <p className='ml-1'> Qualitative Assessment</p>
                         </Link>
                             <Link href="/risk_assessment_arx" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                            <HiPresentationChartBar />
+                            <BiCalculator />
                             <p className='ml-1'> Quantitative Assessment</p>
                         </Link>
                     </Sidebar.ItemGroup> 
 
                     <Sidebar.ItemGroup>
-                        <Link href="/dataset" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                            <HiShieldCheck />
+                        <Link href="/rule-based-deid" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                            <BiSolidRuler />
                             <p className='ml-1'> Rule-Based de-identification</p>
                         </Link>
-                            <Link href="/formal_deid" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                            <HiShieldCheck />
+                            <Link href="/deidentification-notebook" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                            <BiSolidReport />
                             <p className='ml-1'> Formal de-identification</p>
                         </Link>
-                        <Link href="/" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                            <HiShieldCheck />
+                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
+                            <BiLayer />
                             <p className='ml-1'> Synthetic Data</p>
+                        </Link>
+                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded opacity-50'>
+                            <BiSolidDetail />
+                            <p className='ml-1'> Text de-identification</p>
                         </Link>
                     </Sidebar.ItemGroup> 
 
@@ -66,7 +79,7 @@ export default function SideMenu() {
                                 <p className='ml-1'>Audit Log</p>
                             </Link>
                         </Sidebar.Collapse>
-                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                        <Link href="/documentation" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiInbox />
                             <p className='ml-1'>Documentation</p>
                         </Link>

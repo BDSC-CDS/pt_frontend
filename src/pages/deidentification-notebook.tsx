@@ -1,37 +1,24 @@
 
 import Head from 'next/head';
-import { useAuth } from '~/utils/authContext';
-import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
-import DatasetSelector from '~/components/DatasetSelector';
 import { useRouter } from 'next/router';
+import { useAuth } from '~/utils/authContext';
+import DatasetSelector from '~/components/DatasetSelector';
 
-
-export default function RiskAssessmentArx() {
+export default function DeidentificationNotebook() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
 
-
-
-    const handleRiskAssessment = async (id: number | undefined) => {
+    const handle = async (id: number | undefined) => {
         if (id) {
-            const response = await getRiskAssessment(id);
-
-            // Handle successful response
-            if (response) {
-
-                router.push(`/risk_assessment_arx/${id}`);
-            } else {
-                alert("No quasi-identifiers have been defined for this dataset.");
-            }
+            router.push(`/deidentification-notebook/${id}`);
         }
-
     };
 
     return (
         <>
             <Head>
-                <title>Quantitative Risk Assessment</title>
+                <title>Formal de-identification</title>
             </Head>
             {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
@@ -39,11 +26,11 @@ export default function RiskAssessmentArx() {
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold">Quantitative Risk Assessment</h1>
+                        <h1 className="text-2xl font-bold">Formal De-identification</h1>
                     </div>
                     <div className="flex justify-between items-center mb-4">
                         <p>
-                            On this page you are able to formally assert the risk of reidetification of your dataset by using ARX.
+                            On this page will be able to formally deidentify your dataset by using a Jupyter notbook preloaded with your dataset and a library to deidentify using ARX.
                         </p>
                     </div>
                     <div className="flex justify-between items-center mb-4">
@@ -51,9 +38,8 @@ export default function RiskAssessmentArx() {
                     </div>
 
                     <DatasetSelector
-                        // onRowClick={(id) => handleRowClick(id)}
                         actions={[
-                            { name: "Risk assesment", callback: (id) => handleRiskAssessment(id) },
+                            { name: "De-identify", callback: (id) => handle(id) },
                         ]}
                     />
                 </div>

@@ -1,15 +1,17 @@
 import Head from "next/head";
-import Header from "../components/Header";
 import Link from "next/link";
+import { HiDatabase, HiInbox, HiPresentationChartBar, HiOutlineCog, HiLockClosed, HiShieldCheck  } from 'react-icons/hi';
 import {
     BiCalculator,
     BiMessageSquareDetail,
     BiLayer,
     BiSolidReport,
     BiSolidRuler,
+    BiSolidDetail,
 } from "react-icons/bi";
-import { GrDocumentLocked } from "react-icons/gr";
 import { ReactNode } from "react";
+import ToolCard from '../components/ToolCard';
+
 
 /**
  * Home component that represents the main page of the application.
@@ -42,7 +44,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <ToolCard
                         href="/risk_assessment"
-                        icon={<BiMessageSquareDetail size="3em" />}
+                        icon={<HiPresentationChartBar size="3em" />}
                         title="Qualitative Risk Assessment"
                         description="Assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire."
                     />
@@ -65,13 +67,13 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <ToolCard
-                        href="/dataset"
+                        href="/rule-based-deid"
                         icon={<BiSolidRuler size="3em" />}
                         title="Rule-Based De-identification"
                         description="Apply basic rules to transform and de-identify your data."
                     />
                     <ToolCard
-                        href="/formal_deid"
+                        href="/deidentification-notebook"
                         icon={<BiSolidReport size="3em" />}
                         title="Formal De-identification"
                         description="Use advanced techniques to anonymize datasets."
@@ -84,61 +86,17 @@ export default function Home() {
                         disabled={true} // Pass a disabled prop
                     />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <ToolCard
+                        href="#" 
+                        icon={<BiSolidDetail size="3em" />}
+                        title="Text De-identification"
+                        description="De-identify non structured data in free text form"
+                        disabled={true}
+                    />
+                </div>
             </div>
         </>
-    );
-}
-
-
-/**
- * Props for the ToolCard component.
- */
-interface ToolCardProps {
-    href: string;
-    icon: ReactNode;
-    title: string;
-    description: string;
-    disabled?:boolean;
-}
-
-/**
- * ToolCard component for rendering each tool as a card.
- */
-function ToolCard({
-    href,
-    icon,
-    title,
-    description,
-    disabled = false,
-}: ToolCardProps) {
-    const handleClick = (e: React.MouseEvent) => {
-        if (disabled) {
-            e.preventDefault(); // Prevent navigation if disabled
-            alert("This feature is not implemented yet.");
-        }
-    };
-
-    return (
-        <Link
-            href={disabled ? "#" : href} // Disable navigation when disabled
-            onClick={handleClick}
-            className={`flex flex-col items-center text-center bg-white rounded-lg shadow-lg p-6 transition-transform transform ${
-                disabled
-                    ? "bg-gray-200 text-gray-400"
-                    : "hover:scale-105"
-            }`}
-        >
-            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
-                {icon}
-            </div>
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm text-gray-600 mt-2">{description}</p>
-            {disabled && (
-                <p className="mt-2 text-sm text-center">
-                    Not Yet Implemented
-                </p>
-            )}
-        </Link>
     );
 }
 
