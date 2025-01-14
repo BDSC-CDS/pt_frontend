@@ -2,30 +2,8 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { getRiskAssessment } from "~/utils/RiskAssessmentArx";
 import { TemplatebackendGetRiskAssessmentReply, TemplatebackendGetRiskAssessmentResult } from '~/internal/client';
-
-// A simple gauge component to show the risk as a percentage
-const Gauge = ({ value }: { value: number }) => {
-    return (
-        <div className="gauge-container">
-            <svg className="gauge-svg" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="100" cy="100" r="90" stroke="#ddd" strokeWidth="20" fill="none" />
-                <circle
-                    cx="100"
-                    cy="100"
-                    r="90"
-                    stroke={value < 0.5 ? 'green' : value < 0.8 ? 'yellow' : 'red'}
-                    strokeWidth="20"
-                    fill="none"
-                    strokeDasharray={`${(value / 1) * 565} 565`}
-                    transform="rotate(-90 100 100)"
-                />
-                <text x="50%" y="50%" textAnchor="middle" dy="7" fontSize="24" fill="black">
-                    {Math.round(value * 100)}%
-                </text>
-            </svg>
-        </div>
-    );
-};
+import dynamic from 'next/dynamic';
+const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
 // The RiskAssessmentPage component
 const RiskAssessmentPage = () => {
@@ -101,17 +79,25 @@ const RiskAssessmentPage = () => {
                 <div className="gauge-section">
                     <div>
                         <h3>Average Prosecutor Risk</h3>
-                        <Gauge value={initialAverageProsecutor || 0} />
+                        <GaugeChart percent={initialAverageProsecutor || 0} textColor='black' />
                     </div>
                     <div>
                         <h3>Highest Prosecutor Risk</h3>
-                        <Gauge value={initialHighestProsecutor || 0} />
+                        <GaugeChart percent={initialHighestProsecutor || 0} textColor='black' />
                     </div>
                 </div>
             </div>
         </div>
     );
 };
+
+// <GaugeChart id="gauge-chart2"
+//                             nrOfLevels={20}
+//                             cornerRadius={0}
+//                             percent={currentRiskPc}
+//                             textColor='black'
+//                             animate={false}
+//                         />
 
 export default RiskAssessmentPage;
 
