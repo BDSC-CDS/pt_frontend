@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { getRiskAssessment } from "/workspaces/pt_frontend/src/utils/RiskAssessmentArx";
-import { TemplatebackendGetRiskAssessmentReply } from '~/internal/client';
+import { TemplatebackendGetRiskAssessmentReply, TemplatebackendGetRiskAssessmentResult } from '~/internal/client';
 
 // A simple gauge component to show the risk as a percentage
 const Gauge = ({ value }: { value: number }) => {
@@ -46,7 +46,7 @@ const RiskAssessmentPage = () => {
         return <div>Loading...</div>;
     }
 
-    const riskAssessment = data.result?.riskAssessment;
+    const riskAssessment: any = data.result?.riskAssessment!;
     const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata;
     const quasiIdentifiers = riskAssessment?.quasi_identifiers;
     const sensitiveAttributes: string[] = [];
