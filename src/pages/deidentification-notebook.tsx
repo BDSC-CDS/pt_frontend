@@ -26,7 +26,7 @@ export default function DeidentificationNotebook() {
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-2xl font-bold">Rule-Based De-identification</h1>
+                        <h1 className="text-2xl font-bold">Formal De-identification</h1>
                     </div>
                     <div className="flex justify-between items-center mb-4">
                         <p>
