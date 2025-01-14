@@ -1,33 +1,47 @@
-import Head from 'next/head';
-import Header from '../components/Header';
-import { ChangeEvent, useState } from 'react';
-import { authenticateUser } from '../utils/authentication';
-import { useAuth } from '../utils/authContext';
-import Link from 'next/link';
-import { Button, Modal } from 'flowbite-react';
-import { useRouter } from 'next/router';
-import SideMenu from '~/components/SideMenu';
-import FooterMenu from '~/components/Footer';
+import Head from "next/head";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { authenticateUser } from "../utils/authentication";
+import { useAuth } from "../utils/authContext";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Authenticate() {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const router = useRouter();
 
+    // Authentication
     const { login } = useAuth();
 
-    const [token, setToken] = useState<string>();
-    const [modal, setModal] = useState<boolean>(false);
-    const authUser = async () => {
-        const response = await authenticateUser(formData.email, formData.password);
-        const newToken = response ? (response.result ? response.result.token : '') : '';
+    // Routing
+    const router = useRouter();
 
-        setToken(newToken === '' ? 'NULL' : newToken);
-        if (newToken && newToken !== 'NULL') {
+    // States
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    });
+    const [token, setToken] = useState<string>();
+    const [loading, setLoading] = useState<boolean>(false); // Loading state
+    const [message, setMessage] = useState<string>(''); // Success message state
+
+    // Handlers
+    const authUser = async () => {
+        setLoading(true)
+        const response = await authenticateUser(formData.email, formData.password);
+        const newToken = response ? (response.result ? response.result.token : "") : "";
+        setLoading(false)
+
+        setToken(newToken === "" ? "NULL" : newToken);
+        
+        if (newToken && newToken !== "NULL") {
             login(newToken);
-            setModal(true);
+
+            // Give user a feedback
+            setMessage("Successfully logged in!")
+
+            // Redirect to home page
+            router.push("/")
+        } else {
+            setMessage("Your credentials are not correct.")
+            setTimeout(() => setMessage(""), 3000)
         }
     }
 
@@ -37,53 +51,69 @@ export default function Authenticate() {
             ...prevState,
             [name]: value,
         }));
-        setToken('');
+        setToken("");
+    };
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        authUser();
     };
 
     return (
         <>
             <Head>
-                <title>Authentication</title>
+                <title>Login</title>
             </Head>
-            <div className='rounded flex flex-col items-center justify-center py-10'>
+            <div className="rounded flex flex-col items-center justify-center py-10">
                 <div className="text-center">
                     <h2 className="mb-4 text-4xl">
-                        Authentication
+                        Login
                     </h2>
                 </div>
-                <form onSubmit={authUser} className='w-1/3 mt-8 pb-6'>
+                <form onSubmit={handleSubmit} className="w-1/3 flex flex-col justify-center">
+
                     <div className="mb-4">
                         <label htmlFor="email" className="block mb-2">Email:</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="border rounded p-2 w-full text-black" />
+                        <input id="email" name="email" value={formData.email} onChange={handleChange} className="border rounded p-2 w-full text-black" />
                     </div>
+
                     <div className="mb-4">
                         <label htmlFor="password" className="block mb-2">Password:</label>
                         <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="border rounded p-2 w-full text-black" />
                     </div>
+
+                    <button type="submit" className="mt-5 flex h-11 justify-center items-center gap-5 rounded-lg bg-gray-500 bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer">
+                        {loading && (
+                            <svg 
+                                className="text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24"
+                            >
+                                <path
+                                d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                                stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path
+                                d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                                stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" className="text-gray-900">
+                                </path>
+                            </svg>
+                        )}
+                        {!loading && (
+                            <span>Log in</span>
+                        )}
+                    </button>
                 </form>
-                <button onClick={authUser}
-                    className="rounded-lg bg-gray-500 bg-opacity-20 py-2 px-6 text-lg font-medium hover:bg-opacity-30 cursor-pointer"
-                >
-                    Log in
-                </button>
-                <Link href="/user" passHref className='mt-4'>
+               
+                <Link href="/user" passHref className="mt-4">
                     <span>Or create an account <span className="text-blue-900 underline">here</span></span>
                 </Link>
-                <p className="mt-4 text-xl text-red-500">{token === 'NULL' && 'Your credentials are not correct'}</p>
-                <Modal show={modal} onClose={() => setModal(false)}>
-                    <Modal.Body>
-                        <div className="space-y-6">
-                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                You are logged in!
-                            </p>
 
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={() => { setModal(false); router.push('/'); }}>Close</Button>
-
-                    </Modal.Footer>
-                </Modal>
+                {/* Message */}
+                {message && (
+                    <div className="mt-4 text-red-500">
+                        {message}
+                    </div>
+                )}
+                {/* <p className="mt-4 text-xl text-red-500">{token === "NULL" && "Your credentials are not correct"}</p> */}
             </div>
         </>
     );
