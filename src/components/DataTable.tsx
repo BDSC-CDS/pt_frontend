@@ -116,9 +116,9 @@ const DataTable = <T extends {}>({
                                 {/* Render actions tooltip */}
                                 {actions && actions.length === 1 && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="button-container">
+                                        <div className="button-container flex justify-end pr-8">
                                             <button
-                                                className="px-4 py-2 text-sm text-white bg-[#306278] hover:bg-[#255362] rounded-md focus:outline-none"
+                                                className="px-4 py-2 text-sm text-white bg-[#306278] hover:bg-[#255362] rounded-md focus:outline-none "
                                                 onClick={() => actions[0]?.callback(row)}
                                             >
                                                 {actions[0]?.name}
