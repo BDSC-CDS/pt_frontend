@@ -98,9 +98,7 @@ export default function Questionnaire() {
                                                 <Table.Cell><TimeAgo date={version.createdAt || ''} /></Table.Cell>
                                                 <Table.Cell>{version.published?(<HiCheck/>):(<></>)}</Table.Cell>
                                                 <Table.Cell className="flex flex-col items-end">
-                                                    <a href="#" onClick={(e) => e.stopPropagation()}>
-                                                        <HiPencilAlt size={20} />
-                                                    </a>
+                                                    <HiPencilAlt size={20} />
                                                 </Table.Cell>
                                             </Table.Row>
                                         ))}
