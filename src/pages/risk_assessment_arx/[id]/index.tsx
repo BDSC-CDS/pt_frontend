@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { getRiskAssessment } from "/workspaces/pt_frontend/src/utils/RiskAssessmentArx";
+import { getRiskAssessment } from "~/utils/RiskAssessmentArx";
 import { TemplatebackendGetRiskAssessmentReply, TemplatebackendGetRiskAssessmentResult } from '~/internal/client';
 
 // A simple gauge component to show the risk as a percentage
