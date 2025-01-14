@@ -31,6 +31,51 @@ table tbody td {
     vertical-align: middle;
 }
 
+.container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gauge-svg {
+    display: block;
+    margin: 0 auto;
+}
+
+.gauge-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.gauge-section div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gauge-section h3 {
+    font-size: 1.2rem;
+    color: #333;
+}
+
 /* revert to default for .markdown and children*/
 .markdown {
     all: revert;

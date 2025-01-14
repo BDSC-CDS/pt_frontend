@@ -3,31 +3,24 @@ import Head from 'next/head';
 import { useAuth } from '~/utils/authContext';
 import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
 import DatasetSelector from '~/components/DatasetSelector';
+import { useRouter } from 'next/router';
 
 
 export default function RiskAssessmentArx() {
     const { isLoggedIn } = useAuth();
 
+    const router = useRouter();
+
+
 
     const handleRiskAssessment = async (id: number | undefined) => {
-        if (id) { 
+        if (id) {
             const response = await getRiskAssessment(id);
-            
+
             // Handle successful response
             if (response) {
-                
-                const jsonContent = JSON.stringify(response, null, 2);
-                const blob = new Blob([jsonContent], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                // Trigger file download
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `risk_assessment_${id}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+
+                router.push(`/risk_assessment_arx/${id}`);
             } else {
                 alert("No quasi-identifiers have been defined for this dataset.");
             }
