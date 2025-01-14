@@ -180,6 +180,7 @@ export default function Questionnaire() {
     const [openEditQuestionModal, setOpenEditQuestionModal] = useState(false);
     const [questionToEdit, setQuestionToEdit] = useState<TemplatebackendQuestionnaireQuestion>();
     const editQuestion = (question: TemplatebackendQuestionnaireQuestion) => {
+        setOpenEditQuestionModal(false)
         setQuestionToEdit(cloneDeep(question))
         setOpenEditQuestionModal(true);
     };
@@ -215,15 +216,13 @@ export default function Questionnaire() {
             highRisk: addAnswerHighRisk,
         };
 
-        // Reopen modal with new question
-        editQuestion({...questionToEdit, answers: [...(questionToEdit?.answers || []), newAnswer]})
-    
-        // Reset add answer states
         setAddAnswerText("")
         setAddAnswerRiskLevel(0)
         setAddAnswerHighRisk(false)
-    };
 
+        // Reopen modal with new question
+        editQuestion({...questionToEdit, answers: [...(questionToEdit?.answers || []), newAnswer]})
+    };
 
     if (!questionnaire) {
         return (
@@ -573,6 +572,7 @@ export default function Questionnaire() {
                                                                                 name="text"
                                                                                 placeholder="Answer"
                                                                                 required
+                                                                                value={addAnswerText}
                                                                                 onChange={(event) => setAddAnswerText(event.target.value)}
                                                                             />
                                                                         </Table.Cell>
@@ -580,7 +580,6 @@ export default function Questionnaire() {
                                                                     <Table.Row >
                                                                         <Table.HeadCell>Risk level</Table.HeadCell>
                                                                         <Table.Cell>
-
                                                                             <CounterInput
                                                                                 placeholder="10"
                                                                                 initValue={0}
