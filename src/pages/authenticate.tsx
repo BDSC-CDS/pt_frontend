@@ -37,9 +37,8 @@ export default function Authenticate() {
 
             // Give user a feedback
             setSuccessMessage("Successfully logged in!")
-
-            // Redirect to home page
-            router.push("/")
+            setTimeout(()=>router.push("/"), 500)
+            
         } else {
             setErrorMessage("Your credentials are not correct.")
             setTimeout(() => setErrorMessage(""), 3000)
