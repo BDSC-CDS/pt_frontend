@@ -31,3 +31,10 @@ table tbody td {
     vertical-align: middle;
 }
 
+/* revert to default for .markdown and children*/
+.markdown {
+    all: revert;
+}
+.markdown *{
+    all: revert;
+}
