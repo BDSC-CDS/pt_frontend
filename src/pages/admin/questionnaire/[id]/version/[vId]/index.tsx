@@ -206,23 +206,22 @@ export default function Questionnaire() {
     const [addAnswerRiskLevel, setAddAnswerRiskLevel] = useState(0);
     const [addAnswerHighRisk, setAddAnswerHighRisk] = useState(false);
     const addAnswer = () => {
-        console.log("saving new question", addAnswerText, addAnswerRiskLevel);
-        setQuestionToEdit(prevQuestion => {
-            if (!prevQuestion) return;
+        console.log("saving new answer", addAnswerText, addAnswerRiskLevel);
 
-            if (!prevQuestion.answers) {
-                prevQuestion.answers = [];
-            }
-            prevQuestion.answers.push({
-                text: addAnswerText,
-                riskLevel: addAnswerRiskLevel,
-                highRisk: addAnswerHighRisk,
-            });
+        // Create a new answer object
+        const newAnswer = {
+            text: addAnswerText,
+            riskLevel: addAnswerRiskLevel,
+            highRisk: addAnswerHighRisk,
+        };
 
-            console.log("question updated", prevQuestion);
-
-            return prevQuestion;
-        })
+        // Reopen modal with new question
+        editQuestion({...questionToEdit, answers: [...(questionToEdit?.answers || []), newAnswer]})
+    
+        // Reset add answer states
+        setAddAnswerText("")
+        setAddAnswerRiskLevel(0)
+        setAddAnswerHighRisk(false)
     };
 
 
