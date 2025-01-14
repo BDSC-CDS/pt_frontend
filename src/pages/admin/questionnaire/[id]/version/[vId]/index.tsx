@@ -9,7 +9,7 @@ import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON } from '~/internal/client';
-import { questionsFromApi } from '~/utils/questions';
+import cloneDeep from "lodash/cloneDeep";
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -22,11 +22,6 @@ type Tab = {
 };
 
 type Tabs = Tab[];
-
-// Helper function to deep copy an object
-function deepCopy(obj: any) {
-    return JSON.parse(JSON.stringify(obj))
-}
 
 export default function Questionnaire() {
     
@@ -56,7 +51,6 @@ export default function Questionnaire() {
         }
 
         processQuestionnaireVersion(v);
-        console.log("tabs", tabs)
     }
 
     const processQuestionnaireVersion = (v: Version) => {
@@ -118,11 +112,21 @@ export default function Questionnaire() {
             ...version,
             version: saveName,
             published: savePublish,
+            createdAt: new Date()
         }
 
-        const id = await createQuestionnaireVersion(questionnaireId, versionToSave);
+        try {
+            const id = await createQuestionnaireVersion(questionnaireId, versionToSave);
+            if(id){
+                setOpenSaveAlert(true);
+            } else {
+                alert("Error creating the version.")
+            }
+        } catch (error) {
+            alert("Error creating the questionnaire version: " + error)
+        }
 
-        setOpenSaveAlert(true);
+        
     }
 
     // Everything to remove a tab and it's questions
@@ -162,25 +166,21 @@ export default function Questionnaire() {
     const [questionToRemove, setQuestionToRemove] = useState<TemplatebackendQuestionnaireQuestion>();
     const removeQuestionConfirmation = (question: TemplatebackendQuestionnaireQuestion) => {
         setOpenRemoveQuestionModal(true);
-        setQuestionToRemove({...question})
+        setQuestionToRemove(question)
     };
     const removeQuestion = () => {
         setOpenRemoveQuestionModal(false);
 
-        const updatedQuestions = version.questions?.filter(q => q.id !== questionToRemove?.id);
-        const updatedVersion = {
-            ...version,
-            questions: updatedQuestions
-        };
+        version.questions = version.questions?.filter(q => q.id !== questionToRemove?.id);
 
-        processQuestionnaireVersion(updatedVersion);
+        processQuestionnaireVersion(version);
     }
 
     // Everything to edit a question
     const [openEditQuestionModal, setOpenEditQuestionModal] = useState(false);
     const [questionToEdit, setQuestionToEdit] = useState<TemplatebackendQuestionnaireQuestion>();
     const editQuestion = (question: TemplatebackendQuestionnaireQuestion) => {
-        setQuestionToEdit(deepCopy(question))
+        setQuestionToEdit(cloneDeep(question))
         setOpenEditQuestionModal(true);
     };
 
@@ -194,12 +194,12 @@ export default function Questionnaire() {
     const saveEditedQuestion = () => {
         setOpenEditQuestionModal(false);
 
-        const updatedVersion = {
-            ...version,
-            questions: version.questions?.map(q => q.id === questionToEdit?.id ? {...questionToEdit} : q)
+        const i = version.questions?.findIndex(q => q.id == questionToEdit?.id);
+        if (version.questions && questionToEdit && i !== undefined) {
+            version.questions[i] = questionToEdit;
         }
 
-        processQuestionnaireVersion(updatedVersion);
+        processQuestionnaireVersion(version);
     }
 
     const [addAnswerText, setAddAnswerText] = useState("");
@@ -249,7 +249,8 @@ export default function Questionnaire() {
                     <p className='ml-2 text-sm'> Save</p>
                 </span>
             </div>
-            <div className="flex flex-col mb-8">
+
+            <div className="flex flex-col mb-5">
                 <Table >
                     <Table.Body className="divide-y">
                         <Table.Row >
@@ -272,43 +273,42 @@ export default function Questionnaire() {
                 </Table>
             </div>
 
-            <div className="flex flex-col mb-8">
-                <ul className="flex items-stretch w-full">
-                    {tabs.map((tab, n) => (
+            <div className="flex flex-col w-full">
+                <div className="overflow-auto pb-3 mb-2">
+                    <ul className="flex flex-row">
+                        {tabs.map((tab, n) => (
+                            <li
+                                key={tab.tabName}
+                                className={`flex-grow text-center hover:bg-gray-500  hover:bg-opacity-20 py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-b-2 border-gray-400 bg-gray-100'}`}
+                                onClick={() => setActiveTab(n)}
+                            >
+                                <div className='flex items-center pl-2'>
+                                    <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                        {n + 1}
+                                    </span>
+                                    <span>
+                                        <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
+                                    </span>
+                                    <span className="p-2 hover:bg-gray-500  hover:bg-opacity-20" onClick={() => removeTabConfirmation(n)}>
+                                        <HiTrash />
+                                    </span>
+                                </div>
+                            </li>
+                        ))}
                         <li
-                            key={tab.tabName}
-                            className={`flex-grow text-center hover:bg-gray-500  hover:bg-opacity-20 py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-b-2 border-gray-600 bg-gray-100'}`}
-                            onClick={() => setActiveTab(n)}
+                            className={`flex-grow text-center py-2 px-0`}
                         >
-                            <div className='flex items-center pl-2'>
-                                <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
-                                    {n + 1}
-                                </span>
-                                <span>
-                                    <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
-                                </span>
-                                <span className="p-2 hover:bg-gray-500  hover:bg-opacity-20" onClick={() => removeTabConfirmation(n)}>
-                                    <HiTrash />
-                                </span>
-                            </div>
+                            <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
+                                <MdOutlineAdd />
+                                New Tab
+                            </Button>
+
                         </li>
-                    ))}
-                    <li
-                        className={`flex-grow text-center py-2 px-0`}
-                    >
-                        <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
-                            <MdOutlineAdd />
-                            New Tab
-                        </Button>
+                    </ul>
+                </div>
+                
 
-                    </li>
-                </ul>
-                <hr className="h-px bg-gray-500 border-0 " />
-
-            </div>
-
-            <div className="flex flex-col mb-8">
-                <Table >
+                <Table className="border">
                     <Table.Head>
                         <Table.HeadCell>Question</Table.HeadCell>
                         <Table.HeadCell>Risk weight</Table.HeadCell>
@@ -345,6 +345,7 @@ export default function Questionnaire() {
                     </Table.Body>
                 </Table>
             </div>
+            
             
             {/* SAVE MODAL */}
             <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
@@ -573,12 +574,7 @@ export default function Questionnaire() {
                                                                                 name="text"
                                                                                 placeholder="Answer"
                                                                                 required
-                                                                                onChange={(event) => {
-                                                                                    let newAnswers = questionToEdit?.answers || []
-                                                                                    newAnswers.push()
-                                                                                    
-                                                                                    setQuestionToEdit({...questionToEdit, answers: newAnswers})
-                                                                                }}
+                                                                                onChange={(event) => setAddAnswerText(event.target.value)}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
