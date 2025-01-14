@@ -1,9 +1,8 @@
 # Qualitative Risk Assessment
 You can use the Qualitative Risk Assessment to assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire.
 
-### Steps and Process
-
-#### 1. **Project Dashboard**
+## Steps and Process
+### 1. **Project Dashboard**
 - **Page View**: Displays a list of existing projects with the following columns:
   - **ID**: A unique identifier for the project
   - **Project Name**: The name given to the project
@@ -11,7 +10,7 @@ You can use the Qualitative Risk Assessment to assess the re-identification risk
   - **Created At**: Date when the project was created
 - **Actions**: Click the **"New Project"** button to start a new qualitative risk assessment
 
-#### 2. **Questionnaire**
+### 2. **Questionnaire**
 The qualitative risk assessment questionnaire is divided into 8 main sections, as shown by the navigation bar:
 1. **Administrative**: Covers jurisdiction and agreements related to data storage and handling
 2. **Basic Info**: General project information
@@ -24,7 +23,7 @@ The qualitative risk assessment questionnaire is divided into 8 main sections, a
 
 Each section presents a series of questions. The **Current Score Gauge** is a visual representation of the current risk score in percentage. Green to red scale indicating low to high risk.
 
-#### 3. **Results Page**
+### 3. **Results Page**
 - **Survey Results Summary**:
   - **Total Questions Answered**: Number of completed questions.
   - **Sections Completed**: Overview of the completed and missing sections.
