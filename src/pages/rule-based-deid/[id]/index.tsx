@@ -518,7 +518,7 @@ const TransformPage = () => {
             }
             {isLoggedIn &&
                 <>
-                    <div className="bg-gray-100 p-5 ml-8 rounded-lg shadow text-md ">
+                    <div className="bg-gray-100 p-5 rounded-lg shadow text-md ">
                         <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
                         <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
                         <p><strong>Number of Rows:</strong> {totalRows}</p>

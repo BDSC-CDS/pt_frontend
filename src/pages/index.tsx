@@ -1,14 +1,14 @@
 import Head from "next/head";
-import Header from "../components/Header";
 import Link from "next/link";
+import { HiDatabase, HiInbox, HiPresentationChartBar, HiOutlineCog, HiLockClosed, HiShieldCheck  } from 'react-icons/hi';
 import {
     BiCalculator,
     BiMessageSquareDetail,
     BiLayer,
     BiSolidReport,
     BiSolidRuler,
+    BiSolidDetail,
 } from "react-icons/bi";
-import { GrDocumentLocked } from "react-icons/gr";
 import { ReactNode } from "react";
 
 /**
@@ -42,7 +42,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <ToolCard
                         href="/risk_assessment"
-                        icon={<BiMessageSquareDetail size="3em" />}
+                        icon={<HiPresentationChartBar size="3em" />}
                         title="Qualitative Risk Assessment"
                         description="Assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire."
                     />
@@ -65,13 +65,13 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <ToolCard
-                        href="/dataset"
+                        href="/rule-based-deid"
                         icon={<BiSolidRuler size="3em" />}
                         title="Rule-Based De-identification"
                         description="Apply basic rules to transform and de-identify your data."
                     />
                     <ToolCard
-                        href="/formal_deid"
+                        href="/deidentification-notebook"
                         icon={<BiSolidReport size="3em" />}
                         title="Formal De-identification"
                         description="Use advanced techniques to anonymize datasets."
@@ -82,6 +82,15 @@ export default function Home() {
                         title="Synthetic Data"
                         description="Generate synthetic data for secure sharing and analysis."
                         disabled={true} // Pass a disabled prop
+                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <ToolCard
+                        href="#" 
+                        icon={<BiSolidDetail size="3em" />}
+                        title="Text De-identification"
+                        description="De-identify non structured data in free text form"
+                        disabled={true}
                     />
                 </div>
             </div>
