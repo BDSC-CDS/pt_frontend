@@ -24,7 +24,7 @@ type Tab = {
 type Tabs = Tab[];
 
 export default function Questionnaire() {
-    
+
     // Routing
     const router = useRouter();
     const { id, vId } = router.query;
@@ -117,7 +117,7 @@ export default function Questionnaire() {
 
         try {
             const id = await createQuestionnaireVersion(questionnaireId, versionToSave);
-            if(id){
+            if (id) {
                 setOpenSaveAlert(true);
             } else {
                 alert("Error creating the version.")
@@ -126,7 +126,7 @@ export default function Questionnaire() {
             alert("Error creating the questionnaire version: " + error)
         }
 
-        
+
     }
 
     // Everything to remove a tab and it's questions
@@ -231,7 +231,7 @@ export default function Questionnaire() {
         setAddAnswerHighRisk(false)
 
         // Reopen modal with new question
-        editQuestion({...questionToEdit, answers: [...(questionToEdit?.answers || []), newAnswer]})
+        editQuestion({ ...questionToEdit, answers: [...(questionToEdit?.answers || []), newAnswer] })
     };
 
     if (!questionnaire) {
@@ -240,6 +240,17 @@ export default function Questionnaire() {
                 <p>Questionnaire not found...</p>
             </div>
         )
+    }
+
+    const [openAddRulePrefillModal, setAddRulePrefillModal] = useState(false);
+    const [rulePrefillModalAnswer, setRulePrefillModalAnswer] = useState<TemplatebackendQuestionnaireQuestionAnswer>();
+    const [rulePrefillModalQuestion, setRulePrefillModalQuestion] = useState<TemplatebackendQuestionnaireQuestion>();
+    const [rulePrefillFilter, setRulePrefillFilter] = useState("");
+
+    const addRulePrefil = (answer: TemplatebackendQuestionnaireQuestionAnswer) => {
+        // console.log("rule prefill answerId", answerID);
+        setRulePrefillModalAnswer(answer);
+        setAddRulePrefillModal(true);
     }
 
     return (
@@ -252,7 +263,7 @@ export default function Questionnaire() {
                 <span className="font-bold">Version {saveName} </span>successfuly saved!
             </Alert>
             <div className="flex flex-row items-end p-5">
-                <span onClick={()=>setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
+                <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save</p>
                 </span>
@@ -314,7 +325,7 @@ export default function Questionnaire() {
                         </li>
                     </ul>
                 </div>
-                
+
 
                 <Table className="border">
                     <Table.Head>
@@ -353,8 +364,8 @@ export default function Questionnaire() {
                     </Table.Body>
                 </Table>
             </div>
-            
-            
+
+
             {/* SAVE MODAL */}
             <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
                 <Modal.Header />
@@ -409,7 +420,7 @@ export default function Questionnaire() {
                     </div>
                 </Modal.Body>
             </Modal>
-            
+
             {/* CREATE TAB MODAL */}
             <Modal show={openCreateTabModal} size="md" onClose={() => setOpenCreateTabModal(false)} popup>
                 <Modal.Header />
@@ -436,7 +447,7 @@ export default function Questionnaire() {
                     </div>
                 </Modal.Body>
             </Modal>
-            
+
             {/* REMOVE QUESTION MODAL */}
             <Modal show={openRemoveQuestionModal} size="md" onClose={() => setOpenRemoveQuestionModal(false)} popup>
                 <Modal.Header />
@@ -457,10 +468,10 @@ export default function Questionnaire() {
                     </div>
                 </Modal.Body>
             </Modal>
-            
+
             {/* EDIT QUESTION MODAL */}
             <Modal show={openEditQuestionModal} size="4xl" onClose={() => setOpenEditQuestionModal(false)} popup>
-                <Modal.Header/>
+                <Modal.Header />
                 <Modal.Body>
                     <div className="text-center">
                         <div className="flex flex-col mb-8">
@@ -503,7 +514,7 @@ export default function Questionnaire() {
                                             />
                                         </Table.Cell>
                                     </Table.Row>
-                    
+
                                     <Table.Row >
                                         <Table.HeadCell>Answers</Table.HeadCell>
                                         <Table.Cell>
@@ -522,9 +533,9 @@ export default function Questionnaire() {
                                                                                 name={"text-" + { n }}
                                                                                 placeholder="Answer"
                                                                                 required
-                                                                                value={{...questionToEdit}?.answers?.[n]?.text || ""}
-                                                                                
-                                                                                onChange={(event) =>handleAnswerInputChange(n, event.target.value, "text")}
+                                                                                value={{ ...questionToEdit }?.answers?.[n]?.text || ""}
+
+                                                                                onChange={(event) => handleAnswerInputChange(n, event.target.value, "text")}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
@@ -534,17 +545,43 @@ export default function Questionnaire() {
                                                                             <CounterInput
                                                                                 placeholder="10"
                                                                                 initValue={questionToEdit?.answers?.[n]?.riskLevel || 0}
-                                                                                onChange={(value) =>handleAnswerInputChange(n, value, "riskLevel")}
+                                                                                onChange={(value) => handleAnswerInputChange(n, value, "riskLevel")}
                                                                             />
                                                                         </Table.Cell>
                                                                     </Table.Row>
                                                                     <Table.Row >
                                                                         <Table.HeadCell>High risk</Table.HeadCell>
                                                                         <Table.Cell>
-                                                                            <ToggleSwitch 
+                                                                            <ToggleSwitch
                                                                                 checked={questionToEdit?.answers?.[n]?.highRisk || false}
-                                                                                onChange={(value) =>handleAnswerInputChange(n, value, "highRisk")}
+                                                                                onChange={(value) => handleAnswerInputChange(n, value, "highRisk")}
                                                                             />
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>Rule Prefills</Table.HeadCell>
+                                                                        <Table.Cell>
+
+                                                                            {(answer.rulePrefills || []).map((rulePrefill, n) => (
+
+                                                                                <div className="w-48 text-sm font-medium bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                                                    <div className="w-full px-4 py-2">
+
+                                                                                        {rulePrefill.answerId}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )).concat(
+                                                                                // <div className="w-48 text-sm font-medium bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                                                //     <div className="w-full px-4 py-2">
+                                                                                //         <MdOutlineAdd className='inline' /> Add rule prefill
+                                                                                //     </div>
+                                                                                // </div>
+                                                                                <Button color="gray" onClick={() => addRulePrefil(answer)}>
+                                                                                    <MdOutlineAdd className='inline' /> Add rule prefill
+                                                                                </Button>
+                                                                            )}
+
+
                                                                         </Table.Cell>
                                                                     </Table.Row>
                                                                 </Table.Body>
@@ -583,8 +620,8 @@ export default function Questionnaire() {
                                                                     <Table.Row >
                                                                         <Table.HeadCell>High risk</Table.HeadCell>
                                                                         <Table.Cell>
-                                                                            <ToggleSwitch 
-                                                                                checked={ addAnswerHighRisk }
+                                                                            <ToggleSwitch
+                                                                                checked={addAnswerHighRisk}
                                                                                 onChange={value => setAddAnswerHighRisk(value)}
                                                                             />
                                                                         </Table.Cell>
@@ -603,7 +640,7 @@ export default function Questionnaire() {
 
                                 </Table.Body>
                             </Table>
-                        </div> 
+                        </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-4 border-t-2 bg-gray-50">
@@ -611,6 +648,87 @@ export default function Questionnaire() {
                         Edit
                     </Button>
                     <Button color="gray" onClick={() => setOpenEditQuestionModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* ADD RULE PREFILL MODAL */}
+            <Modal show={openAddRulePrefillModal} size="4xl" onClose={() => setAddRulePrefillModal(false)} popup>
+                <Modal.Header className="flex justify-center gap-4 border-t-2 bg-gray-50">
+                    <div className="flex flex-col p-8 font-medium">
+                        When the user select the answer "{rulePrefillModalAnswer?.text}", which question should be prefilled?
+                    </div>
+                </Modal.Header >
+                <Modal.Body>
+                    <Accordion collapseAll>
+                        <Accordion.Panel>
+                            <Accordion.Title>
+                                Select a question
+                            </Accordion.Title>
+                            <Accordion.Content>
+                                <TextInput
+                                    placeholder="Filter questions"
+                                    onChange={(event) => { setRulePrefillFilter(event.target.value) }}
+                                />
+                                <Table hoverable>
+                                    <Table.Body className="divide-y">
+                                        <Table.Row >
+                                            <Table.Cell>Tab</Table.Cell>
+                                            <Table.Cell>Question</Table.Cell>
+                                        </Table.Row>
+                                        {(version.questions || [])
+                                            .filter(question =>
+                                                JSON.stringify(question).toLowerCase().includes(rulePrefillFilter)
+                                            )
+                                            .map((question, n) => (
+                                                <Table.Row onClick={() => { setRulePrefillModalQuestion(question) }}>
+                                                    <Table.Cell>{question.tab}</Table.Cell>
+                                                    <Table.Cell>{question.question}</Table.Cell>
+                                                </Table.Row>
+                                            ))}
+                                    </Table.Body>
+                                </Table>
+                            </Accordion.Content>
+                        </Accordion.Panel>
+                        <Accordion.Panel>
+                            <Accordion.Title>
+                                Select the answer that it will automatically select.
+                            </Accordion.Title>
+                            <Accordion.Content>
+                                <div className="text-center">
+                                    <div className="flex flex-col mb-8">
+                                        <div className='flex justify-left p-4'>
+                                            <Table >
+                                                <Table.Body className="divide-y">
+                                                    <Table.Row >
+                                                        <Table.Cell>Answer</Table.Cell>
+                                                        <Table.Cell></Table.Cell>
+                                                    </Table.Row>
+                                                    {(rulePrefillModalQuestion?.answers || []).map((answer) => (
+                                                        <Table.Row >
+                                                            <Table.Cell>{answer.text}</Table.Cell>
+                                                            <Table.Cell>
+                                                                <Button color="blue" onClick={() => {/*TODO*/ }}>
+                                                                    Select
+                                                                </Button>
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                    ))}
+                                                </Table.Body>
+                                            </Table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Accordion.Content>
+                        </Accordion.Panel>
+                    </Accordion>
+                </Modal.Body>
+                <Modal.Footer className="flex justify-center gap-4 border-t-2 bg-gray-50">
+                    <Button color="success" onClick={() => {/*TODO*/ }}>
+                        Add
+                    </Button>
+                    <Button color="gray" onClick={() => setAddRulePrefillModal(false)}>
                         Cancel
                     </Button>
                 </Modal.Footer>
