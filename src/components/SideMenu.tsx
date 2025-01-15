@@ -79,7 +79,7 @@ export default function SideMenu() {
                                 <p className='ml-1'>Audit Log</p>
                             </Link>
                         </Sidebar.Collapse>
-                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                        <Link href="/documentation" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiInbox />
                             <p className='ml-1'>Documentation</p>
                         </Link>
