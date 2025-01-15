@@ -28,11 +28,11 @@ export default function About() {
                             description="Assess the re-identification risk of a project in compliance with Swiss law requirements by going through a questionnaire."
                         />
 
-                        {/* Quantitative Risk Assessment Link */}
+                        {/* Formal Risk Assessment Link */}
                         <ToolCard
-                            href="/documentation/doc_qualitative_risk_assessment.md"
+                            href="/documentation/doc_formal_risk_assessment.md"
                             icon={<BiCalculator size="3em" />}
-                            title="Quantitative Risk Assessment"
+                            title="Formal Risk Assessment"
                             description="Perform detailed and formal privacy assessments of your datasets."
                         />
 
