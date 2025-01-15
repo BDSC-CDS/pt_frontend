@@ -74,8 +74,6 @@ const DataTable = <T extends {}>({
     onRowClick,
     actions,
 }: DataTableProps<T>): JSX.Element => {
-    console.log(data)
-    console.log(columns)
     return (
         <Flowbite theme={{theme: customTheme}}>
             <div className="w-full border overflow-x-auto border-gray-200 rounded-lg">
@@ -113,7 +111,7 @@ const DataTable = <T extends {}>({
                                     </Table.Cell>
                                 ))}
                                 
-                                {/* Render actions tooltip */}
+                                {/* Render single action */}
                                 {actions && actions.length === 1 && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
                                         <div className="button-container flex justify-end pr-8">
@@ -126,11 +124,13 @@ const DataTable = <T extends {}>({
                                         </div>
                                     </Table.Cell>
                                 )}
+
+                                {/* Render actions tooltip */}
                                 { actions && actions.length>=2 && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="group">
+                                        <div className="group w-0">
                                             <MdMoreHoriz size={20}/>
-                                            <ListGroup className="fixed z-50 hidden group-hover:block -translate-x-1/2 ml-2">
+                                            <ListGroup className="fixed z-50 hidden group-hover:block -translate-x-1/2 ml-2 -mt-1">
                                                 {actions.map((action, actionIndex) => (
                                                     <ListGroup.Item
                                                         key={"action" + actionIndex}
