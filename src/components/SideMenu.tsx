@@ -41,11 +41,11 @@ export default function SideMenu() {
                     <Sidebar.ItemGroup>
                         <Link href="/risk_assessment" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiPresentationChartBar />
-                            <p className='ml-1'> Qualitative Assessment</p>
+                            <p className='ml-1'> Qualitative Risk Assessment</p>
                         </Link>
                             <Link href="/risk_assessment_arx" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <BiCalculator />
-                            <p className='ml-1'> Quantitative Assessment</p>
+                            <p className='ml-1'> Formal Risk Assessment</p>
                         </Link>
                     </Sidebar.ItemGroup> 
 
@@ -79,7 +79,7 @@ export default function SideMenu() {
                                 <p className='ml-1'>Audit Log</p>
                             </Link>
                         </Sidebar.Collapse>
-                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
+                        <Link href="/documentation" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiInbox />
                             <p className='ml-1'>Documentation</p>
                         </Link>
