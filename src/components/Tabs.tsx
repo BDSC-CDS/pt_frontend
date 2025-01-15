@@ -131,9 +131,6 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                                         </div>
                                         
                                         {/* Tooltip */}
-                                        {/* <div className="absolute top-full bg-white mt-1 hidden rounded-lg border text-xs text-justify px-2 py-1 shadow-lg group-hover:block max-w-sm">
-                                            {question.tooltip}
-                                        </div> */}
                                         <div className="absolute z-10 left-full hidden w-80 bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700 shadow-lg group-hover:block">
                                             <div className="font-sans leading-relaxed text-gray-800 text-justify">
                                                 {question.tooltip}
