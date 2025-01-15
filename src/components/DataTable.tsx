@@ -118,7 +118,7 @@ const DataTable = <T extends {}>({
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
                                         <div className="button-container flex justify-end pr-8">
                                             <button
-                                                className="px-4 py-2 text-sm text-white bg-[#306278] hover:bg-[#255362] rounded-md focus:outline-none "
+                                                className="px-4 py-2 text-sm border hover:bg-gray-200 rounded-md focus:outline-none "
                                                 onClick={() => actions[0]?.callback(row)}
                                             >
                                                 {actions[0]?.name}
@@ -126,7 +126,7 @@ const DataTable = <T extends {}>({
                                         </div>
                                     </Table.Cell>
                                 )}
-                                { actions && actions.length>2 && (
+                                { actions && actions.length>=2 && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
                                         <div className="group">
                                             <MdMoreHoriz size={20}/>
