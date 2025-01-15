@@ -1,5 +1,11 @@
 import { TemplatebackendQuestionnaireVersion } from '~/internal/client';
 
+interface RulePrefill {
+  answerId: string,
+  questionId: string,
+  answerText: string,
+}
+
 interface Answer {
   answerId: string;
   answerDescription: string;
@@ -7,6 +13,7 @@ interface Answer {
   highRisk: boolean;
   riskLevel: number;
   selected?: boolean;
+  rulePrefills?: RulePrefill[],
 }
 
 export interface Question {
@@ -44,6 +51,11 @@ export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questi
         highRisk: answer.highRisk || false,
         riskLevel: answer.riskLevel || 0,
         selected: false,
+        rulePrefills: answer.rulePrefills?.map(rulePrefill => ({
+          answerId: rulePrefill.answerId?.toString() || "",
+          questionId: rulePrefill.questionId?.toString() || "",
+          answerText: rulePrefill.answerText || "",
+        }))
       })) || [],
     })
   });
