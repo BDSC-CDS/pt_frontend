@@ -4,7 +4,7 @@ import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestion
 import { createReply } from "../utils/questionnaire"
 import dynamic from "next/dynamic";
 import { MdSave } from "react-icons/md";
-import { FaFilePdf } from "react-icons/fa6";
+import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
 
 import { Button, Modal, TextInput, ToggleSwitch, Alert } from 'flowbite-react';
@@ -119,9 +119,29 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 {questions[tab]?.map((question) => (
                     <div key={question.questionId} className="flex flex-col my-4">
                         <form className="w-1/2">
-                            <label className="block mb-2 text-sm font-medium text-gray-900">
-                                {question.questionDescription}
-                            </label>
+                            {/* Form question & Tooltip */}
+                            <div className="flex justify-between gap-4 items-center">
+                                <label className="block mb-2 text-sm font-medium text-gray-900">
+                                    {question.questionDescription}
+                                </label>
+                                {question.tooltip && (
+                                    <div className="group relative flex">
+                                        <div className="p-1">
+                                            <FaCircleInfo className="text-gray-300 group-hover:text-gray-400 cursor-pointer" />
+                                        </div>
+                                        
+                                        {/* Tooltip */}
+                                        <div className="absolute z-10 left-full hidden w-80 bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700 shadow-lg group-hover:block">
+                                            <div className="font-sans leading-relaxed text-gray-800 text-justify">
+                                                {question.tooltip}
+                                            </div>
+                                            </div>
+                                        </div>
+                                )}
+                               
+                            </div>
+                            
+                            {/* Form select dropdown */}
                             <select
                                 id={question.questionId}
                                 className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
@@ -137,9 +157,10 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                                 ))}
                             </select>
                         </form>
+
                         {/* Warning Message for High-Risk Answer */}
                         {question.answers.some((answer) => answer.selected && answer.highRisk) && (
-                            <div className="mt-2 text-red-500 text-sm font-medium">
+                            <div className="mt-2 text-red-500 text-sm font-medium flex items-center">
                                 <svg
                                     className="inline w-5 h-5 text-red-500 mr-2"
                                     aria-hidden="true"

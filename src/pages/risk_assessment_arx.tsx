@@ -31,7 +31,7 @@ export default function RiskAssessmentArx() {
     return (
         <>
             <Head>
-                <title>Quantitative Risk Assessment</title>
+                <title>Formal Risk Assessment</title>
             </Head>
             {!isLoggedIn && (
                 <p className='m-8'> Please log in to consult your datasets.</p>
@@ -39,7 +39,7 @@ export default function RiskAssessmentArx() {
             {isLoggedIn && (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold">Quantitative Risk Assessment</h1>
+                        <h1 className="text-3xl font-bold">Formal Risk Assessment</h1>
                     </div>
                     <div className="flex justify-between items-center mb-4">
                         <p>
