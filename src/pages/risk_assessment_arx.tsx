@@ -11,8 +11,6 @@ export default function RiskAssessmentArx() {
 
     const router = useRouter();
 
-
-
     const handleRiskAssessment = async (id: number | undefined) => {
         if (id) {
             const response = await getRiskAssessment(id);
@@ -55,6 +53,7 @@ export default function RiskAssessmentArx() {
                         actions={[
                             { name: "Risk assesment", callback: (id) => handleRiskAssessment(id) },
                         ]}
+                        preview
                     />
                 </div>
             )}
