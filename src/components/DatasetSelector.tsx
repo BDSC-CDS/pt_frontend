@@ -4,6 +4,7 @@ import { listDatasets } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import DataTable from '~/components/DataTable';
+import DatasetPreviewModal from './modals/DatasetPreviewModal';
 
 
 interface DatasetSelectorProps {
@@ -11,14 +12,18 @@ interface DatasetSelectorProps {
         name: string;
         callback: (row: number | undefined) => void;
     }[];
+    preview?: boolean;
 };
 
 const DatasetSelector = ({
     actions,
+    preview,
 }: DatasetSelectorProps): JSX.Element => {
     const router = useRouter();
 
     const [datasetsList, setDatasetsList] = useState<Array<TemplatebackendDataset>>([]);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
+    const [datasetToPreview, setDatasetToPreview] = useState<number>()
 
     const handleRowClick = (id: number | undefined) => {
         if (id) {
@@ -44,16 +49,40 @@ const DatasetSelector = ({
     }
 
     useEffect(() => {
-        try {
-            getListDatasets();
-        } catch (error) {
-            alert("Error listing the datasets")
-        }
-    }, []);
+        const handleRouteChange = () => {
+            try {
+                getListDatasets();
+            } catch (error) {
+                alert("Error listing the datasets: "+error)
+            }
+        };
+
+        // Attach event listener
+        router.events.on('routeChangeComplete', handleRouteChange);
+
+        // Initial load
+        getListDatasets();
+
+        // Clean up event listener on unmount
+        return () => {
+            router.events.off('routeChangeComplete', handleRouteChange);
+        };
+    }, [router.events]);
 
     const mappedActions = actions?.map(a => {
         return { name: a.name, callback: (row: { id: number | undefined }) => a.callback(row.id) }
     })
+
+    if(preview){
+        mappedActions?.push({name: "Preview", callback: (row) => previewDataset(row.id)})
+    }
+
+    const previewDataset = async (id: number | undefined) => {     
+        if(id){
+            setDatasetToPreview(id)
+            setIsPreviewModalOpen(true)
+        }
+    }
 
     return (
         <>
@@ -72,6 +101,9 @@ const DatasetSelector = ({
             ) : (
                 <div className="text-center text-gray-500 mt-20">No datasets yet</div>
             )}
+
+           
+            <DatasetPreviewModal show={isPreviewModalOpen} datasetId={datasetToPreview!} onClose={()=>setIsPreviewModalOpen(false)}/>
         </>
     );
 }
