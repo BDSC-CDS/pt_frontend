@@ -43,34 +43,6 @@ export default function Dataset() {
         'M/d/yyyy',
     ];
 
-    const getListDatasets = async (offset?: number, limit?: number) => {
-        // Call API
-        let response;
-        if (!offset && !limit) {
-            response = await listDatasets();
-        } else if (offset && limit) {
-            response = await listDatasets(
-            );
-        } else {
-            console.log("ERROR You have to define both the offset and the limit") // TODO
-            return;
-        }
-        const result = response?.result?.datasets
-        if (result) {
-            setDatasetsList(result);
-        }
-    }
-
-    useEffect(() => {
-        try {
-            getListDatasets();
-        } catch (error) {
-            alert("Error listing the datasets")
-        }
-    }, []);
-
-
-
     const getUniqueFileName = (baseFileName: string, datasetsList: TemplatebackendDataset[]): string => {
         let uniqueFileName = baseFileName;
         let counter = 1;
@@ -225,11 +197,6 @@ export default function Dataset() {
     };
 
     const processCSV = async () => {
-        // if (fileName == '') {
-        //     alert("You must input a name for the dataset.")
-        //     return;
-        // }
-
         if (csvString == '') {
             alert("You must upload a file.")
             return;
@@ -261,14 +228,7 @@ export default function Dataset() {
         setIsUploadModalOpen(false);
         setIsTypeModalOpen(false)
         setFileName('');
-        getListDatasets();
-    };
-
-    // Event handlers
-    const handleRowClick = (id: number | undefined) => {
-        if (id) {
-            router.push(`/dataset/${id}`);
-        }
+        router.push("/dataset")// Needed to trigger a refresh for the dataset list
     };
 
     const handleTransform = async (id: number | undefined) => {
@@ -279,8 +239,13 @@ export default function Dataset() {
 
     const handleDelete = async (id: number | undefined) => {
         if (id) {
-            const response = await deleteDataset(id);
-            getListDatasets();
+            try {
+                const response = await deleteDataset(id);
+                console.log("Dataset successfully deleted.")
+                router.push("/dataset")// Needed to trigger a refresh for the dataset list
+            } catch (error) {
+                console.error("Error while trying to delete a dataset: ", error)
+            }
         }
     };
 
@@ -340,10 +305,7 @@ export default function Dataset() {
                             </button>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button onClick={() => {
-                                closeUploadModals();
-                                router.push('dataset');
-                            }}>
+                            <Button onClick={() => closeUploadModals()}>
                                 Cancel
                             </Button>
                         </Modal.Footer>
