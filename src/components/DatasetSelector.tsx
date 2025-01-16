@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import DataTable from '~/components/DataTable';
 import DatasetPreviewModal from './modals/DatasetPreviewModal';
+import { MdSearch } from 'react-icons/md';
 
 
 interface DatasetSelectorProps {
@@ -70,11 +71,11 @@ const DatasetSelector = ({
     }, [router.events]);
 
     const mappedActions = actions?.map(a => {
-        return { name: a.name, callback: (row: { id: number | undefined }) => a.callback(row.id) }
+        return { name: a.name, callback: (row: { id: number | undefined }) => a.callback(row.id)}
     })
 
     if(preview){
-        mappedActions?.push({name: "Preview", callback: (row) => previewDataset(row.id)})
+        mappedActions?.push()
     }
 
     const previewDataset = async (id: number | undefined) => {     
@@ -86,24 +87,28 @@ const DatasetSelector = ({
 
     return (
         <>
+            {/* Dataset list */}
             {datasetsList.length > 0 ? (
                 <DataTable
                     data={datasetsList.map(dataset => ({ ...dataset, id: dataset.id ?? 0 }))}
                     columns={[
                         { name: "id", header: "Dataset ID" },
                         { name: "datasetName", header: "Dataset Name" },
-                        // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" },
+                        // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" }, // NOT IMPLEMENTED: query dataset quasi-identifiers
                         { name: "createdAt", header: "Created At" },
                     ]}
                     onRowClick={(row) => handleRowClick(row.id)}
+                    iconActions={preview ? [{icon: <MdSearch/>, tooltip: "Preview", callback: (row:any) => previewDataset(row.id)}] : undefined}
                     actions={mappedActions}
                 />
             ) : (
                 <div className="text-center text-gray-500 mt-20">No datasets yet</div>
             )}
 
-           
-            <DatasetPreviewModal show={isPreviewModalOpen} datasetId={datasetToPreview!} onClose={()=>setIsPreviewModalOpen(false)}/>
+            {/* Preview modal */}
+            {preview && (
+                <DatasetPreviewModal show={isPreviewModalOpen} datasetId={datasetToPreview!} onClose={()=>setIsPreviewModalOpen(false)}/>
+            )}
         </>
     );
 }
