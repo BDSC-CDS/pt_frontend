@@ -4,6 +4,7 @@ import { TemplatebackendMetadata } from "~/internal/client";
 import { getDatasetContent, getInfo, getMetadata } from "~/utils/dataset";
 import DataTable from "../DataTable";
 import Spinner from "../ui/Spinner";
+import { useRouter } from "next/router";
 
 interface DatasetPreviewModalProps {
     show: boolean
@@ -25,6 +26,8 @@ interface DatasetInfo {
 const PREVIEW_NB_ROWS = 5
 
 export default function DatasetPreviewModal({show, datasetId, onClose}: DatasetPreviewModalProps) {
+    const router = useRouter()
+
     const [isLoading, setIsLoading] = useState(true)
     const [datasetInfo, setDatasetInfo] = useState<DatasetInfo>()
 
@@ -100,7 +103,7 @@ export default function DatasetPreviewModal({show, datasetId, onClose}: DatasetP
     const getDataFromColumns = (columns:(string[] | undefined)[], metadata: (string | undefined)[]) => {
         const rows: Record<string, any>[] = Array.from({length: columns[0]!.length}, (_, rowIndex) => {
             const row: Record<string, any> = {}
-            metadata.forEach((meta, colIndex) => {
+            metadata.forEach((_, colIndex) => {
                 row[`column${colIndex}`] = columns[colIndex]?.[rowIndex]
             })
             return row
@@ -154,7 +157,8 @@ export default function DatasetPreviewModal({show, datasetId, onClose}: DatasetP
                         </div> 
                     )}                   
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="flex justify-center gap-3">
+                    <Button onClick={() => router.push(`/dataset/${datasetId}`)}>Go to Dataset</Button>
                     <Button onClick={handleCloseModal}>Close</Button>
                 </Modal.Footer>
             </Modal>
