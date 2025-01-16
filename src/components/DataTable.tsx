@@ -130,7 +130,7 @@ const DataTable = <T extends {}>({
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
                                         <div className="group w-0">
                                             <MdMoreHoriz size={20}/>
-                                            <ListGroup className="fixed z-50 hidden group-hover:block -translate-x-1/2 ml-2 -mt-1">
+                                            <ListGroup className="fixed z-50 hidden shadow group-hover:block -translate-x-1/2 ml-2 -mt-1">
                                                 {actions.map((action, actionIndex) => (
                                                     <ListGroup.Item
                                                         key={"action" + actionIndex}
