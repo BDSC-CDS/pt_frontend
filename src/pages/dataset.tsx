@@ -389,6 +389,7 @@ export default function Dataset() {
                             { name: "Assess risk", callback: (id) => handleAssessRisk(id) },
                             { name: "Delete", callback: (id) => handleDelete(id) },
                         ]}
+                        preview
                     />
                 </div>
             )}

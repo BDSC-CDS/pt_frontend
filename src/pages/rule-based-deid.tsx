@@ -42,6 +42,7 @@ export default function RuleBasedDeid() {
                         actions={[
                             { name: "De-identify", callback: (id) => handle(id) },
                         ]}
+                        preview
                     />
                 </div>
             )}
