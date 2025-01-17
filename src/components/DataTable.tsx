@@ -1,5 +1,5 @@
 import { CustomFlowbiteTheme, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
-import { ReactElement, ReactNode, cloneElement} from "react";
+import { ElementType, ReactNode, cloneElement} from "react";
 import { MdMoreHoriz } from "react-icons/md";
 
 // Custom theme for Flowbite components
@@ -56,7 +56,7 @@ interface DataTableProps<T> {
     }[];
     onRowClick?: (row: T) => void;
     iconActions?: {
-        icon: ReactElement;
+        Icon: ElementType;
         tooltip: string;
         callback: (row: T) => void;
     }[];
@@ -130,7 +130,7 @@ const DataTable = <T extends {}>({
                                                 <div>
                                                     {iconActions.map((iconAction, actionIndex) => (
                                                         <div className="group p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
-                                                            {cloneElement(iconAction.icon, {className: "text-lg"} )}
+                                                            <iconAction.Icon className="text-lg"/>
                                                             <span className="fixed hidden group-hover:block bg-white border shadow px-2 py-1 text-sm rounded-lg -translate-x-1/2 ml-2 -translate-y-full -mt-6">
                                                                 {iconAction.tooltip}
                                                             </span>
