@@ -1,7 +1,8 @@
 import { CustomFlowbiteTheme, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
-import { ReactNode } from "react";
+import { ElementType, ReactNode} from "react";
 import { MdMoreHoriz } from "react-icons/md";
 
+// Custom theme for Flowbite components
 const customTheme: CustomFlowbiteTheme = {
     "table": {
         "root": {
@@ -45,14 +46,20 @@ const customTheme: CustomFlowbiteTheme = {
     }
 }
 
+// Interface definition for props
 interface DataTableProps<T> {
     data: T[],
     columns: {
         name: string;
         header: string;
         tooltip?: ReactNode;
-    }[],
+    }[];
     onRowClick?: (row: T) => void;
+    iconActions?: {
+        Icon: ElementType;
+        tooltip: string;
+        callback: (row: T) => void;
+    }[];
     actions?: {
         name: string;
         callback: (row: T) => void;
@@ -68,14 +75,16 @@ const renderCell = (value: any): React.ReactNode => {
 };
 
 
+/**
+ * DataTable component 
+ */
 const DataTable = <T extends {}>({ 
     data,
     columns,
     onRowClick,
+    iconActions,
     actions,
 }: DataTableProps<T>): JSX.Element => {
-    console.log(data)
-    console.log(columns)
     return (
         <Flowbite theme={{theme: customTheme}}>
             <div className="w-full border overflow-x-auto border-gray-200 rounded-lg">
@@ -112,37 +121,56 @@ const DataTable = <T extends {}>({
                                         {renderCell(row[col.name as keyof T])}
                                     </Table.Cell>
                                 ))}
-                                
-                                {/* Render actions tooltip */}
-                                {actions && actions.length === 1 && (
+
+                                {(actions || iconActions) && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="button-container flex justify-end pr-8">
-                                            <button
-                                                className="px-4 py-2 text-sm text-white bg-[#306278] hover:bg-[#255362] rounded-md focus:outline-none "
-                                                onClick={() => actions[0]?.callback(row)}
-                                            >
-                                                {actions[0]?.name}
-                                            </button>
-                                        </div>
-                                    </Table.Cell>
-                                )}
-                                { actions && actions.length>2 && (
-                                    <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
-                                        <div className="group">
-                                            <MdMoreHoriz size={20}/>
-                                            <ListGroup className="fixed z-50 hidden group-hover:block -translate-x-1/2 ml-2">
-                                                {actions.map((action, actionIndex) => (
-                                                    <ListGroup.Item
-                                                        key={"action" + actionIndex}
-                                                        onClick={() => action.callback(row)}
+                                        <div className="flex items-center gap-3 justify-center">
+                                            {/* Render icon actions */}
+                                            {iconActions && (
+                                                <div>
+                                                    {iconActions.map((iconAction, actionIndex) => (
+                                                        <div className="group p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
+                                                            <iconAction.Icon className="text-lg"/>
+                                                            <div className="fixed hidden group-hover:block bg-white border shadow px-2 py-1 text-sm rounded-lg -translate-x-1/2 ml-2 -translate-y-full -mt-6">
+                                                                {iconAction.tooltip}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                </div>
+                                            )}
+                                            
+                                            {/* Render single action */}
+                                            {actions && actions.length === 1 && (
+                                                <div className="button-container flex justify-end pr-8">
+                                                    <button
+                                                        className="px-4 py-2 text-sm border hover:bg-gray-200 rounded-md focus:outline-none "
+                                                        onClick={() => actions[0]?.callback(row)}
                                                     >
-                                                        {action.name}
-                                                    </ListGroup.Item>
-                                                ))}
-                                            </ListGroup>
+                                                        {actions[0]?.name}
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* Render actions list */}
+                                            {actions && actions.length>=2 && (
+                                                <div className="group w-0">
+                                                    <MdMoreHoriz size={20}/>
+                                                    <ListGroup className="fixed z-50 hidden shadow group-hover:block -translate-x-1/2 ml-2 -mt-1">
+                                                        {actions.map((action, actionIndex) => (
+                                                            <ListGroup.Item
+                                                                key={"action" + actionIndex}
+                                                                onClick={() => action.callback(row)}
+                                                            >
+                                                                {action.name}
+                                                            </ListGroup.Item>
+                                                        ))}
+                                                    </ListGroup>
+                                                </div>
+                                            )}
                                         </div>
                                     </Table.Cell>
-                                )}
+                                )}                            
                             </Table.Row>
                         ))}
                     </Table.Body>

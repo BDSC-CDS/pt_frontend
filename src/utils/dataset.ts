@@ -86,7 +86,7 @@ export const getDeidentificationNotebookURL = async (id: number) => {
         const response = await apiClientDataset.datasetServiceGetDatasetJupyterhub(request, getAuthInitOverrides());
         return response?.result?.url;
     } catch (error) {
-        console.log("Error getting metadata: " + error);
+        console.log("Error getting Dataset JupyterHub: " + error);
     }
 };
 

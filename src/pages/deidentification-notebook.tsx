@@ -41,6 +41,7 @@ export default function DeidentificationNotebook() {
                         actions={[
                             { name: "De-identify", callback: (id) => handle(id) },
                         ]}
+                        preview
                     />
                 </div>
             )}
