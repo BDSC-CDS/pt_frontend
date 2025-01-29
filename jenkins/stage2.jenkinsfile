@@ -84,13 +84,8 @@ pipeline {
                   HELM_CHART_NAME="pt-frontend-chart"
                   HELM_CHART_VERSION="$VERSION_SEMVER"
 
-                  cp configs/default/values.yaml helm/pt-backend-chart/values.yaml
-                  cp configs/default/main.yaml helm/pt-backend-chart/main.yaml
-
-                  helm dependency update helm/pt-backend-chart/
-
                   # Package the Helm chart
-                  helm package helm/pt-backend-chart \
+                  helm package helm/pt-frontend \
                     --destination . \
                     --version "$HELM_CHART_VERSION" \
                     --app-version "$VERSION_SEMVER"
