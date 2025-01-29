@@ -9,38 +9,105 @@ pipeline {
     }
   }
   environment{
-        E_MAIL_INFORM = 'paloma.cito@chuv.ch'
-        COMPOSE_PROJECT_NAME = 'my-app'
-        componentName = 'pt-frontend'
+    COMPOSE_PROJECT_NAME = 'my-app'
+    componentName = 'pt-frontend'
   }
   stages {
     stage('Test') {
       steps {
-        // container(name: 'pt-ubuntu', shell: '/bin/bash') {
-        //   dir('pt-dev-ops') {
-            checkout scm
-            sh '''
-              pnpm install --frozen-lockfile
-              ls -lah
-              ls -lah public
-              pnpm test
-            '''
-        //   }
-        // }
+        checkout scm
+        sh '''
+          pnpm install --frozen-lockfile
+          ls -lah
+          ls -lah public
+          pnpm test
+        '''
       }
     }
     stage('Build') {
+      when {
+        not{
+          branch 'release/v*'
+        }
+      }
       steps {
-        // container(name: 'pt-ubuntu', shell: '/bin/bash') {
-        //   dir('pt-dev-ops') {
-            checkout scm
-            sh '''
-              cd docker
-              chmod +x build-stage2.sh
-              ./build-stage2.sh
-            '''
-        //   }
-        // }
+        checkout scm
+        sh '''
+          cd docker
+          chmod +x build-stage2.sh
+
+          export export IMAGE_TAG=latest
+
+          ./build-stage2.sh
+        '''
+      }
+    }
+    stage('Build release') {
+      when {
+        branch 'release/v*'
+      }
+      steps {
+        checkout scm
+        sh '''
+          cd docker
+          chmod +x build-stage2.sh
+
+          stripped=${BRANCH_NAME#release/v}
+          MAJOR=$(echo $stripped | cut -d'.' -f1)
+          MINOR=$(echo $stripped | cut -d'.' -f2)
+          export IMAGE_TAG=v$MAJOR.$MINOR.$BUILD_ID
+
+          ./build-stage2.sh
+        '''
+      }
+    }
+
+    stage("Release") {
+      when {
+        branch 'release/v*'
+      }
+      stages {
+        stage('Package') {
+          steps {
+            container(name: 'pt-ubuntu', shell: '/bin/bash') {
+              dir('pt-dev-ops') {
+                checkout scm
+                sh '''
+                  stripped=${BRANCH_NAME#release/v}
+                  MAJOR=$(echo $stripped | cut -d'.' -f1)
+                  MINOR=$(echo $stripped | cut -d'.' -f2)
+                  VERSION_SEMVER=v$MAJOR.$MINOR.$BUILD_ID
+
+                  HELM_REPO_NAME="charts"
+                  HELM_REPO_URL="registry.rdeid.unil.ch"
+                  HELM_REPO_GITHUB_URL="ghcr.io/bdsc-cds"
+                  HELM_CHART_NAME="pt-frontend-chart"
+                  HELM_CHART_VERSION="$VERSION_SEMVER"
+
+                  cp configs/default/values.yaml helm/pt-backend-chart/values.yaml
+                  cp configs/default/main.yaml helm/pt-backend-chart/main.yaml
+
+                  helm dependency update helm/pt-backend-chart/
+
+                  # Package the Helm chart
+                  helm package helm/pt-backend-chart \
+                    --destination . \
+                    --version "$HELM_CHART_VERSION" \
+                    --app-version "$VERSION_SEMVER"
+
+                  # Login to Helm registry (replace with actual credentials or use a secure method)
+                  # helm registry login "$HELM_REPO_URL" --username "your-username" --password "your-password"
+
+                  export HELM_REGISTRY_CONFIG=/pt/pt-deployer/.docker/config.json
+
+                  # Push the Helm chart to the registry
+                  helm push "$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" "oci://$HELM_REPO_URL/$HELM_REPO_NAME"
+                  helm push "$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" "oci://$HELM_REPO_GITHUB_URL/$HELM_REPO_NAME"
+                '''
+              }
+            }
+          }
+        }
       }
     }
 
@@ -51,20 +118,16 @@ pipeline {
       stages {
         stage('Deploy') {
           steps {
-            // container(name: 'pt-ubuntu', shell: '/bin/bash') {
-            //   dir('pt-dev-ops') {
-                checkout scm
-                sh """
-                  export env=int
-                  export IMAGE_TAG=latest
-                  export RELEASE_NAME="${componentName}-int-master"
-                  cd deploy
-                  ./deploy.sh
-                """
-              }
-            }
-        //   }
-        // }
+            checkout scm
+            sh """
+              export env=int
+              export IMAGE_TAG=latest
+              export RELEASE_NAME="${componentName}-int-master"
+              cd deploy
+              ./deploy.sh
+            """
+          }
+        }
       }
     }
   }
