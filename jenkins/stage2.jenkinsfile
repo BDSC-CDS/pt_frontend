@@ -81,7 +81,7 @@ pipeline {
                   HELM_REPO_NAME="charts"
                   HELM_REPO_URL="registry.rdeid.unil.ch"
                   HELM_REPO_GITHUB_URL="ghcr.io/bdsc-cds"
-                  HELM_CHART_NAME="pt-frontend-chart"
+                  HELM_CHART_NAME="pt-frontend"
                   HELM_CHART_VERSION="$VERSION_SEMVER"
 
                   # Package the Helm chart
