@@ -1,13 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "pt-frontend.fullname" . }}
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-deployment
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "pt-frontend.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "pt-frontend.selectorLabels" . | nindent 6 }}
@@ -23,13 +22,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "pt-frontend.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
