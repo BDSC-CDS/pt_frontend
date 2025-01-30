@@ -30,6 +30,9 @@ spec:
         - name: {{ .Chart.Name }}-deployment
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: API_URL
+            - value: {{ .Values.env.apiUrl }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
