@@ -33,6 +33,10 @@ ingress:
     kubernetes.io/ingress.class: "public"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
+# Backend api url.   
+env:
+  apiUrl: ""
+
 # Deployment specific options
 podAnnotations: {}
 podLabels: {}
