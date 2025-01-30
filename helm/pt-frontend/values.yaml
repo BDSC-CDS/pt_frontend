@@ -30,7 +30,6 @@ ingress:
   tls: false # Secret name should match: {{ .Chart.Name }}-tls
   className: public
   annotations:
-    kubernetes.io/ingress.class: "public"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
 # Backend api url.   
