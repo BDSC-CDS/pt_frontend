@@ -5,6 +5,8 @@
 nameOverride: "pt-frontend"
 
 image: registry.rdeid.unil.ch/pt-frontend:latest
+apiUrl: "https://pt-backend.rdeid.unil.ch"
+
 
 version: master
 
