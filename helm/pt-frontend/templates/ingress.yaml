@@ -19,7 +19,6 @@ spec:
     - hosts:
         - {{ .Values.ingress.host | quote }}
       secretName: {{ .Chart.Name }}-tls
-    {{- end }}
   {{- end }}
   rules:
     - host: {{ .Values.ingress.host | quote}}
