@@ -24,5 +24,8 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 80
+          env:
+            - name: API_URL
+              value: {{ .Values.apiUrl }}
       imagePullSecrets:
         - name: registry-auth
