@@ -2,5 +2,7 @@ ingress:
   enabled: true
   host: "pt-frontend.rdeid.unil.ch"
 
+apiUrl: "https://pt-backend.rdeid.unil.ch"
+
 service:
   port: 16080
