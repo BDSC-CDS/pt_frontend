@@ -1,9 +1,5 @@
-import { Button, Modal, TextInput, ToggleSwitch } from "flowbite-react";
-import { ReactNode, useEffect, useState } from "react";
-import { TemplatebackendMetadata } from "~/internal/client";
-import { getDatasetContent, getInfo, getMetadata } from "~/utils/dataset";
-import DataTable from "../DataTable";
-import Spinner from "../ui/Spinner";
+import { Button, Modal, TextInput } from "flowbite-react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { createQuestionnaire } from "~/utils/questionnaire";
 
@@ -15,10 +11,6 @@ interface NewQuestionnaireModalProps {
 interface QuestionnaireInfo {
     name: string
 }
-
-
-// Adjust the number of rows to preview here
-const PREVIEW_NB_ROWS = 5
 
 export default function NewQuestionnaireModal({show, onClose}: NewQuestionnaireModalProps) {
     const router = useRouter()

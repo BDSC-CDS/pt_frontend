@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { MdOutlineAdd } from "react-icons/md";
 import DataTable from '~/components/DataTable';
-import NewQuestionnaireModal from '~/components/modals/NewQuestionnaireModal';
+import NewQuestionnaireModal from '~/components/modals/admin/NewQuestionnaireModal';
 
 export default function Questionnaire() {
     // Routing
