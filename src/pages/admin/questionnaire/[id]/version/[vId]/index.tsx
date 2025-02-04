@@ -23,13 +23,13 @@ type Tab = {
 
 type Tabs = Tab[];
 
-export default function Questionnaire() {
+export default function QuestionnaireVersion() {
 
     // Routing
     const router = useRouter();
     const { id, vId } = router.query;
     const questionnaireId = Number(id);
-    const versionId = Number(vId);
+    const versionId = vId;
 
     // Questionnaire States
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
@@ -90,7 +90,7 @@ export default function Questionnaire() {
     }
 
     useEffect(() => {
-        if (!questionnaireId) {
+        if (!questionnaireId ) {
             return
         }
         try {
@@ -120,7 +120,7 @@ export default function Questionnaire() {
             if (id) {
                 setOpenSaveAlert(true);
             } else {
-                alert("Error creating the version.")
+                alert("Error creating the questionnaire version.")
             }
         } catch (error) {
             alert("Error creating the questionnaire version: " + error)
