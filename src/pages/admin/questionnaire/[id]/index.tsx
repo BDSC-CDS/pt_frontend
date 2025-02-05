@@ -13,7 +13,6 @@ export default function Questionnaire() {
     const router = useRouter();
     const { id } = router.query;
     const questionnaireId = Number(id);
-    console.log("qid", questionnaireId);
 
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
 
