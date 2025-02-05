@@ -11,7 +11,6 @@ import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
-import { transformValue } from 'node_modules/superjson/dist/transformer';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -362,7 +361,7 @@ export default function QuestionnaireVersion() {
 
 
             {/* SAVE NEW VERSION MODAL */}
-            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} onClose={() => setOpenSaveModal(false)}/>
+            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onClose={() => setOpenSaveModal(false)}/>
 
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>

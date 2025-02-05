@@ -1,16 +1,18 @@
 import { Button, Modal, TextInput, ToggleSwitch } from "flowbite-react";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { createQuestionnaire, createQuestionnaireVersion } from "~/utils/questionnaire";
+import { createQuestionnaireVersion } from "~/utils/questionnaire";
+import { TemplatebackendQuestionnaireVersion } from "~/internal/client";
 
 interface NewQuestionnaireVersionModalProps {
     show: boolean
     questionnaireId: number
+    questionnaireVersion: TemplatebackendQuestionnaireVersion
     onClose: () => void
 }
 
 
-export default function NewQuestionnaireVersionModal({show, questionnaireId, onClose}: NewQuestionnaireVersionModalProps) {
+export default function NewQuestionnaireVersionModal({show, questionnaireId, questionnaireVersion: version, onClose}: NewQuestionnaireVersionModalProps) {
     const router = useRouter()
 
     const [versionName, setVersionName] = useState("")
@@ -25,10 +27,10 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, onC
         if( versionName != ""){
             try {
                 const id = await createQuestionnaireVersion(questionnaireId, {
+                    ...version,
                     version: versionName,
                     published: isVersionPublished
                 })
-                console.log(id)
                 if(id) {
                     router.push("/admin/questionnaire/" + questionnaireId)
                 } else {
