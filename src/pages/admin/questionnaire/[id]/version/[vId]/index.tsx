@@ -10,6 +10,7 @@ import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
+import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -297,7 +298,7 @@ export default function QuestionnaireVersion() {
                     <ul className="flex flex-row">
                         {tabs.map((tab, n) => (
                             <li
-                                key={tab.tabName}
+                                key={`tab${n}`}
                                 className={`flex-grow text-center hover:bg-gray-500  hover:bg-opacity-20 py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-b-2 border-gray-400 bg-gray-100'}`}
                                 onClick={() => setActiveTab(n)}
                             >
@@ -367,37 +368,7 @@ export default function QuestionnaireVersion() {
 
 
             {/* SAVE MODAL */}
-            <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
-                <Modal.Header />
-                <Modal.Body>
-                    <div className="text-center">
-                        <div className="flex flex-col mb-8">
-                            <TextInput
-                                placeholder="Version"
-                                required
-                                // value={"12"}
-                                onChange={(event) => { setSaveName(event.target.value) }}
-                            />
-                        </div>
-
-                        <hr />
-                        <div className="flex flex-col mb-8">
-                            <ToggleSwitch checked={savePublish} label="Publish version" onChange={setSavePublish} />
-                        </div>
-
-                        <hr />
-
-                        <div className="flex justify-center gap-4">
-                            <Button color="success" onClick={() => save()}>
-                                Save
-                            </Button>
-                            <Button color="gray" onClick={() => setOpenSaveModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
+            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} onClose={() => setOpenSaveModal(false)}/>
 
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
