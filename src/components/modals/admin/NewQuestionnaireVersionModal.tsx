@@ -30,7 +30,7 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, onC
                 })
                 console.log(id)
                 if(id) {
-                    router.push("/admin/questionnaire/" + id)
+                    router.push("/admin/questionnaire/" + questionnaireId)
                 } else {
                     alert("Error creating the questionnaire.")
                 }
