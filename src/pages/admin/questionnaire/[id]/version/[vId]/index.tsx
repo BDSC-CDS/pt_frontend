@@ -4,13 +4,14 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Alert, Tooltip } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
-import { getQuestionnaire, createQuestionnaireVersion } from "../../../../../../utils/questionnaire"
+import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
+import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -32,12 +33,17 @@ export default function QuestionnaireVersion() {
     const questionnaireId = Number(id);
     const versionId = vId;
 
+    // Enable unsaved changes warning
+    const [isDirty, setIsDirty] = useState(false);
+    useUnsavedChangesWarning(isDirty)
+
     // Questionnaire States
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
     const [version, setVersion] = useState<Version>({});
     const [tabs, setTabs] = useState<Tabs>([]);
     const [activeTab, setActiveTab] = useState<number>(0);
 
+    // Load questionnaire and all its versions
     const loadQuestionnaire = async () => {
         const result = await getQuestionnaire(questionnaireId);
 
@@ -54,6 +60,7 @@ export default function QuestionnaireVersion() {
         processQuestionnaireVersion(v);
     }
 
+    // Process 
     const processQuestionnaireVersion = (v: Version) => {
         if (!v.tabs) {
             const tabMap: any = {};
@@ -65,8 +72,6 @@ export default function QuestionnaireVersion() {
         }
 
         setVersion(v);
-
-        console.log(v.questions)
 
         const ts: Tabs = [];
         for (let tabName of v.tabs) {
@@ -93,19 +98,17 @@ export default function QuestionnaireVersion() {
     }
 
     useEffect(() => {
-        if (!questionnaireId ) {
+        if (!questionnaireId) {
             return
-        }
-        try {
+        } try {
             loadQuestionnaire();
         } catch (error) {
             alert("Error listing the datasets")
         }
-    }, [id]);
+    }, [questionnaireId]);
 
-    // Everything to save
+    // Save questionnaire version modal
     const [openSaveModal, setOpenSaveModal] = useState(false);
-    const [openSaveAlert, setOpenSaveAlert] = useState(false);
 
     // Everything to remove a tab and it's questions
     const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
@@ -120,6 +123,7 @@ export default function QuestionnaireVersion() {
         version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
         version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     // Everything to add a tab
@@ -138,6 +142,7 @@ export default function QuestionnaireVersion() {
         
         // version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     // Everything to remove a question
@@ -153,6 +158,7 @@ export default function QuestionnaireVersion() {
         version.questions = version.questions?.filter(q => q.id !== questionToRemove?.id);
 
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     // Everything to create a new question
@@ -200,6 +206,7 @@ export default function QuestionnaireVersion() {
         }
 
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     const [addAnswerText, setAddAnswerText] = useState("");
@@ -246,9 +253,6 @@ export default function QuestionnaireVersion() {
                 <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
 
-            <Alert className={(openSaveAlert ? "" : "hidden") + " mt-5"} color="success" onDismiss={() => setOpenSaveAlert(false)}>
-                <span className="font-bold">Version </span>successfuly saved!
-            </Alert>
             <div className="flex flex-row items-end p-5">
                 <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
@@ -361,7 +365,7 @@ export default function QuestionnaireVersion() {
 
 
             {/* SAVE NEW VERSION MODAL */}
-            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onClose={() => setOpenSaveModal(false)}/>
+            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onSave={() => setIsDirty(false)} onClose={() => setOpenSaveModal(false)}/>
 
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>

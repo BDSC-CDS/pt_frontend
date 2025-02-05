@@ -8,26 +8,23 @@ interface NewQuestionnaireVersionModalProps {
     show: boolean
     questionnaireId: number
     questionnaireVersion: TemplatebackendQuestionnaireVersion
+    onSave: () => void
     onClose: () => void
 }
 
 
-export default function NewQuestionnaireVersionModal({show, questionnaireId, questionnaireVersion: version, onClose}: NewQuestionnaireVersionModalProps) {
+export default function NewQuestionnaireVersionModal({show, questionnaireId, questionnaireVersion, onSave, onClose}: NewQuestionnaireVersionModalProps) {
     const router = useRouter()
 
     const [versionName, setVersionName] = useState("")
     const [isVersionPublished, setIsVersionPublished] = useState(false)
 
-    // Handlers
-    const handleCloseModal = () => {
-        onClose()
-    }
-
     const save = async () => {
+        onSave()
         if( versionName != ""){
             try {
                 const id = await createQuestionnaireVersion(questionnaireId, {
-                    ...version,
+                    ...questionnaireVersion,
                     version: versionName,
                     published: isVersionPublished
                 })
@@ -42,12 +39,11 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
         } else {
             alert("The questionnaire name cannot be empty.")
         }
-        
     }
 
     return (
         <>
-            <Modal show={show} onClose={handleCloseModal} size="xl">
+            <Modal show={show} onClose={onClose} size="xl">
                 <Modal.Header>
                     <p>Create New Questionnaire Version</p>
                 </Modal.Header>
@@ -67,10 +63,10 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
-                    <Button color="success" onClick={() => save()}>
+                    <Button color="success" onClick={save} disabled={!versionName.trim()}>
                         Save
                     </Button>
-                    <Button color="gray" onClick={handleCloseModal}>
+                    <Button color="gray" onClick={onClose}>
                         Cancel
                     </Button>
                 </Modal.Footer>
