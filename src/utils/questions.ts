@@ -21,6 +21,7 @@ export interface Question {
   questionDescription: string;
   tooltip: string;
   riskWeight: number;
+  highRiskAnswerSelected: boolean;
   answers: Answer[];
 }
 
@@ -44,6 +45,7 @@ export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questi
       questionDescription: question.question || "",
       tooltip: question.tooltip || "",
       riskWeight: question.riskWeight || 0,
+      highRiskAnswerSelected: false,
       answers: question.answers?.map(answer => ({
         answerId: answer.id?.toString() || "",
         answerDescription: answer.text || "",
