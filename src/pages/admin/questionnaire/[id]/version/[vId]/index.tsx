@@ -25,6 +25,9 @@ type Tab = {
 
 type Tabs = Tab[];
 
+/**
+ * Admin questionnaire version page.
+ */
 export default function QuestionnaireVersion() {
 
     // Routing
@@ -41,12 +44,45 @@ export default function QuestionnaireVersion() {
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
     const [version, setVersion] = useState<Version>({});
     const [tabs, setTabs] = useState<Tabs>([]);
-    const [activeTab, setActiveTab] = useState<number>(0);
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+    const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null)
+
+    // Tabs drag and drop handlers
+    const handleDragStart = (index: number) => {
+        setDraggedTabIndex(index)
+    };
+
+    const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+        event.preventDefault()
+    };
+
+    const handleDrop = (index: number) => {
+        if (draggedTabIndex === null || draggedTabIndex === index){
+            return
+        }
+
+        const updatedTabs = [...tabs]
+        const movedTab = updatedTabs.splice(draggedTabIndex, 1)[0]
+        if(!movedTab){
+            return
+        }
+
+        // Insert at new position
+        updatedTabs.splice(index, 0, movedTab)
+
+        // Set the tabs and version
+        setTabs(updatedTabs);
+        version.tabs = updatedTabs.map(tab => tab.tabName)
+        version.questions = updatedTabs.flatMap(tab => tab.questions)
+        processQuestionnaireVersion(version)
+        setActiveTabIndex(index)
+        setDraggedTabIndex(null)
+        setIsDirty(true)
+    };
 
     // Load questionnaire and all its versions
     const loadQuestionnaire = async () => {
         const result = await getQuestionnaire(questionnaireId);
-
         if (!result) {
             return
         }
@@ -135,7 +171,7 @@ export default function QuestionnaireVersion() {
     const createTab = () => {
         if (version.tabs) {
             version.tabs.push(createTabName);
-            setActiveTab(version.tabs?.length-1)
+            setActiveTabIndex(version.tabs?.length-1)
         }
 
         setOpenCreateTabModal(false)
@@ -163,7 +199,7 @@ export default function QuestionnaireVersion() {
 
     // Everything to create a new question
     const createNewQuestion = () => {
-        editQuestion({tab: tabs[activeTab]?.tabName})
+        editQuestion({tab: tabs[activeTabIndex]?.tabName})
     }
 
     // Everything to edit a question
@@ -289,8 +325,14 @@ export default function QuestionnaireVersion() {
                         {tabs.map((tab, n) => (
                             <li
                                 key={`tab${n}`}
-                                className={`flex-grow text-center hover:bg-gray-100 py-2 px-0 cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-t-2 border-gray-400 bg-gray-50'}`}
-                                onClick={() => setActiveTab(n)}
+                                draggable={true}
+                                onDragStart={() => handleDragStart(n)}
+                                onDragOver={handleDragOver}
+                                onDrop={() => handleDrop(n)}
+                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-pointer text-md text-gray-600 
+                                    ${activeTabIndex === n && 'border-t-2 border-gray-400 bg-gray-50'}
+                                `}
+                                onClick={() => setActiveTabIndex(n)}
                             >
                                 <div className="flex items-center px-2 justify-between">
                                     <div className="flex items-center">
@@ -327,7 +369,7 @@ export default function QuestionnaireVersion() {
                             </Table.HeadCell>
                         </Table.Head>
                         <Table.Body className="divide-y">
-                            {((tabs[activeTab] || {}).questions || []).map((question) => (
+                            {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
                                 <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                     <Table.Cell>{question.question}</Table.Cell>
                                     <Table.Cell>{question.riskWeight}</Table.Cell>
