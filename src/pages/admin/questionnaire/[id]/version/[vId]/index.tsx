@@ -329,7 +329,7 @@ export default function QuestionnaireVersion() {
                                 onDragStart={() => handleDragStart(n)}
                                 onDragOver={handleDragOver}
                                 onDrop={() => handleDrop(n)}
-                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-pointer text-md text-gray-600 
+                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-grab text-md text-gray-600 
                                     ${activeTabIndex === n && 'border-t-2 border-gray-400 bg-gray-50'}
                                 `}
                                 onClick={() => setActiveTabIndex(n)}
@@ -342,7 +342,7 @@ export default function QuestionnaireVersion() {
                                         <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
                                     </div>
                                     
-                                    <span className="p-2 hover:bg-gray-200 rounded-lg" onClick={() => removeTabConfirmation(n)}>
+                                    <span className="p-2 hover:cursor-pointer hover:bg-gray-200 rounded-lg" onClick={() => removeTabConfirmation(n)}>
                                         <HiTrash />
                                     </span>
                                 </div>
