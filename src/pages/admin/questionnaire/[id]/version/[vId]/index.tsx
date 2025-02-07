@@ -169,11 +169,12 @@ export default function QuestionnaireVersion() {
         setCreateTabName(name);
     };
     const createTab = () => {
-        if (version.tabs) {
-            version.tabs.push(createTabName);
-            setActiveTabIndex(version.tabs?.length-1)
+        if (!version.tabs) {
+            version.tabs = []
         }
 
+        version.tabs.push(createTabName);
+        setActiveTabIndex(version.tabs?.length-1)
         setOpenCreateTabModal(false)
         
         // version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
