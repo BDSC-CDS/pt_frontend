@@ -3,7 +3,7 @@ import { Question, Questions } from '../utils/questions';
 import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../internal/client/index';
 import { createReply } from "../utils/questionnaire"
 import dynamic from "next/dynamic";
-import { MdSave } from "react-icons/md";
+import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
 import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
 
@@ -87,17 +87,18 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             a.selected = false;
             if (a.answerId == answerId) {
                 a.selected = true;
+                question.highRiskAnswerSelected = a.highRisk;
             }
         });
 
         computeCurrentRisk();
         computeCurrentReport();
-        setTotalHighRiskAnswers(computeHighRiskCount());
+        computeHighRiskCount()
     }
-
+    
     const computeHighRiskCount = () => {
         let totalHighRiskAnswers = 0;
-
+        
         Object.keys(questions).forEach((tab) => {
             questions[tab]?.forEach((question) => {
                 // Count answers with highRisk = false
@@ -107,8 +108,14 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                 }
             });
         });
+        
+        setTotalHighRiskAnswers(totalHighRiskAnswers);
 
-        return totalHighRiskAnswers;
+        // uncomment to make score goes to 100% in case of any high risk answers selected
+        // if (totalHighRiskAnswers > 0) {
+        //     setCurrentRiskPc(1);
+        //     setCurrentDisplayRiskPc(1);
+        // } 
     };
 
     const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
@@ -159,7 +166,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                         </form>
 
                         {/* Warning Message for High-Risk Answer */}
-                        {question.answers.some((answer) => answer.selected && answer.highRisk) && (
+                        {question.highRiskAnswerSelected && (
                             <div className="mt-2 text-red-500 text-sm font-medium flex items-center">
                                 <svg
                                     className="inline w-5 h-5 text-red-500 mr-2"
@@ -212,6 +219,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
     const [currentRisk, setCurrentRisk] = useState(0);
     const [currentRiskPc, setCurrentRiskPc] = useState(0);
+    const [currentDisplayRiskPc, setCurrentDisplayRiskPc] = useState(0);
     const [maxRisk, minRisk] = getRiskBounds();
 
     const computeCurrentRisk = () => {
@@ -224,18 +232,39 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
         let cRisk = 0;
         allQuestions?.forEach(q => {
+            const riskLevels = q.answers.map(a => a.riskLevel);
+            const maxRiskLevel = Math.max(...riskLevels) * q.riskWeight;
+            let selectedRisk;
+            
             q.answers.forEach(a => {
                 if (a.selected) {
                     cRisk += a.riskLevel * q.riskWeight;
+                    selectedRisk = a.riskLevel * q.riskWeight;
                 }
             });
+            console.log("max", maxRiskLevel, selectedRisk);
         });
 
-        const riskRange = (maxRisk || 1) - (minRisk || 0);
-        const cRiskPc = ((cRisk - (minRisk || 0)) / riskRange);
+        console.log("cRisk bef", cRisk);
+        cRisk = Math.max(cRisk, 0);
+
+        // const riskRange = (maxRisk || 1) - (minRisk || 0);
+        // const cRiskPc = ((cRisk - (minRisk || 0)) / riskRange);
+        const riskRange = maxRisk || 1;
+        const cRiskPc = cRisk / riskRange;
+
+        // we set the maxium to 80%, as only high risk answers make the user go in the red.
+        // const displayCRiskPc = cRiskPc * 0.8;
+        const displayCRiskPc = cRiskPc;
+
+        console.log("cRisk", cRisk);
+        console.log("maxRisk", maxRisk);
+        console.log("cRiskPc",cRiskPc);
+        console.log("displayCRiskPc",displayCRiskPc);
 
         setCurrentRisk(cRisk);
         setCurrentRiskPc(cRiskPc);
+        setCurrentDisplayRiskPc(displayCRiskPc);
     }
 
     useEffect(() => {
@@ -639,10 +668,10 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                                 <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
                             </div>
                             <div className="px-3 py-2">
-                                Current risk {currentRisk}<br />
-                                Current risk (%) {(currentRiskPc * 100).toFixed(2) + "%"}<br />
-                                Max. possible risk {maxRisk}<br />
-                                Min. possible risk {minRisk}<br />
+                                Current risk: {currentRisk} <p className='text-xs text-gray-400 inline-block'>({(currentRiskPc * 100).toFixed(2) + "%"})</p><br />
+                                Max. possible risk: {maxRisk}<br />
+                                Min. possible risk: 0 <br />
+                                <p className='text-xs text-gray-400'>Note that some questions have negative risk so the minimum could be less but is clamped</p>
                             </div>
                             <div data-popper-arrow></div>
                         </div>
@@ -652,12 +681,23 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     maxRisk {maxRisk}<br />
                     minRisk {minRisk}<br /> */}
                         <GaugeChart id="gauge-chart2"
-                            nrOfLevels={20}
-                            cornerRadius={0}
-                            percent={currentRiskPc}
+                            nrOfLevels={30}
+                            // arcsLength={[0.4, 0.4, 0.2]}
+                            // cornerRadius={0}
+                            // colors={['#5BE12C', '#F5CD19', '#EA4228']}
+                            percent={currentDisplayRiskPc}
+                            // formatTextValue={value=>value+"%"}
+                            formatTextValue={value=>currentRisk + ""}
                             textColor='black'
                             animate={false}
                         />
+
+                        {(totalHighRiskAnswers > 0) && (
+                            <div className="flex items-center">
+                                <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block"/>
+                                <div className="inline-block flex items-center text-red-700" >You've selected a <br/>high-risk answer</div>
+                            </div>
+                        )}
                     </div>
                 )}
                 {/* <TabsComponent questions={questions} /> */}
