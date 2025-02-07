@@ -651,7 +651,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                     </div>
                 </Modal.Body>
             </Modal>
-            <div id="all-tabs" className='p-5'>
+            <div id="all-tabs">
                 {activeTab !== '8' && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                         <h1 className='mt-4 text-md font-semibold flex flex-row'>
@@ -695,34 +695,37 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                         {(totalHighRiskAnswers > 0) && (
                             <div className="flex items-center">
                                 <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block"/>
-                                <div className="inline-block flex items-center text-red-700" >You've selected a <br/>high-risk answer</div>
+                                <div className="inline-block items-center text-red-700" >You've selected a <br/>high-risk answer</div>
                             </div>
                         )}
                     </div>
                 )}
                 {/* <TabsComponent questions={questions} /> */}
 
-                <ul className="flex items-stretch w-full">
-                    {tabs.map((tab) => (
-                        <li
-                            key={tab.id}
-                            className={`flex-grow text-center  py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === tab.id && 'border-b-2 border-gray-600 bg-gray-100'}`}
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            <div className='flex items-center pl-2'>
-                                <span className={`flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ${isTabCompleted(tab.title) ? 'bg-green-50' : 'bg-red-50'}`}>
-                                    {tab.id}
-                                </span>
-                                <span>
-                                    <h3 className="font-medium leading-tight pl-2">{tab.title}</h3>
-                                </span>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-                <hr className="h-px bg-gray-500 border-0 " />
+                <div className="overflow-auto border rounded-t-lg scroll-mt-2">
+                    <ul className="flex w-full">
+                        {tabs.map((tab, n) => (
+                            <li
+                                key={`tab${n}`}
+                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-pointer text-md text-gray-600 
+                                    ${activeTab === tab.id && 'border-t-2 border-gray-400 bg-gray-50'}
+                                `}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                <div className="flex items-center px-2 justify-between">
+                                    <div className="flex items-center">
+                                        <a className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                            {n + 1}
+                                        </a>
+                                        <h3 className="font-medium leading-tight pl-2 pr-2">{tab.title}</h3>
+                                    </div>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                <div className="p-10">
+                <div className="py-5 px-3 border rounded-b-lg shadow-lg">
                     {/* {
                         exportInProgress ?
                             tabs.map(t => t?.content) :
