@@ -232,9 +232,12 @@ export default function QuestionnaireVersion() {
     const saveEditedQuestion = () => {
         setOpenEditQuestionModal(false);
 
+        if(!version.questions){
+            version.questions = []
+        }
+
         const i = version.questions?.findIndex(q => q.id == questionToEdit?.id);
-        console.log(i)
-        if (version.questions && questionToEdit) {
+        if (questionToEdit) {
             if(i !== undefined && i !== -1){
                 version.questions[i] = questionToEdit;
             } else {
