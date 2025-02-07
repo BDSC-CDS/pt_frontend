@@ -1,8 +1,24 @@
 import apiClientQuestionnaire from './apiClientQuestionnaire';
 import {getAuthInitOverrides} from './authContext'
 
-import { TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireReply } from '../internal/client/index';
-import internal from 'stream';
+import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireReply } from '../internal/client/index';
+
+/**
+ * Create a questionnaire via the backend API's endpoint.
+ * @param questionnaireName 
+ */
+export const createQuestionnaire = async (questionnaire: TemplatebackendQuestionnaire) => {
+    try {
+        const response = await apiClientQuestionnaire.questionnaireServiceCreateQuestionnaire({
+            body: {
+                questionnaire: questionnaire
+            }
+        }, getAuthInitOverrides())
+        return response?.result?.id
+    } catch (error) {
+        console.log("Error creating questionnaire:" + error);
+    }
+}
 
 export const createQuestionnaireVersion = async (questionnaireId:number, version: TemplatebackendQuestionnaireVersion) => {
     try {
@@ -14,7 +30,7 @@ export const createQuestionnaireVersion = async (questionnaireId:number, version
         }, getAuthInitOverrides());
         return response?.result?.id;
     } catch (error) {
-        console.log("Error creating questionnaire:" + error);
+        console.log("Error creating questionnaire version:" + error);
     }
 };
 

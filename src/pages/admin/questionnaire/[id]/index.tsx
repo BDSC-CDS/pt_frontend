@@ -5,16 +5,14 @@ import { useEffect, useState } from 'react';
 import { Table } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../utils/questionnaire"
-import { MdOutlineAdd, MdMoreHoriz } from "react-icons/md";
+import { MdOutlineAdd } from "react-icons/md";
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { HiPencilAlt, HiCheck } from "react-icons/hi";
-import Link from 'next/link';
 
 export default function Questionnaire() {
     const router = useRouter();
     const { id } = router.query;
     const questionnaireId = Number(id);
-    console.log("qid", questionnaireId);
 
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
 
@@ -57,12 +55,17 @@ export default function Questionnaire() {
             <Head>
                 <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
+                
             <div className="flex flex-col items-end p-5">
-                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <MdOutlineAdd size={30} />
+                <button
+                    onClick={() => router.push(`/admin/questionnaire/${id}/version/new`)}
+                    className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer"
+                >
+                    <MdOutlineAdd />
                     <p className='ml-2 text-sm'> New version</p>
-                </Link>
+                </button>
             </div>
+
             <div className="flex flex-col">
                 <Table >
                     <Table.Body className="divide-y">

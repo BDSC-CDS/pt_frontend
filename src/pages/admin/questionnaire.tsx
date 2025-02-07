@@ -6,8 +6,8 @@ import { listQuestionnaires } from "../../utils/questionnaire"
 import { useEffect, useState } from 'react';
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { MdOutlineAdd } from "react-icons/md";
-import Link from 'next/link';
 import DataTable from '~/components/DataTable';
+import NewQuestionnaireModal from '~/components/modals/admin/NewQuestionnaireModal';
 
 export default function Questionnaire() {
     // Routing
@@ -15,6 +15,7 @@ export default function Questionnaire() {
 
     // States
     const [questionnaireList, setQuestionnaireList] = useState<Array<TemplatebackendQuestionnaire>>([]);
+    const [isNewQuestionnaireModalOpen, setIsNewQuestionnaireModalOpen] = useState(false)
 
     const getlistQuestionnaires = async (offset?: number, limit?: number) => {
         let result;
@@ -54,10 +55,13 @@ export default function Questionnaire() {
                 <title>Questionnaires</title>
             </Head>
             <div className="flex flex-col items-end p-5 gap-5">
-                <Link href='/admin/new-questionnaire' passHref className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <button
+                    onClick={() => setIsNewQuestionnaireModalOpen(true)}
+                    className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer"
+                >
                     <MdOutlineAdd />
                     <p className='ml-2 text-sm'> New questionnaire</p>
-                </Link>
+                </button>
 
                 {/* Dataset table */}
                 {questionnaireList.length > 0 ? (
@@ -75,6 +79,8 @@ export default function Questionnaire() {
                 ) : (
                     <div className="text-center text-gray-500 mt-20">No datasets yet</div>
                 )}
+
+                <NewQuestionnaireModal show={isNewQuestionnaireModalOpen} onClose={() => setIsNewQuestionnaireModalOpen(false)}/>
             </div>
         </>
     );

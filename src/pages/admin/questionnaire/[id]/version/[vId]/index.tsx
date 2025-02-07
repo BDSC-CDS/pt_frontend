@@ -2,14 +2,16 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Alert } from 'flowbite-react';
+import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Alert, Tooltip } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
-import { getQuestionnaire, createQuestionnaireVersion } from "../../../../../../utils/questionnaire"
+import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
+import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
+import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -23,23 +25,64 @@ type Tab = {
 
 type Tabs = Tab[];
 
-export default function Questionnaire() {
+/**
+ * Admin questionnaire version page.
+ */
+export default function QuestionnaireVersion() {
 
     // Routing
     const router = useRouter();
     const { id, vId } = router.query;
     const questionnaireId = Number(id);
-    const versionId = Number(vId);
+    const versionId = vId;
+
+    // Enable unsaved changes warning
+    const [isDirty, setIsDirty] = useState(false);
+    useUnsavedChangesWarning(isDirty)
 
     // Questionnaire States
     const [questionnaire, setQuestionnaire] = useState<TemplatebackendQuestionnaire>({});
     const [version, setVersion] = useState<Version>({});
     const [tabs, setTabs] = useState<Tabs>([]);
-    const [activeTab, setActiveTab] = useState<number>(0);
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+    const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null)
 
+    // Tabs drag and drop handlers
+    const handleDragStart = (index: number) => {
+        setDraggedTabIndex(index)
+    };
+
+    const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+        event.preventDefault()
+    };
+
+    const handleDrop = (index: number) => {
+        if (draggedTabIndex === null || draggedTabIndex === index){
+            return
+        }
+
+        const updatedTabs = [...tabs]
+        const movedTab = updatedTabs.splice(draggedTabIndex, 1)[0]
+        if(!movedTab){
+            return
+        }
+
+        // Insert at new position
+        updatedTabs.splice(index, 0, movedTab)
+
+        // Set the tabs and version
+        setTabs(updatedTabs);
+        version.tabs = updatedTabs.map(tab => tab.tabName)
+        version.questions = updatedTabs.flatMap(tab => tab.questions)
+        processQuestionnaireVersion(version)
+        setActiveTabIndex(index)
+        setDraggedTabIndex(null)
+        setIsDirty(true)
+    };
+
+    // Load questionnaire and all its versions
     const loadQuestionnaire = async () => {
         const result = await getQuestionnaire(questionnaireId);
-
         if (!result) {
             return
         }
@@ -53,6 +96,7 @@ export default function Questionnaire() {
         processQuestionnaireVersion(v);
     }
 
+    // Process 
     const processQuestionnaireVersion = (v: Version) => {
         if (!v.tabs) {
             const tabMap: any = {};
@@ -92,42 +136,15 @@ export default function Questionnaire() {
     useEffect(() => {
         if (!questionnaireId) {
             return
-        }
-        try {
+        } try {
             loadQuestionnaire();
         } catch (error) {
             alert("Error listing the datasets")
         }
-    }, [id]);
+    }, [questionnaireId]);
 
-    // Everything to save
+    // Save questionnaire version modal
     const [openSaveModal, setOpenSaveModal] = useState(false);
-    const [openSaveAlert, setOpenSaveAlert] = useState(false);
-    const [saveName, setSaveName] = useState("");
-    const [savePublish, setSavePublish] = useState(false);
-    const save = async () => {
-        setOpenSaveModal(false);
-
-        const versionToSave = {
-            ...version,
-            version: saveName,
-            published: savePublish,
-            createdAt: new Date()
-        }
-
-        try {
-            const id = await createQuestionnaireVersion(questionnaireId, versionToSave);
-            if (id) {
-                setOpenSaveAlert(true);
-            } else {
-                alert("Error creating the version.")
-            }
-        } catch (error) {
-            alert("Error creating the questionnaire version: " + error)
-        }
-
-
-    }
 
     // Everything to remove a tab and it's questions
     const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
@@ -142,6 +159,7 @@ export default function Questionnaire() {
         version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
         version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     // Everything to add a tab
@@ -151,14 +169,17 @@ export default function Questionnaire() {
         setCreateTabName(name);
     };
     const createTab = () => {
-        if (version.tabs) {
-            version.tabs.push(createTabName);
+        if (!version.tabs) {
+            version.tabs = []
         }
 
+        version.tabs.push(createTabName);
+        setActiveTabIndex(version.tabs?.length-1)
         setOpenCreateTabModal(false)
-
+        
         // version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     // Everything to remove a question
@@ -174,6 +195,12 @@ export default function Questionnaire() {
         version.questions = version.questions?.filter(q => q.id !== questionToRemove?.id);
 
         processQuestionnaireVersion(version);
+        setIsDirty(true)
+    }
+
+    // Everything to create a new question
+    const createNewQuestion = () => {
+        editQuestion({id:( questionToEdit?.id || 0) + 1, tab: tabs[activeTabIndex]?.tabName})
     }
 
     // Everything to edit a question
@@ -205,20 +232,27 @@ export default function Questionnaire() {
     const saveEditedQuestion = () => {
         setOpenEditQuestionModal(false);
 
+        if(!version.questions){
+            version.questions = []
+        }
+
         const i = version.questions?.findIndex(q => q.id == questionToEdit?.id);
-        if (version.questions && questionToEdit && i !== undefined) {
-            version.questions[i] = questionToEdit;
+        if (questionToEdit) {
+            if(i !== undefined && i !== -1){
+                version.questions[i] = questionToEdit;
+            } else {
+                version.questions.push(questionToEdit)
+            }
         }
 
         processQuestionnaireVersion(version);
+        setIsDirty(true)
     }
 
     const [addAnswerText, setAddAnswerText] = useState("");
     const [addAnswerRiskLevel, setAddAnswerRiskLevel] = useState(0);
     const [addAnswerHighRisk, setAddAnswerHighRisk] = useState(false);
     const addAnswer = () => {
-        console.log("saving new answer", addAnswerText, addAnswerRiskLevel);
-
         // Create a new answer object
         const newAnswer = {
             text: addAnswerText,
@@ -259,9 +293,6 @@ export default function Questionnaire() {
                 <title>{'Questionnaire ' + questionnaire.name}</title>
             </Head>
 
-            <Alert className={(openSaveAlert ? "" : "hidden") + " mt-5"} color="success" onDismiss={() => setOpenSaveAlert(false)}>
-                <span className="font-bold">Version {saveName} </span>successfuly saved!
-            </Alert>
             <div className="flex flex-row items-end p-5">
                 <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
@@ -293,111 +324,94 @@ export default function Questionnaire() {
             </div>
 
             <div className="flex flex-col w-full">
-                <div className="overflow-auto pb-3 mb-2">
+                <div className="overflow-auto border rounded-t-lg scroll-mt-2 shadow">
                     <ul className="flex flex-row">
                         {tabs.map((tab, n) => (
                             <li
-                                key={tab.tabName}
-                                className={`flex-grow text-center hover:bg-gray-500  hover:bg-opacity-20 py-2 px-0  cursor-pointer text-md text-gray-600 ${activeTab === n && 'border-b-2 border-gray-400 bg-gray-100'}`}
-                                onClick={() => setActiveTab(n)}
+                                key={`tab${n}`}
+                                draggable={true}
+                                onDragStart={() => handleDragStart(n)}
+                                onDragOver={handleDragOver}
+                                onDrop={() => handleDrop(n)}
+                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-grab text-md text-gray-600 
+                                    ${activeTabIndex === n && 'border-t-2 border-gray-400 bg-gray-50'}
+                                `}
+                                onClick={() => setActiveTabIndex(n)}
                             >
-                                <div className='flex items-center pl-2'>
-                                    <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
-                                        {n + 1}
-                                    </span>
-                                    <span>
+                                <div className="flex items-center px-2 justify-between">
+                                    <div className="flex items-center">
+                                        <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
+                                            {n + 1}
+                                        </span>
                                         <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
-                                    </span>
-                                    <span className="p-2 hover:bg-gray-500  hover:bg-opacity-20" onClick={() => removeTabConfirmation(n)}>
+                                    </div>
+                                    
+                                    <span className="p-2 hover:cursor-pointer hover:bg-gray-200 rounded-lg" onClick={() => removeTabConfirmation(n)}>
                                         <HiTrash />
                                     </span>
                                 </div>
                             </li>
                         ))}
-                        <li
-                            className={`flex-grow text-center py-2 px-0`}
-                        >
-                            <Button color="gray" size="xs" onClick={() => setOpenCreateTabModal(true)}>
-                                <MdOutlineAdd />
-                                New Tab
-                            </Button>
-
-                        </li>
+                        <button className="p-4 hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={() => setOpenCreateTabModal(true)}>
+                            <MdOutlineAdd size={20} />
+                            <span>New tab</span>
+                        </button>
                     </ul>
                 </div>
 
+                {tabs.length > 0 && (
+                    <Table className="border rounded-t-none">
+                        <Table.Head className='rounded-t-none'>
+                            <Table.HeadCell>Question</Table.HeadCell>
+                            <Table.HeadCell>Risk weight</Table.HeadCell>
+                            <Table.HeadCell>Answer Type</Table.HeadCell>
+                            <Table.HeadCell>Answers</Table.HeadCell>
+                            <Table.HeadCell>Flag</Table.HeadCell>
+                            <Table.HeadCell>Tooltip</Table.HeadCell>
+                            <Table.HeadCell>
+                                <span className="sr-only">Action</span>
+                            </Table.HeadCell>
+                        </Table.Head>
+                        <Table.Body className="divide-y">
+                            {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
+                                <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                    <Table.Cell>{question.question}</Table.Cell>
+                                    <Table.Cell>{question.riskWeight}</Table.Cell>
+                                    <Table.Cell>{question.answerType}</Table.Cell>
+                                    <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
+                                    <Table.Cell>{question.flag}</Table.Cell>
+                                    <Table.Cell>{question.tooltip}</Table.Cell>
+                                    <Table.Cell>
+                                        <div className="flex flex-row">
+                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
+                                                <HiPencilAlt size={20} />
+                                            </span>
+                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => removeQuestionConfirmation(question)}>
+                                                <HiTrash size={20} />
+                                            </span>
+                                        </div>
+                                    </Table.Cell>
+                                </Table.Row>
+                            )).concat(
+                                <Table.Row key="newQuestion" className="">
+                                    <Table.Cell colSpan={7} className="hover:bg-gray-100 cursor-pointer" onClick={() => createNewQuestion()}>
+                                        <div className="flex justify-center items-center text-sm gap-2">
+                                            <MdOutlineAdd size={20}/>
+                                            <span>New question</span>
+                                        </div>
+                                    </Table.Cell>
+                                </Table.Row>
+                            )}
 
-                <Table className="border">
-                    <Table.Head>
-                        <Table.HeadCell>Question</Table.HeadCell>
-                        <Table.HeadCell>Risk weight</Table.HeadCell>
-                        <Table.HeadCell>Answer Type</Table.HeadCell>
-                        <Table.HeadCell>Answers</Table.HeadCell>
-                        <Table.HeadCell>Flag</Table.HeadCell>
-                        <Table.HeadCell>Tooltip</Table.HeadCell>
-                        <Table.HeadCell>
-                            <span className="sr-only">Action</span>
-                        </Table.HeadCell>
-                    </Table.Head>
-                    <Table.Body className="divide-y">
-                        {((tabs[activeTab] || {}).questions || []).map((question) => (
-                            <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                <Table.Cell>{question.question}</Table.Cell>
-                                <Table.Cell>{question.riskWeight}</Table.Cell>
-                                <Table.Cell>{question.answerType}</Table.Cell>
-                                <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
-                                <Table.Cell>{question.flag}</Table.Cell>
-                                <Table.Cell>{question.tooltip}</Table.Cell>
-                                <Table.Cell>
-                                    <div className="flex flex-row">
-                                        <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
-                                            <HiPencilAlt size={20} />
-                                        </span>
-                                        <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => removeQuestionConfirmation(question)}>
-                                            <HiTrash size={20} />
-                                        </span>
-                                    </div>
-                                </Table.Cell>
-                            </Table.Row>
-                        ))}
-
-                    </Table.Body>
-                </Table>
+                        </Table.Body>
+                    </Table>
+                )}
+                
             </div>
 
 
-            {/* SAVE MODAL */}
-            <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
-                <Modal.Header />
-                <Modal.Body>
-                    <div className="text-center">
-                        <div className="flex flex-col mb-8">
-                            <TextInput
-                                placeholder="Version"
-                                required
-                                // value={"12"}
-                                onChange={(event) => { setSaveName(event.target.value) }}
-                            />
-                        </div>
-
-                        <hr />
-                        <div className="flex flex-col mb-8">
-                            <ToggleSwitch checked={savePublish} label="Publish version" onChange={setSavePublish} />
-                        </div>
-
-                        <hr />
-
-                        <div className="flex justify-center gap-4">
-                            <Button color="success" onClick={() => save()}>
-                                Save
-                            </Button>
-                            <Button color="gray" onClick={() => setOpenSaveModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
+            {/* SAVE NEW VERSION MODAL */}
+            <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onSave={() => setIsDirty(false)} onClose={() => setOpenSaveModal(false)}/>
 
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
@@ -422,30 +436,25 @@ export default function Questionnaire() {
             </Modal>
 
             {/* CREATE TAB MODAL */}
-            <Modal show={openCreateTabModal} size="md" onClose={() => setOpenCreateTabModal(false)} popup>
-                <Modal.Header />
-                <Modal.Body>
-                    <div className="text-center">
-                        <div className="flex flex-col mb-8">
-                            <TextInput
-                                placeholder="Tab name"
-                                required
-                                onChange={(event) => handleCreateTabNameChange(event.target.value)}
-                            />
-                        </div>
-
-                        <hr />
-
-                        <div className="flex justify-center gap-4 mt-5">
-                            <Button color="success" onClick={() => createTab()}>
-                                Save
-                            </Button>
-                            <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
+            <Modal show={openCreateTabModal} size="xl" onClose={() => setOpenCreateTabModal(false)} popup>
+                <Modal.Header>
+                    <p>Create new tab</p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col py-5 px-10">
+                    <TextInput
+                        placeholder="Name"
+                        required
+                        onChange={(event) => handleCreateTabNameChange(event.target.value)}
+                    />
                 </Modal.Body>
+                <Modal.Footer className="p-2 flex justify-center gap-4">
+                    <Button color="success" onClick={() => createTab()}>
+                        Save
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
             </Modal>
 
             {/* REMOVE QUESTION MODAL */}
@@ -483,9 +492,9 @@ export default function Questionnaire() {
                                             <TextInput
                                                 id="question"
                                                 name="question"
-                                                placeholder="Question text?"
+                                                placeholder="Text"
                                                 required
-                                                value={questionToEdit?.question}
+                                                value={questionToEdit?.question || ""}
                                                 onChange={(event) => handleInputChange(event.target.value, 'question')}
                                             />
                                         </Table.Cell>
@@ -498,7 +507,7 @@ export default function Questionnaire() {
                                                 name="tooltip"
                                                 placeholder="Tooltip"
                                                 required
-                                                value={questionToEdit?.tooltip}
+                                                value={questionToEdit?.tooltip || ""}
                                                 onChange={(event) => handleInputChange(event.target.value, 'tooltip')}
                                             />
                                         </Table.Cell>
@@ -533,8 +542,7 @@ export default function Questionnaire() {
                                                                                 name={"text-" + { n }}
                                                                                 placeholder="Answer"
                                                                                 required
-                                                                                value={{ ...questionToEdit }?.answers?.[n]?.text || ""}
-
+                                                                                value={questionToEdit?.answers?.[n]?.text}
                                                                                 onChange={(event) => handleAnswerInputChange(n, event.target.value, "text")}
                                                                             />
                                                                         </Table.Cell>
