@@ -200,7 +200,7 @@ export default function QuestionnaireVersion() {
 
     // Everything to create a new question
     const createNewQuestion = () => {
-        editQuestion({tab: tabs[activeTabIndex]?.tabName})
+        editQuestion({id:( questionToEdit?.id || 0) + 1, tab: tabs[activeTabIndex]?.tabName})
     }
 
     // Everything to edit a question
