@@ -129,7 +129,7 @@ const DataTable = <T extends {}>({
                                             {iconActions && (
                                                 <div>
                                                     {iconActions.map((iconAction, actionIndex) => (
-                                                        <div className="group p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
+                                                        <div key={`iconAction${actionIndex}`} className="group p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
                                                             <iconAction.Icon className="text-lg"/>
                                                             <div className="fixed hidden group-hover:block bg-white border shadow px-2 py-1 text-sm rounded-lg -translate-x-1/2 ml-2 -translate-y-full -mt-6">
                                                                 {iconAction.tooltip}
