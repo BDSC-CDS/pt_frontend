@@ -4,35 +4,38 @@ import { getMyUser } from "./user";
 
 type AuthContextType = {
     isLoggedIn: boolean;
+    userInfo: UserInfo | undefined;
     isAdmin: boolean;
     login: (token: string) => void;
     logout: () => void;
     token: string;
+    showAuthModal: boolean;
+    setShowAuthModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthProviderProps = {
     children: ReactNode;
 };
 
-import dynamic from 'next/dynamic';
+type UserInfo = {
+    email: string
+    username: string
+    roles: string[]
+    isAdmin?: boolean
+}
 
-type ClientOnlyProps = { children: JSX.Element };
-const ClientOnly = (props: ClientOnlyProps) => {
-    const { children } = props;
+// Authentication global context
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-    return children;
-};
-
-export default dynamic(() => Promise.resolve(ClientOnly), {
-    ssr: false,
-});
-
+/**
+ * Authentication Provider with specific logic for login and logout.
+ */
 export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
+    const [userInfo, setUserInfo] = useState<UserInfo>()
     const [token, setToken] = useState<string>("");
-    const [isAdmin, setAdmin] = useState<boolean>(false);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [showAuthModal, setShowAuthModal] = useState<boolean>(false)
 
     useEffect(() => {
         if (typeof window !== 'undefined') { // Ensure this code only runs on the client side
@@ -45,11 +48,37 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
         }
     }, []);
 
-    const checkAdminStatus = async () => {
-        const r = getMyUser();
-        const response = await r;
-        const roles = response?.result?.me?.roles || [];
-        setAdmin(roles.includes('admin'));
+    useEffect(() => {
+        const handleShowAuthModal = () => {
+            setShowAuthModal(true);
+        };
+    
+        window.addEventListener("showAuthModal", handleShowAuthModal);
+        return () => {
+            window.removeEventListener("showAuthModal", handleShowAuthModal);
+        };
+    }, []);
+
+    const getUserInfo = async () => {
+        try {
+            const response = await getMyUser();
+            const user = response?.result?.me;
+            if (user) {
+                const updatedUserInfo: UserInfo = {
+                    email: user.email || "",
+                    username: user.username || "",
+                    roles: user.roles || [],
+                    isAdmin: (user.roles || []).includes("admin"),
+                };
+    
+                setUserInfo(updatedUserInfo);
+                setIsAdmin((user.roles || []).includes("admin"));
+            } else {
+                console.warn("User data is unavailable.");
+            }
+        } catch (error) {
+            console.error("Error retrieving user info:", error);
+        }
     };
 
     const login = async (t: string) => {
@@ -57,7 +86,8 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
             localStorage.setItem('token', t);
             setLoggedIn(true);
             setToken(t);
-            checkAdminStatus();
+            setShowAuthModal(false)
+            getUserInfo();
         }
     };
 
@@ -65,17 +95,24 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
             setLoggedIn(false);
+            setIsAdmin(false)
             setToken('');
+            setShowAuthModal(false)
+            setUserInfo(undefined)
         }
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isAdmin, login, logout, token }}>
+        <AuthContext.Provider value={{ isLoggedIn, userInfo, isAdmin, login, logout, token, showAuthModal, setShowAuthModal }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
+/**
+ * Custom useAuth React hook to get the Authentication context
+ * @returns the AuthContext
+ */
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -84,6 +121,9 @@ export const useAuth = (): AuthContextType => {
     return context;
 };
 
+/**
+ * Adds the Authorization header with a token from localStorage to HTTP requests if available
+ */
 export const getAuthInitOverrides = (): InitOverrideFunction => {
     return async (requestContext: { init: HTTPRequestInit, context: RequestOpts }) => {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -97,25 +137,4 @@ export const getAuthInitOverrides = (): InitOverrideFunction => {
         }
         return requestContext.init;
     }
-}
-
-// Define global logout function
-export const globalLogout = () => {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        window.location.href = '/authenticate'; // Redirect to login page
-    }
-};
-
-// Intercept fetch globally
-if (typeof window !== 'undefined') { // Ensure this only runs on the client side
-    const originalFetch = window.fetch;
-
-    window.fetch = async (url, options) => {
-        const response = await originalFetch(url, options);
-        if (response.status === 401 || response.status === 403) {
-            globalLogout(); // Call global logout function when token is invalid
-        }
-        return response;
-    };
 }
