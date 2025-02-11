@@ -5,6 +5,7 @@ import { useAuth } from "../utils/authContext";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Spinner from "~/components/ui/Spinner";
+import { showToast } from "~/utils/showToast";
 
 export default function Authenticate() {
 
@@ -21,8 +22,6 @@ export default function Authenticate() {
     });
     const [token, setToken] = useState<string>();
     const [loading, setLoading] = useState<boolean>(false); // Loading state
-    const [successMessage, setSuccessMessage] = useState<string>(''); // Success message state
-    const [errorMessage, setErrorMessage] = useState<string>(''); // Error message state
 
     // Handlers
     const authUser = async () => {
@@ -37,12 +36,10 @@ export default function Authenticate() {
             login(newToken);
 
             // Give user a feedback
-            setSuccessMessage("Successfully logged in!")
-            setTimeout(()=>router.push("/"), 500)
-            
+            showToast("success", "Successfully logged in.")
+            router.push("/")
         } else {
-            setErrorMessage("Your credentials are not correct.")
-            setTimeout(() => setErrorMessage(""), 3000)
+            showToast("error", "Your credentials are not correct.")
         }
     }
 
@@ -96,22 +93,6 @@ export default function Authenticate() {
                 <Link href="/user" passHref className="mt-4">
                     <span>Or create an account <span className="text-blue-900 underline">here</span></span>
                 </Link>
-
-                {/* Message */}
-                {successMessage && !errorMessage && (
-                    <div className="mt-4 text-green-500">
-                        {successMessage}
-                    </div>
-                )}
-
-                {/* Message */}
-                {!successMessage && errorMessage && (
-                    <div className="mt-4 text-red-500">
-                        {errorMessage}
-                    </div>
-                )}
-
-                {/* <p className="mt-4 text-xl text-red-500">{token === "NULL" && "Your credentials are not correct"}</p> */}
             </div>
         </>
     );

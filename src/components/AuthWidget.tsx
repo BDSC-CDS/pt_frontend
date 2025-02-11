@@ -2,20 +2,18 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from '../utils/authContext';
 import { Button, Modal } from 'flowbite-react';
+import { showToast } from "~/utils/showToast";
+import LoginModal from "./modals/LoginModal";
 
-
-
-export default function Header() {
-    const [visible, setVisible] = useState<boolean>(false);
-
+export default function AuthWidget() {
     const { isLoggedIn, logout } = useAuth();
+
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
 
     const handleLogout = () => {
         logout();
-        setVisible(true);
+        showToast("success", "Successfully logged out.")
     };
-
-    
     
     return (
         <>
@@ -28,22 +26,6 @@ export default function Header() {
                     <span className="px-3 py-2 hover:bg-gray-500  hover:bg-opacity-20 rounded cursor-pointer">Log in</span>
                 </Link>
             }
-
-            <main>
-                <Modal show={visible} onClose={() => setVisible(false)}>
-                    <Modal.Body>
-                        <div className="space-y-6">
-                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                You are logged out!
-                            </p>
-
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button onClick={() => setVisible(false)}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            </main>
         </>
     )
 };
