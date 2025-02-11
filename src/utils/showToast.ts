@@ -1,5 +1,4 @@
 import { toast, ToastContent, ToastOptions, Slide, Id } from "react-toastify"
-import { FaCheckCircle } from "react-icons/fa";
 
 export const defaultToastOptions: ToastOptions = {
     position: "top-right",
@@ -11,7 +10,7 @@ export const defaultToastOptions: ToastOptions = {
     progress: undefined,
     theme: "light",
     transition: Slide,
-    className: "shadow-lg border rounded-lg",
+    className: "rounded-lg bg-white text-gray-500 shadow dark:bg-gray-800 dark:text-gray-400",
 }    
 
 type ToastType = "success" | "error" | "info" | "warning" | "default"    
