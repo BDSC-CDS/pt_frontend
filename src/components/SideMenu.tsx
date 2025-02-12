@@ -13,7 +13,7 @@ import {
 } from "react-icons/bi";
 
 export default function SideMenu() {
-    const { isAdmin } = useAuth();
+    const { userInfo, isLoading } = useAuth();
 
     const customTheme: CustomFlowbiteTheme["sidebar"] = {
         collapse: {
@@ -71,7 +71,7 @@ export default function SideMenu() {
                         </Link>
                     </Sidebar.ItemGroup>
                     
-                    { isAdmin && (
+                    { !isLoading && userInfo?.isAdmin && (
                         <Sidebar.ItemGroup>
                             <Sidebar.Collapse icon={HiOutlineCog} theme={customTheme.collapse} label="Admin">
                                 <Link href="/admin/questionnaire" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
