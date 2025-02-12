@@ -1,6 +1,7 @@
 import { useAuth } from "~/utils/authContext"
 import LoginModal from "./modals/LoginModal"
 import Spinner from "./ui/Spinner"
+import React from "react"
 
 /**
  * Higher-Order Component which can wrap pages to enforce authentication on it.
