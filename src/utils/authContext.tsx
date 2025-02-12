@@ -1,6 +1,7 @@
 import { InitOverrideFunction, HTTPRequestInit, RequestOpts } from '../internal/client/index';
 import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent, useCallback } from 'react';
 import { getMyUser } from "./user";
+import { jwtDecode } from 'jwt-decode';
 
 type UserInfo = {
     token: string;
@@ -55,6 +56,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
             }
         } catch (error) {
             console.error("Error retrieving user info:", error);
+            logout()
         } finally {
             setIsAuthModalOpen(false)
             setIsLoading(false)
@@ -73,10 +75,21 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
         setIsAuthModalOpen(false)
     }
 
+    const isTokenExpired = (token: string) => {
+        try {
+            const decodeToken = jwtDecode<{name: string, exp: number}>(token)
+            const currentTime = Date.now() / 1000
+            return decodeToken.exp < currentTime
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return true;
+        }
+    }
+
     const checkAuth = useCallback(() => {
         const token = localStorage.getItem('token');
-        if (!token) {
-            isLoggedIn && logout();
+        if (!token || isTokenExpired(token)) {
+            logout();
             setIsAuthModalOpen(true)
             return;
         }
