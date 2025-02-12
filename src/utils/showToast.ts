@@ -26,7 +26,6 @@ export const showToast = (
         ...options
     }     
 
-    console.log(defaultToastOptions)
     switch (type) {
         case "success":
             optionsToApply.iconTheme={primary: "#316278", secondary: "#FFFFFF"}
