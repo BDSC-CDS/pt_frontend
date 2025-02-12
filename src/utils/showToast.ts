@@ -2,10 +2,11 @@ import {toast, ToastOptions} from "react-hot-toast"
 
 
 type ToastType = "success" | "error" | "custom" | "default"
-
+ 
 const defaultToastOptions: ToastOptions = {
     duration: 3000,
-    className: "rounded-lg text-gray-500 shadow dark:bg-gray-800 dark:text-gray-400 bg-red-300"
+    className: "border rounded-lg text-gray-500 shadow dark:bg-gray-800 dark:text-gray-400",
+    style: {}
 }
 /**
  * Display toast
@@ -24,6 +25,8 @@ export const showToast = (
         ...defaultToastOptions,
         ...options
     }     
+
+    console.log(defaultToastOptions)
     switch (type) {
         case "success":
             optionsToApply.iconTheme={primary: "#316278", secondary: "#FFFFFF"}
