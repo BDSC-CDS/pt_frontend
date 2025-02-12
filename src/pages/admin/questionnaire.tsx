@@ -8,8 +8,9 @@ import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { MdOutlineAdd } from "react-icons/md";
 import DataTable from '~/components/DataTable';
 import NewQuestionnaireModal from '~/components/modals/admin/NewQuestionnaireModal';
+import withAdmin from '~/components/withAdmin';
 
-export default function Questionnaire() {
+function Questionnaire() {
     // Routing
     const router = useRouter();
 
@@ -85,3 +86,5 @@ export default function Questionnaire() {
         </>
     );
 }
+
+export default withAdmin(Questionnaire)

@@ -5,8 +5,9 @@ import { TemplatebackendAuditLog, TemplatebackendUser } from '~/internal/client'
 import { useAuth } from '~/utils/authContext';
 import { Button, Modal, Tooltip } from 'flowbite-react';
 import { BiSolidMask } from "react-icons/bi";
+import withAdmin from '~/components/withAdmin';
 
-export default function AuditLogging() {
+function AuditLogging() {
     const [originalAuditLogsList, setOriginalAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
     const [filteredAuditLogsList, setFilteredAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -378,3 +379,5 @@ export default function AuditLogging() {
         </>
     );
 }
+
+export default withAdmin(AuditLogging)

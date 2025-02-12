@@ -8,8 +8,9 @@ import { getQuestionnaire } from "../../../../utils/questionnaire"
 import { MdOutlineAdd } from "react-icons/md";
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { HiPencilAlt, HiCheck } from "react-icons/hi";
+import withAdmin from '~/components/withAdmin';
 
-export default function Questionnaire() {
+function Questionnaire() {
     const router = useRouter();
     const { id } = router.query;
     const questionnaireId = Number(id);
@@ -115,3 +116,5 @@ export default function Questionnaire() {
         </>
     );
 }
+
+export default withAdmin(Questionnaire)

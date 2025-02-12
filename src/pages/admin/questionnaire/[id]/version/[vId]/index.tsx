@@ -12,6 +12,7 @@ import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, Temp
 import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
 import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
+import withAdmin from '~/components/withAdmin';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -28,7 +29,7 @@ type Tabs = Tab[];
 /**
  * Admin questionnaire version page.
  */
-export default function QuestionnaireVersion() {
+function QuestionnaireVersion() {
 
     // Routing
     const router = useRouter();
@@ -745,3 +746,5 @@ export default function QuestionnaireVersion() {
         </>
     );
 }
+
+export default withAdmin(QuestionnaireVersion)
