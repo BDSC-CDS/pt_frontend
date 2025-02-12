@@ -42,11 +42,11 @@ export default function LoginModal({show, onClose}: LoginModalProps) {
         
         if (newToken && newToken !== "NULL") {
             login(newToken);
-            setIsLoading(false)
             showToast("success", "Successfully logged in!")
         } else {
             showToast("error", "Invalid credentials.")
         }
+        setIsLoading(false)
     }
 
     const handleUserRegister = async () => {
