@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { listAuditLogs } from '../utils/auditlog';
-import { TemplatebackendAuditLog, TemplatebackendUser } from '../internal/client';
+import { listAuditLogs } from '~/utils/auditlog';
+import { TemplatebackendAuditLog, TemplatebackendUser } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { Button, Modal, Tooltip } from 'flowbite-react';
 import { BiSolidMask } from "react-icons/bi";

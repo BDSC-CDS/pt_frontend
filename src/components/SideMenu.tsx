@@ -78,7 +78,7 @@ export default function SideMenu() {
                                     <HiClipboardDocumentList />
                                     <p className='ml-1'>Questionnaires</p>
                                 </Link>
-                                <Link href="/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
+                                <Link href="/admin/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
                                     <HiLockClosed />
                                     <p className='ml-1'>Audit Log</p>
                                 </Link>
