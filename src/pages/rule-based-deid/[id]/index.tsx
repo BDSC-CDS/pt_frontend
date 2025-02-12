@@ -10,6 +10,7 @@ import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { saveAs } from 'file-saver';
 import DataTable from '~/components/DataTable';
+import withAuth from '~/components/withAuth';
 
 const TransformPage = () => {
 
@@ -1026,4 +1027,4 @@ const TransformPage = () => {
     );
 };
 
-export default TransformPage;
+export default withAuth(TransformPage);

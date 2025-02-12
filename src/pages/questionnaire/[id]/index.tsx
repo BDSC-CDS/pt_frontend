@@ -6,6 +6,7 @@ import { getQuestionnaire, getReply } from "../../../utils/questionnaire"
 import { useRouter } from 'next/router';
 import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
 import { questionsFromApi, Questions } from "../../../utils/questions"
+import withAuth from '~/components/withAuth';
 
 
 const QuestionnairePage = () => {
@@ -82,4 +83,4 @@ const QuestionnairePage = () => {
     );
 };
 
-export default QuestionnairePage;
+export default withAuth(QuestionnairePage);

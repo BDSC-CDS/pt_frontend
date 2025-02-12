@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useAuth } from '~/utils/authContext';
 import DatasetSelector from '~/components/DatasetSelector';
+import withAuth from '~/components/withAuth';
 
-export default function RuleBasedDeid() {
+function RuleBasedDeid() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
@@ -49,3 +50,5 @@ export default function RuleBasedDeid() {
         </>
     );
 }
+
+export default withAuth(RuleBasedDeid)

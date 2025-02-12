@@ -5,8 +5,9 @@ import { TemplatebackendQuestionnaireReply } from '../internal/client/index';
 import { listReplies } from "../utils/questionnaire";
 import { useAuth } from '~/utils/authContext';
 import DataTable from '~/components/DataTable';
+import withAuth from '~/components/withAuth';
 
-export default function RiskAssessment() {
+function RiskAssessment() {
     // Authentication
     const { isLoggedIn } = useAuth();
 
@@ -89,3 +90,5 @@ export default function RiskAssessment() {
         </>
     );
 }
+
+export default withAuth(RiskAssessment)

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { getDeidentificationNotebookURL } from "../../../utils/dataset"
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '~/utils/authContext';
+import withAuth from '~/components/withAuth';
 
 const DatasetPage = () => {
     const [notebookUrl, setNotebookUrl] = useState<string>();
@@ -74,4 +75,4 @@ const DatasetPage = () => {
     );
 };
 
-export default DatasetPage;
+export default withAuth(DatasetPage);

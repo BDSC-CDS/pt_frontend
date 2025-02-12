@@ -4,9 +4,10 @@ import { useAuth } from '~/utils/authContext';
 import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
 import DatasetSelector from '~/components/DatasetSelector';
 import { useRouter } from 'next/router';
+import withAuth from '~/components/withAuth';
 
 
-export default function RiskAssessmentArx() {
+function RiskAssessmentArx() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
@@ -60,3 +61,5 @@ export default function RiskAssessmentArx() {
         </>
     );
 }
+
+export default withAuth(RiskAssessmentArx)

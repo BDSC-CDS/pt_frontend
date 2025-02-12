@@ -9,12 +9,13 @@ import { useAuth } from '~/utils/authContext';
 import { DateTime } from 'luxon';
 import DatasetSelector from '~/components/DatasetSelector';
 import DataTable from '../components/DataTable';
+import withAuth from '~/components/withAuth';
 
 interface ColumnTypes {
     [key: string]: string;
 }
 
-export default function Dataset() {
+function Dataset() {
 
     // Authentication
     const isLoggedIn = useAuth();
@@ -396,3 +397,5 @@ export default function Dataset() {
         </>
     );
 }
+
+export default withAuth(Dataset)

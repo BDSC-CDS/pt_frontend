@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getRiskAssessment } from "~/utils/RiskAssessmentArx";
 import { TemplatebackendGetRiskAssessmentReply, TemplatebackendGetRiskAssessmentResult } from '~/internal/client';
 import dynamic from 'next/dynamic';
+import withAuth from '~/components/withAuth';
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
 // The RiskAssessmentPage component
@@ -91,5 +92,5 @@ const RiskAssessmentPage = () => {
     );
 };
 
-export default RiskAssessmentPage;
+export default withAuth(RiskAssessmentPage);
 
