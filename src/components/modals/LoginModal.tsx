@@ -38,8 +38,7 @@ const registerSchema = z.object({
 
 
 /**
- * 
- * @returns 
+ * Login or register forms modal.
  */
 export default function LoginModal({ show, onClose }: LoginModalProps) {
     const router = useRouter()
@@ -72,7 +71,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                 if (!response.result?.id) {
                     throw "An account with this email already exists."
                 }
-                showToast("success", `User ${response.result.id} created.`)
+                showToast("success", `New user created.`)
             }
 
             const authResponse = await authenticateUser(formData.email, formData.password)
@@ -80,7 +79,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
 
             login(authResponse.result.token)
             showToast("success", "Successfully logged in!")
-            handleClose()
+            onClose()
         } catch (err) {
             if (err instanceof z.ZodError) {
                 const fieldErrors = err.errors.reduce((acc, error) => {
@@ -122,6 +121,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                         e.preventDefault()
                         handleSubmit()
                     }}
+                    autoComplete="on"
                     className="w-full"
                 >
                     {isRegister && (
@@ -130,7 +130,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                             <InputField label="Last name" name="lastName" value={formData.lastName} onChange={handleInpuChange} error={errors.lastName} />
                         </>
                     )}
-                    <InputField label="Email" name="email" value={formData.email} onChange={handleInpuChange} error={errors.email} />
+                    <InputField label="Email" name="email" value={formData.email} onChange={handleInpuChange} error={errors.email} type="email"/>
                     <InputField label="Password" name="password" value={formData.password} onChange={handleInpuChange} error={errors.password} type="password" />
                     {isRegister && (
                         <InputField label="Confirm password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInpuChange} error={errors.confirmPassword} type="password" />
