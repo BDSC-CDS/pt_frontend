@@ -1,19 +1,26 @@
 import { Button, Modal } from "flowbite-react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "~/utils/authContext";
-import { showToast } from "~/utils/showToast";
 import { authenticateUser } from "~/utils/authentication";
 import Link from "next/link";
 import { createUser } from "~/utils/user";
+import { showToast } from "~/utils/showToast";
+import Spinner from "../ui/Spinner";
+
+interface LoginModalProps {
+    show: boolean
+    onClose: () => void
+}
 
 /**
  * 
  * @returns 
  */
-export default function LoginModal() {
+export default function LoginModal({show, onClose}: LoginModalProps) {
     // Authentication
-    const { login, showAuthModal, setShowAuthModal } = useAuth();
+    const { login} = useAuth();
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     // Routing
     const router = useRouter();
@@ -26,28 +33,24 @@ export default function LoginModal() {
         password: "", 
         passwordConfirm: ""
     });
-    const [isLoading, setIsLoading] = useState(true)
 
     // Handlers
     const handleUserLogin = async () => {
         setIsLoading(true)
         const response = await authenticateUser(formData.email, formData.password);
         const newToken = response ? (response.result ? response.result.token : "") : "";
-        setIsLoading(false)
         
         if (newToken && newToken !== "NULL") {
             login(newToken);
-            showToast("success", "Successfully logged in.")
-            // router.replace(router.asPath) // Reload page to use authentication
+            setIsLoading(false)
+            showToast("success", "Successfully logged in!")
         } else {
-            showToast("error", "Your credentials are not correct.")
+            showToast("error", "Invalid credentials.")
         }
     }
 
     const handleUserRegister = async () => {
-        setIsLoading(true)
         const response = await createUser(formData.firstName, formData.lastName, formData.email, formData.password)
-        
     }
     
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -59,13 +62,13 @@ export default function LoginModal() {
     };
 
     const handleClose = () => {
-        setShowAuthModal(false)
+        onClose()
         router.push("/")
     }
 
     return (
         <>
-            <Modal show={showAuthModal} onClose={handleClose} size="lg">
+            <Modal show={show} onClose={handleClose} size="lg">
                 <Modal.Header>
                     Log in
                 </Modal.Header>
@@ -87,7 +90,7 @@ export default function LoginModal() {
                             type="password" 
                             id="password" 
                             name="password" 
-                            value={formData.password} 
+                            value={formData.password}
                             onChange={handleChange} 
                             className="border rounded p-2 w-full text-black"
                         />
@@ -98,7 +101,7 @@ export default function LoginModal() {
                     </Link>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
-                    <Button onClick={handleUserLogin}>Log in</Button>
+                    <Button onClick={handleUserLogin} disabled={isLoading}>{isLoading? <Spinner/> : "Log in"}</Button>
                     <Button onClick={handleClose}>Close</Button>
                 </Modal.Footer>
             </Modal>
