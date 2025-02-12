@@ -1,70 +1,50 @@
 import { InitOverrideFunction, HTTPRequestInit, RequestOpts } from '../internal/client/index';
-import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent, useCallback } from 'react';
 import { getMyUser } from "./user";
+
+type UserInfo = {
+    token: string;
+    email: string;
+    username: string;
+    roles: string[];
+    isAdmin: boolean;
+}
 
 type AuthContextType = {
     isLoggedIn: boolean;
-    userInfo: UserInfo | undefined;
-    isAdmin: boolean;
+    userInfo: UserInfo | null;
+    isLoading: boolean;
+    isAuthModalOpen: boolean;
     login: (token: string) => void;
     logout: () => void;
-    token: string;
-    showAuthModal: boolean;
-    setShowAuthModal: React.Dispatch<React.SetStateAction<boolean>>;
+    hideAuthModal: () => void;
 };
 
 type AuthProviderProps = {
     children: ReactNode;
 };
 
-type UserInfo = {
-    email: string
-    username: string
-    roles: string[]
-    isAdmin?: boolean
-}
-
 // Authentication global context
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 /**
  * Authentication Provider with specific logic for login and logout.
  */
 export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
-    const [userInfo, setUserInfo] = useState<UserInfo>()
-    const [token, setToken] = useState<string>("");
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [showAuthModal, setShowAuthModal] = useState<boolean>(false)
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') { // Ensure this code only runs on the client side
-            const t = localStorage.getItem('token');
-            if (t) {
-                login(t)
-            } else {
-                logout();
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        const handleShowAuthModal = () => {
-            setShowAuthModal(true);
-        };
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
     
-        window.addEventListener("showAuthModal", handleShowAuthModal);
-        return () => {
-            window.removeEventListener("showAuthModal", handleShowAuthModal);
-        };
-    }, []);
-
-    const getUserInfo = async () => {
+    const login = async (token: string) => {
+        localStorage.setItem('token', token);
+        setLoggedIn(true);
         try {
             const response = await getMyUser();
             const user = response?.result?.me;
             if (user) {
                 const updatedUserInfo: UserInfo = {
+                    token: token,
                     email: user.email || "",
                     username: user.username || "",
                     roles: user.roles || [],
@@ -72,38 +52,54 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
                 };
     
                 setUserInfo(updatedUserInfo);
-                setIsAdmin((user.roles || []).includes("admin"));
-            } else {
-                console.warn("User data is unavailable.");
             }
         } catch (error) {
             console.error("Error retrieving user info:", error);
-        }
-    };
-
-    const login = async (t: string) => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('token', t);
-            setLoggedIn(true);
-            setToken(t);
-            setShowAuthModal(false)
-            getUserInfo();
+        } finally {
+            setIsAuthModalOpen(false)
+            setIsLoading(false)
         }
     };
 
     const logout = () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-            setLoggedIn(false);
-            setIsAdmin(false)
-            setToken('');
-            setShowAuthModal(false)
-            setUserInfo(undefined)
-        }
+        localStorage.removeItem('token')
+        setLoggedIn(false);
+        setUserInfo(null)
+        setIsAuthModalOpen(false)
+        setIsLoading(false)
     };
 
+    const hideAuthModal = () => {
+        setIsAuthModalOpen(false)
+    }
+
+    const checkAuth = useCallback(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            isLoggedIn && logout();
+            setIsAuthModalOpen(true)
+            return;
+        }
+
+        if (!isLoggedIn) {
+            login(token)
+        }
+    }, [isLoggedIn, login, logout, hideAuthModal]);
+
+    // Sync auth status across multiple windows
+    useEffect(() => {
+        // run checkAuth every page visit
+        checkAuth();
+    
+        // run checkAuth every focus changes
+        window.addEventListener('focus', checkAuth);
+        return () => {
+            window.removeEventListener('focus', checkAuth);
+        };
+    }, [checkAuth]);
+
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userInfo, isAdmin, login, logout, token, showAuthModal, setShowAuthModal }}>
+        <AuthContext.Provider value={{ isLoggedIn, userInfo, isLoading, isAuthModalOpen, login, logout, hideAuthModal}}>
             {children}
         </AuthContext.Provider>
     );

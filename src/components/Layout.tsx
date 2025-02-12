@@ -5,7 +5,7 @@ import FooterMenu from "../components/Footer";
 import SideMenu from "../components/SideMenu";
 
 import { AuthProvider } from '../utils/authContext';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
 
 
 type Props = {
@@ -23,7 +23,7 @@ export const Layout: FunctionComponent<Props> = ({ children }) => {
             <AuthProvider>
                 <div className="min-h-screen">
                     <Header />
-                    <ToastContainer className="fixed top-16 right-2"/>
+                    <Toaster position="top-right" containerClassName="fixed top-15 right-2"/>
                     <div className="flex h-screen pt-14 pb-12">
                         <SideMenu />
                         <main className="flex-1 px-10 py-5 overflow-x-auto">

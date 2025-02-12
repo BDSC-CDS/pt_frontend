@@ -1,55 +1,39 @@
-import { toast, ToastContent, ToastOptions, Slide, Id } from "react-toastify"
+import {toast, ToastOptions} from "react-hot-toast"
 
-export const defaultToastOptions: ToastOptions = {
+
+type ToastType = "success" | "error" | "custom" | "default"
+
+const defaultToastOptions: ToastOptions = {
     position: "top-right",
-    autoClose: 3000,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    transition: Slide,
-    className: "rounded-lg bg-white text-gray-500 shadow dark:bg-gray-800 dark:text-gray-400",
-}    
-
-type ToastType = "success" | "error" | "info" | "warning" | "default"    
-
+    duration: 3000,
+    className: "rounded-lg text-gray-500 shadow dark:bg-gray-800 dark:text-gray-400 bg-red-300"
+}
 /**
  * Display toast
  *
  * @param {ToastType} type
- * @param {ToastContent} content
- * @param {ToastOptions} [options=defaultToastOption]
+ * 
+ * @param {} content
  * @return {Id}
  */
 export const showToast = (
     type: ToastType,
-    content: ToastContent,
+    content: string | JSX.Element,
     options: Partial<ToastOptions> = {},
-): Id => {
+) => {
     const optionsToApply: ToastOptions = {
         ...defaultToastOptions,
         ...options
-    }
-
+    }     
     switch (type) {
         case "success":
-            optionsToApply.className += " ";
+            optionsToApply.iconTheme={primary: "#316278", secondary: "#FFFFFF"}
             return toast.success(content, optionsToApply)    
         case "error":
-            optionsToApply.className += " ";
             return toast.error(content, optionsToApply)    
-        case "info":
-            optionsToApply.className += " ";
-            return toast.info(content, optionsToApply)    
-        case "warning":
-            optionsToApply.className += " ";
-            return toast.warn(content, optionsToApply)    
-        case "default":
-            return toast(content, optionsToApply)    
+        case "custom":
+            return toast.custom(content, optionsToApply);
         default:
             return toast(content, optionsToApply)    
     }
-    
 }    
