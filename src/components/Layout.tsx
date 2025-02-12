@@ -23,7 +23,7 @@ export const Layout: FunctionComponent<Props> = ({ children }) => {
             <AuthProvider>
                 <div className="min-h-screen">
                     <Header />
-                    <Toaster position="top-right" containerClassName="fixed top-15 right-2"/>
+                    <Toaster position="top-right" containerClassName="mt-14"/>
                     <div className="flex h-screen pt-14 pb-12">
                         <SideMenu />
                         <main className="flex-1 px-10 py-5 overflow-x-auto">
