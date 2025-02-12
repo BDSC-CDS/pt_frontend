@@ -88,6 +88,9 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
 
     // Sync auth status across multiple windows
     useEffect(() => {
+        if (typeof window === 'undefined') { // Ensure this code only runs on the client side
+            return
+        }
         // run checkAuth every page visit
         checkAuth();
     
