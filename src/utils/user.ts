@@ -1,7 +1,7 @@
 import apiClientUser from './apiClientUser';
 import {getAuthInitOverrides} from './authContext'
 
-import { UserServiceCreateUserRequest, TemplatebackendCreateUserReply } from '../internal/client/index';
+import { UserServiceCreateUserRequest, TemplatebackendCreateUserReply, ResponseError } from '../internal/client/index';
 
 /**
  * Function to create a new user with the provided details.
@@ -27,7 +27,8 @@ export const createUser = async (firstName: string, lastName: string, email: str
         const response = await apiClientUser.userServiceCreateUser(user);
         return response; // TODO return response.result.id ....
     } catch (error) {
-        console.log("Error creating user:" + error);
+        console.log("Error creating user:" + error);        
+        throw error
     }
 };
 
@@ -36,6 +37,7 @@ export const getMyUser = async (token?: string) => {
         const response = await apiClientUser.userServiceGetUserMe(getAuthInitOverrides());
         return response;
     } catch (error) {
-        console.log("Error creating user:" + error);
+        console.log("Error retrieving user:" + error);
+        throw error
     }
 };
