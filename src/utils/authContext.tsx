@@ -2,6 +2,7 @@ import { InitOverrideFunction, HTTPRequestInit, RequestOpts } from '../internal/
 import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent, useCallback } from 'react';
 import { getMyUser } from "./user";
 import { jwtDecode } from 'jwt-decode';
+import { set } from 'lodash';
 
 type UserInfo = {
     token: string;
