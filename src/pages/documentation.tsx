@@ -13,7 +13,7 @@ export default function About() {
                 <title>Documentation</title>
                 <meta name="description" content="About us page" />
             </Head>
-            <div className="flex flex-col p-8">
+            <div className="flex flex-col">
                 <Header />
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-3xl font-bold">Documentation</h1>

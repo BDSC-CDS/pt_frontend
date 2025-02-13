@@ -56,7 +56,7 @@ function RiskAssessment() {
                 <title>Qualitative Risk Assessment</title>
             </Head>
             {isLoading ? (<Spinner/> ): (
-                <div className="flex flex-col p-8">
+                <div className="flex flex-col">
                     <div className="flex justify-between items-center mb-4">
                         <h1 className="text-3xl font-bold">Qualitative Risk Assessment</h1>
                         <button
