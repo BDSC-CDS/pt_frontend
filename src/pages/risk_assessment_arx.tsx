@@ -4,9 +4,11 @@ import { useAuth } from '~/utils/authContext';
 import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
 import DatasetSelector from '~/components/DatasetSelector';
 import { useRouter } from 'next/router';
+import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 
-export default function RiskAssessmentArx() {
+function RiskAssessmentArx() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
@@ -20,7 +22,7 @@ export default function RiskAssessmentArx() {
 
                 router.push(`/risk_assessment_arx/${id}`);
             } else {
-                alert("No quasi-identifiers have been defined for this dataset.");
+                showToast("error", "No quasi-identifiers have been defined for this dataset.")
             }
         }
 
@@ -60,3 +62,5 @@ export default function RiskAssessmentArx() {
         </>
     );
 }
+
+export default withAuth(RiskAssessmentArx)

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { createQuestionnaireVersion } from "~/utils/questionnaire";
 import { TemplatebackendQuestionnaireVersion } from "~/internal/client";
+import { showToast } from "~/utils/showToast";
 
 interface NewQuestionnaireVersionModalProps {
     show: boolean
@@ -31,13 +32,13 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
                 if(id) {
                     router.push("/admin/questionnaire/" + questionnaireId)
                 } else {
-                    alert("Error creating the questionnaire.")
+                    throw "No id returned."
                 }
             } catch (error) {
-                alert("Error creating the questionnaire: " + error)
+                showToast("error", "Error creating the version:"+error)
             }
         } else {
-            alert("The questionnaire name cannot be empty.")
+            showToast("error", "The version name cannot be empty.")
         }
     }
 

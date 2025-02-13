@@ -6,6 +6,7 @@ import { TemplatebackendDataset } from '~/internal/client';
 import DataTable from '~/components/DataTable';
 import DatasetPreviewModal from './modals/DatasetPreviewModal';
 import { MdSearch } from 'react-icons/md';
+import { showToast } from '~/utils/showToast';
 
 
 interface DatasetSelectorProps {
@@ -54,7 +55,7 @@ const DatasetSelector = ({
             try {
                 getListDatasets();
             } catch (error) {
-                alert("Error listing the datasets: "+error)
+                showToast("error", "Error listing datasets: "+error)
             }
         };
 

@@ -7,14 +7,13 @@ import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import {
     BiCalculator,
-    BiMessageSquareDetail,
-    BiLayer,
     BiSolidReport,
     BiSolidRuler,
     BiUndo,
-    BiSolidDetail,
 } from "react-icons/bi";
 import DataTable from '~/components/DataTable';
+import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 const DatasetPage = () => {
     // Athentication
@@ -77,7 +76,7 @@ const DatasetPage = () => {
                 getDatasetInfo();
                 getAndProcessDatasetContent();
             } catch (error) {
-                alert("Error getting the data");
+                showToast("error", "Error retrieving dataset data.")
             }
         }
     }, [id, page, limit]);
@@ -225,4 +224,4 @@ const DatasetPage = () => {
     );
 };
 
-export default DatasetPage;
+export default withAuth(DatasetPage);

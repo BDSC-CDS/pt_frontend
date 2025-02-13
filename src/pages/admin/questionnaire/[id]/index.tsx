@@ -8,8 +8,10 @@ import { getQuestionnaire } from "../../../../utils/questionnaire"
 import { MdOutlineAdd } from "react-icons/md";
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { HiPencilAlt, HiCheck } from "react-icons/hi";
+import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
-export default function Questionnaire() {
+function Questionnaire() {
     const router = useRouter();
     const { id } = router.query;
     const questionnaireId = Number(id);
@@ -33,7 +35,7 @@ export default function Questionnaire() {
         try {
             loadQuestionnaire();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaires.")
         }
     }, [id]);
 
@@ -115,3 +117,5 @@ export default function Questionnaire() {
         </>
     );
 }
+
+export default withAdmin(Questionnaire)

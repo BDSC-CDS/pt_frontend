@@ -8,8 +8,10 @@ import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { MdOutlineAdd } from "react-icons/md";
 import DataTable from '~/components/DataTable';
 import NewQuestionnaireModal from '~/components/modals/admin/NewQuestionnaireModal';
+import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
-export default function Questionnaire() {
+function Questionnaire() {
     // Routing
     const router = useRouter();
 
@@ -38,7 +40,7 @@ export default function Questionnaire() {
         try {
             getlistQuestionnaires();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaires.")
         }
     }, []);
 
@@ -85,3 +87,5 @@ export default function Questionnaire() {
         </>
     );
 }
+
+export default withAdmin(Questionnaire)

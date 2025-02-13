@@ -1,22 +1,19 @@
 import { Sidebar } from 'flowbite-react';
 import Link from 'next/link';
-import { BiBuoy } from 'react-icons/bi';
-import { HiDatabase, HiInbox, HiPresentationChartBar, HiOutlineCog, HiLockClosed, HiShieldCheck  } from 'react-icons/hi';
+import { HiDatabase, HiInbox, HiPresentationChartBar, HiOutlineCog, HiLockClosed  } from 'react-icons/hi';
 import { HiClipboardDocumentList } from 'react-icons/hi2';
 import { useAuth } from '~/utils/authContext';
 import type { CustomFlowbiteTheme } from "flowbite-react";
 import {
     BiCalculator,
-    BiMessageSquareDetail,
     BiLayer,
     BiSolidReport,
     BiSolidRuler,
-    BiUndo,
     BiSolidDetail,
 } from "react-icons/bi";
 
 export default function SideMenu() {
-    const { isAdmin } = useAuth();
+    const { userInfo, isLoading } = useAuth();
 
     const customTheme: CustomFlowbiteTheme["sidebar"] = {
         collapse: {
@@ -25,7 +22,6 @@ export default function SideMenu() {
             },
         },
     };
-
 
     return (
         <div className="w-72 sticky bg-gray-50">
@@ -69,25 +65,26 @@ export default function SideMenu() {
                     </Sidebar.ItemGroup> 
 
                     <Sidebar.ItemGroup>
-                        <Sidebar.Collapse className={`${!isAdmin ? "hidden" : ""}`} icon={HiOutlineCog} theme={customTheme.collapse} label="Admin">
-                            <Link href="/admin/questionnaire" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
-                                <HiClipboardDocumentList />
-                                <p className='ml-1'>Questionnaires</p>
-                            </Link>
-                            <Link href="/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
-                                <HiLockClosed />
-                                <p className='ml-1'>Audit Log</p>
-                            </Link>
-                        </Sidebar.Collapse>
                         <Link href="/documentation" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
                             <HiInbox />
                             <p className='ml-1'>Documentation</p>
                         </Link>
-                        <Link href="#" passHref className='flex items-center ml-2 hover:bg-gray-100 hover:rounded'>
-                            <BiBuoy />
-                            <p className='ml-1'>Settings</p>
-                        </Link>
-                    </Sidebar.ItemGroup> 
+                    </Sidebar.ItemGroup>
+                    
+                    { !isLoading && userInfo?.isAdmin && (
+                        <Sidebar.ItemGroup>
+                            <Sidebar.Collapse icon={HiOutlineCog} theme={customTheme.collapse} label="Admin">
+                                <Link href="/admin/questionnaire" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
+                                    <HiClipboardDocumentList />
+                                    <p className='ml-1'>Questionnaires</p>
+                                </Link>
+                                <Link href="/admin/audit-logging" passHref className='flex items-center ml-10 hover:bg-gray-100 hover:rounded'>
+                                    <HiLockClosed />
+                                    <p className='ml-1'>Audit Log</p>
+                                </Link>
+                            </Sidebar.Collapse>
+                        </Sidebar.ItemGroup> 
+                    )}
                 </Sidebar.Items>
             </Sidebar>
         </div>

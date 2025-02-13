@@ -22,5 +22,6 @@ export const authenticateUser = async (email: string, password: string) => {
         return response; // Returning the response from the API.
     } catch (error) {
         console.log("Error authenticating user:" + error);
+        throw error
     }
 };

@@ -1,12 +1,14 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { listAuditLogs } from '../utils/auditlog';
-import { TemplatebackendAuditLog, TemplatebackendUser } from '../internal/client';
+import { listAuditLogs } from '~/utils/auditlog';
+import { TemplatebackendAuditLog, TemplatebackendUser } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
 import { Button, Modal, Tooltip } from 'flowbite-react';
 import { BiSolidMask } from "react-icons/bi";
+import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
-export default function AuditLogging() {
+function AuditLogging() {
     const [originalAuditLogsList, setOriginalAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
     const [filteredAuditLogsList, setFilteredAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +46,7 @@ export default function AuditLogging() {
             setFilteredAuditLogsList(sortedLogs);
         } catch (error) {
             console.error("Error listing the audit logs:", error);
-            alert("Error listing the audit logs");
+            showToast("error", "Error listing the audit logs.")
         }
     };
 
@@ -378,3 +380,5 @@ export default function AuditLogging() {
         </>
     );
 }
+
+export default withAdmin(AuditLogging)

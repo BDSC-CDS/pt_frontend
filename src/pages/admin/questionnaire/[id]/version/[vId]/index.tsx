@@ -12,6 +12,8 @@ import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, Temp
 import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
 import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
+import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -28,7 +30,7 @@ type Tabs = Tab[];
 /**
  * Admin questionnaire version page.
  */
-export default function QuestionnaireVersion() {
+function QuestionnaireVersion() {
 
     // Routing
     const router = useRouter();
@@ -139,7 +141,7 @@ export default function QuestionnaireVersion() {
         } try {
             loadQuestionnaire();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaire versions.")
         }
     }, [questionnaireId]);
 
@@ -745,3 +747,5 @@ export default function QuestionnaireVersion() {
         </>
     );
 }
+
+export default withAdmin(QuestionnaireVersion)

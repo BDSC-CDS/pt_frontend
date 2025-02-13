@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useAuth } from '~/utils/authContext';
 import DatasetSelector from '~/components/DatasetSelector';
+import withAuth from '~/components/withAuth';
 
-export default function DeidentificationNotebook() {
+function DeidentificationNotebook() {
     const { isLoggedIn } = useAuth();
 
     const router = useRouter();
@@ -48,3 +49,5 @@ export default function DeidentificationNotebook() {
         </>
     );
 }
+
+export default withAuth(DeidentificationNotebook)

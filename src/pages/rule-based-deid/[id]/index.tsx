@@ -10,6 +10,8 @@ import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
 import { saveAs } from 'file-saver';
 import DataTable from '~/components/DataTable';
+import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 const TransformPage = () => {
 
@@ -332,7 +334,7 @@ const TransformPage = () => {
                 getAndProcessDatasetContent();
                 // handleGetConfigs();
             } catch (error) {
-                alert("Error getting the data");
+                showToast("error", "Error retrieving dataset data.")
             }
         }
     }, [id]);
@@ -1026,4 +1028,4 @@ const TransformPage = () => {
     );
 };
 
-export default TransformPage;
+export default withAuth(TransformPage);
