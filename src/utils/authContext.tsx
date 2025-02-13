@@ -2,6 +2,7 @@ import { InitOverrideFunction, HTTPRequestInit, RequestOpts } from '../internal/
 import React, { createContext, useContext, useEffect, useState, ReactNode, FunctionComponent, useCallback } from 'react';
 import { getMyUser } from "./user";
 import { jwtDecode } from 'jwt-decode';
+import { set } from 'lodash';
 
 type UserInfo = {
     token: string;
@@ -38,6 +39,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
     
     const login = async (token: string) => {
+        setIsLoading(true)
         localStorage.setItem('token', token);
         setLoggedIn(true);
         try {
