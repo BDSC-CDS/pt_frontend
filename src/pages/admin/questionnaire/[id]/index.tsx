@@ -9,6 +9,7 @@ import { MdOutlineAdd } from "react-icons/md";
 import { TemplatebackendQuestionnaire } from '~/internal/client';
 import { HiPencilAlt, HiCheck } from "react-icons/hi";
 import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
 function Questionnaire() {
     const router = useRouter();
@@ -34,7 +35,7 @@ function Questionnaire() {
         try {
             loadQuestionnaire();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaires.")
         }
     }, [id]);
 

@@ -13,6 +13,7 @@ import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
 import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
 import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -140,7 +141,7 @@ function QuestionnaireVersion() {
         } try {
             loadQuestionnaire();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaire versions.")
         }
     }, [questionnaireId]);
 

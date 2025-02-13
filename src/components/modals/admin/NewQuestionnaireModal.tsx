@@ -2,6 +2,7 @@ import { Button, Modal, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { createQuestionnaire } from "~/utils/questionnaire";
+import { showToast } from "~/utils/showToast";
 
 interface NewQuestionnaireModalProps {
     show: boolean
@@ -27,17 +28,16 @@ export default function NewQuestionnaireModal({show, onClose}: NewQuestionnaireM
         if(questionnaireInfo.name != ""){
             try {
                 const id = await createQuestionnaire(questionnaireInfo)
-                console.log(id)
                 if(id) {
                     router.push("/admin/questionnaire/" + id)
                 } else {
-                    alert("Error creating the questionnaire.")
+                    throw "No id returned."
                 }
             } catch (error) {
-                alert("Error creating the questionnaire: " + error)
+                showToast("error", "Error creating the questionnaire:"+error)
             }
         } else {
-            alert("The questionnaire name cannot be empty.")
+            showToast("error", "The questionnaire name cannot be empty.")
         }
         
     }

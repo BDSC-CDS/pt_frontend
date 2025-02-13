@@ -1,7 +1,7 @@
 import {toast, ToastOptions} from "react-hot-toast"
 
 
-type ToastType = "success" | "error" | "custom" | "default"
+type ToastType = "success" | "info" | "error" | "custom" | "default"
  
 const defaultToastOptions: ToastOptions = {
     duration: 3000,
@@ -29,7 +29,10 @@ export const showToast = (
     switch (type) {
         case "success":
             optionsToApply.iconTheme={primary: "#316278", secondary: "#FFFFFF"}
-            return toast.success(content, optionsToApply)    
+            return toast.success(content, optionsToApply) 
+        case "info":
+            optionsToApply.icon="ℹ️"
+            return toast(content, optionsToApply);
         case "error":
             return toast.error(content, optionsToApply)    
         case "custom":

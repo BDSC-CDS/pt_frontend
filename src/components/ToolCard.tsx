@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import { showToast } from '~/utils/showToast';
 
 /**
  * Props for the ToolCard component.
@@ -25,7 +26,7 @@ function ToolCard({
     const handleClick = (e: React.MouseEvent) => {
         if (disabled) {
             e.preventDefault(); // Prevent navigation if disabled
-            alert("This feature is not implemented yet.");
+            showToast("info", "This feature is not implemented yet.")
         }
     };
 

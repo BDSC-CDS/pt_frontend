@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { showToast } from '~/utils/showToast';
 // import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 const DatasetPage = () => {
@@ -28,7 +29,7 @@ const DatasetPage = () => {
                 getMarkdown();
                 prevIdRef.current = String(id);
             } catch (error) {
-                alert("Error getting the data");
+                showToast("error", "Error retrieving documentation file.")
             }
         }
     }, [id]);

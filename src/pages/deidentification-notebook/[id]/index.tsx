@@ -5,6 +5,7 @@ import { getDeidentificationNotebookURL } from "../../../utils/dataset"
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '~/utils/authContext';
 import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 const DatasetPage = () => {
     const [notebookUrl, setNotebookUrl] = useState<string>();
@@ -28,7 +29,7 @@ const DatasetPage = () => {
                 getDatasetJupyterhub();
                 prevIdRef.current = Number(id);
             } catch (error) {
-                alert("Error getting the data");
+                showToast("error", "Error retrieving dataset data.")
             }
         }
     }, [id]);

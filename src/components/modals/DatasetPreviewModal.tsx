@@ -5,6 +5,7 @@ import { getDatasetContent, getInfo, getMetadata } from "~/utils/dataset";
 import DataTable from "../DataTable";
 import Spinner from "../ui/Spinner";
 import { useRouter } from "next/router";
+import { showToast } from "~/utils/showToast";
 
 interface DatasetPreviewModalProps {
     show: boolean
@@ -117,7 +118,7 @@ export default function DatasetPreviewModal({show, datasetId, onClose}: DatasetP
             try {
                 getDatasetInfo()
             } catch (error) {
-                alert("Error retrieving the dataset info.")
+                showToast("error", "Error retrieving dataset info.")
             }
         }
     }, [show]);

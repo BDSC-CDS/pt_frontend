@@ -6,6 +6,7 @@ import { useAuth } from '~/utils/authContext';
 import { Button, Modal, Tooltip } from 'flowbite-react';
 import { BiSolidMask } from "react-icons/bi";
 import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
 function AuditLogging() {
     const [originalAuditLogsList, setOriginalAuditLogsList] = useState<Array<TemplatebackendAuditLog>>([]);
@@ -45,7 +46,7 @@ function AuditLogging() {
             setFilteredAuditLogsList(sortedLogs);
         } catch (error) {
             console.error("Error listing the audit logs:", error);
-            alert("Error listing the audit logs");
+            showToast("error", "Error listing the audit logs.")
         }
     };
 

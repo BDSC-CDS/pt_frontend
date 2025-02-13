@@ -583,7 +583,6 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
 
     // Everything to save
     const [openSaveModal, setOpenSaveModal] = useState(false);
-    const [openSaveAlert, setOpenSaveAlert] = useState(false);
     const [saveName, setSaveName] = useState("");
     const save = async () => {
         setOpenSaveModal(false);

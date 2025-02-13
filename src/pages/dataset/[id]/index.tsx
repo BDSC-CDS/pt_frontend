@@ -13,6 +13,7 @@ import {
 } from "react-icons/bi";
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 const DatasetPage = () => {
     // Athentication
@@ -75,7 +76,7 @@ const DatasetPage = () => {
                 getDatasetInfo();
                 getAndProcessDatasetContent();
             } catch (error) {
-                alert("Error getting the data");
+                showToast("error", "Error retrieving dataset data.")
             }
         }
     }, [id, page, limit]);

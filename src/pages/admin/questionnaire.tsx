@@ -9,6 +9,7 @@ import { MdOutlineAdd } from "react-icons/md";
 import DataTable from '~/components/DataTable';
 import NewQuestionnaireModal from '~/components/modals/admin/NewQuestionnaireModal';
 import withAdmin from '~/components/withAdmin';
+import { showToast } from '~/utils/showToast';
 
 function Questionnaire() {
     // Routing
@@ -39,7 +40,7 @@ function Questionnaire() {
         try {
             getlistQuestionnaires();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", "Error listing questionnaires.")
         }
     }, []);
 
