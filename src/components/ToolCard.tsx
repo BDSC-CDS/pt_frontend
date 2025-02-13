@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { showToast } from '~/utils/showToast';
+import { showToast } from '../utils/showToast';
 
 /**
  * Props for the ToolCard component.
