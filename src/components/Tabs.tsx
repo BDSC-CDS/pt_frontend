@@ -6,11 +6,13 @@ import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
 import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
-
-import { Button, Modal, TextInput, ToggleSwitch, Alert } from 'flowbite-react';
-const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
+import { Button, Modal, TextInput } from 'flowbite-react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { showToast } from '~/utils/showToast';
+import { useRouter } from 'next/router';
+
+const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
+
 
 interface TabsComponentProps {
     questions: Questions;
@@ -26,9 +28,22 @@ type Tabs = {
 
 
 const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireVersionId, reply }) => {
+    const router = useRouter()
     const [activeTab, setActiveTab] = useState<string>('1');
 
-    console.log("tab", questionnaireVersionId, reply);
+    const setSelectedAnswer = (question: Question, answerId: string) => {
+        question.answers.forEach(a => {
+            a.selected = false;
+            if (a.answerId == answerId) {
+                a.selected = true;
+                question.highRiskAnswerSelected = a.highRisk;
+            }
+        });
+
+        computeCurrentRisk();
+        computeCurrentReport();
+        computeHighRiskCount()
+    }
 
     if (reply) {
         interface QuestionMap {
@@ -45,7 +60,12 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             const q = allQuestions[r.questionnaireQuestionId];
             if (!q) return;
             const a = q.answers.find(a => a.answerId == r.answer)
-            if (a) a.selected = true;
+            if (a) {
+                a.selected = true;
+                if(a.highRisk){
+                    q.highRiskAnswerSelected = true
+                }
+            }
         })
     }
 
@@ -81,20 +101,6 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
         }
         return false;
     };
-
-    const setSelectedAnswer = (question: Question, answerId: string) => {
-        question.answers.forEach(a => {
-            a.selected = false;
-            if (a.answerId == answerId) {
-                a.selected = true;
-                question.highRiskAnswerSelected = a.highRisk;
-            }
-        });
-
-        computeCurrentRisk();
-        computeCurrentReport();
-        computeHighRiskCount()
-    }
     
     const computeHighRiskCount = () => {
         let totalHighRiskAnswers = 0;
@@ -604,16 +610,20 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
             replies: replies,
         }
 
-        const id = await createReply(replyToSave);
-
-        setOpenSaveAlert(true);
+        try {
+            const id = await createReply(replyToSave);
+            if(!id) {
+                throw "Error creating the new version."
+            }
+            showToast("success", "New reply successfully saved.")
+            router.push("/risk_assessment")
+        } catch (error) {
+            showToast("error", String(error))
+        }
     }
 
     return (
         <>
-            <Alert className={(openSaveAlert ? "" : "hidden") + " mt-5"} color="success" onDismiss={() => setOpenSaveAlert(false)}>
-                <span className="font-bold">Version {saveName} </span>successfuly saved!
-            </Alert>
             <div className="flex flex-row items-end p-5">
                 <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
@@ -628,7 +638,6 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
                             <TextInput
                                 placeholder="Project name"
                                 required
-                                // value={"12"}
                                 onChange={(event) => { setSaveName(event.target.value) }}
                             />
                         </div>

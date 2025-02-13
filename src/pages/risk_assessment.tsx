@@ -6,6 +6,8 @@ import { listReplies } from "../utils/questionnaire";
 import { useAuth } from '~/utils/authContext';
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
+import Spinner from '~/components/ui/Spinner';
+import { showToast } from '~/utils/showToast';
 
 function RiskAssessment() {
     // Authentication
@@ -16,10 +18,11 @@ function RiskAssessment() {
 
     // States
     const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const loadReplies = async () => {
+        setIsLoading(true)
         const replies = await listReplies();
-
         if (!replies) {
             return;
         }
@@ -29,13 +32,14 @@ function RiskAssessment() {
         }
 
         setReplies(replies);
+        setIsLoading(false)
     };
 
     useEffect(() => {
         try {
             loadReplies();
         } catch (error) {
-            alert("Error listing the replies");
+            showToast("error", "Error listing the replies.")
         }
     }, []);
 
@@ -51,10 +55,7 @@ function RiskAssessment() {
             <Head>
                 <title>Qualitative Risk Assessment</title>
             </Head>
-            {!isLoggedIn && (
-                <p className='m-8'>Please log in to consult your risk assessments.</p>
-            )}
-            {isLoggedIn && (
+            {isLoading ? (<Spinner/> ): (
                 <div className="flex flex-col p-8">
                     <div className="flex justify-between items-center mb-4">
                         <h1 className="text-3xl font-bold">Qualitative Risk Assessment</h1>

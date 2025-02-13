@@ -7,22 +7,24 @@ import { useRouter } from 'next/router';
 import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
 import { questionsFromApi, Questions } from "../../../utils/questions"
 import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
+import Spinner from '~/components/ui/Spinner';
 
 
 const QuestionnairePage = () => {
     let questionnaireId = 1;
-    const [questionnaireVersionId, setQuestionnaireVersionId] = useState<number>();
-
-
+    
     const router = useRouter();
     const { id } = router.query;
 
-
+    const [questionnaireVersionId, setQuestionnaireVersionId] = useState<number>();
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [questions, setQuestions] = useState<Questions>();
     const [reply, setReply] = useState<TemplatebackendQuestionnaireReply>();
 
 
     const load = async () => {
+        setIsLoading(true)
         let replyId;
         if (id && id != "new") {
             replyId = Number(id);
@@ -39,7 +41,6 @@ const QuestionnairePage = () => {
         }
 
         const result = await getQuestionnaire(questionnaireId);
-
         if (!result) {
             return
         }
@@ -57,26 +58,23 @@ const QuestionnairePage = () => {
         }
         const q = questionsFromApi(v);
         setQuestions(q);
+        setIsLoading(false)
     }
 
     useEffect(() => {
         try {
             load();
         } catch (error) {
-            alert("Error listing the datasets")
+            showToast("error", `Error listing the replies: ${error}`)
         }
     }, []);
 
-
-
     return (
         <>
-            {questions ? (
+            {!isLoading && questions ? (
                 <TabsComponent questions={questions} questionnaireVersionId={questionnaireVersionId} reply={reply} />
             ) : (
-                <div>
-                    <p>Loading or project not found...</p>
-                </div>
+                <Spinner/>
             )}
 
         </>
