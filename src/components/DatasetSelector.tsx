@@ -119,8 +119,10 @@ const DatasetSelector = ({
                             onRowClick={(row) => handleRowClick(row.id)}
                             iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
                             actions={mappedActions}
-                            addRow={true}
-                            onAddRowClick={() => setIsUploadModalOpen(true)}
+                            addRow={{
+                                label: "New dataset",
+                                onRowClick: () => setIsUploadModalOpen(true),
+                            }}
                         />
                     ) : (
                         <div className="text-center text-gray-500 mt-20">No datasets yet.</div>

@@ -64,8 +64,10 @@ interface DataTableProps<T> {
         name: string;
         callback: (row: T) => void;
     }[];
-    addRow?: boolean;
-    onAddRowClick?: () => void;
+    addRow?: {
+        label: string;
+        onRowClick: () => void;
+    }
 };
 
 // Utility function to render cell values
@@ -87,7 +89,6 @@ const DataTable = <T extends {}>({
     iconActions,
     actions,
     addRow,
-    onAddRowClick,
 }: DataTableProps<T>): JSX.Element => {
     return (
         <Flowbite theme={{theme: customTheme}}>
@@ -179,10 +180,10 @@ const DataTable = <T extends {}>({
                         )).concat( addRow ? (
                             // Add a row at the end of the table
                             <Table.Row key="addRow" className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                <Table.Cell colSpan={columns.length + (iconActions ? 1 : 0) + (actions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={onAddRowClick}>
+                                <Table.Cell colSpan={columns.length + (iconActions ? 1 : 0) + (actions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={addRow.onRowClick}>
                                     <div className="flex justify-center items-center text-sm gap-2">
                                         <MdOutlineAdd size={20}/>
-                                        <span>New dataset</span>
+                                        <span>{addRow.label}</span>
                                     </div>
                                 </Table.Cell>
                             </Table.Row>
