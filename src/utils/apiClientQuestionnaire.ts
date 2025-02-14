@@ -1,9 +1,9 @@
-import { Configuration, QuestionnaireApi } from '../internal/client/index';
+import { Configuration, QuestionnaireServiceApi } from '../internal/client/index';
 import { apiURL } from './apiURL';
 
 const apiConfig = new Configuration({ basePath: apiURL() });
 
 
-const apiClientQuestionnaire = new QuestionnaireApi(apiConfig);
+const apiClientQuestionnaire = new QuestionnaireServiceApi(apiConfig);
 
 export default apiClientQuestionnaire;

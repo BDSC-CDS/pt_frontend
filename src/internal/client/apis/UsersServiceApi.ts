@@ -21,6 +21,8 @@ import type {
   TemplatebackendGetUserMeReply,
   TemplatebackendGetUserReply,
   TemplatebackendResetPasswordReply,
+  TemplatebackendSearchUsersReply,
+  TemplatebackendSearchUsersRequest,
   TemplatebackendUpdatePasswordReply,
   TemplatebackendUpdatePasswordRequest,
   TemplatebackendUser,
@@ -38,6 +40,10 @@ import {
     TemplatebackendGetUserReplyToJSON,
     TemplatebackendResetPasswordReplyFromJSON,
     TemplatebackendResetPasswordReplyToJSON,
+    TemplatebackendSearchUsersReplyFromJSON,
+    TemplatebackendSearchUsersReplyToJSON,
+    TemplatebackendSearchUsersRequestFromJSON,
+    TemplatebackendSearchUsersRequestToJSON,
     TemplatebackendUpdatePasswordReplyFromJSON,
     TemplatebackendUpdatePasswordReplyToJSON,
     TemplatebackendUpdatePasswordRequestFromJSON,
@@ -46,39 +52,43 @@ import {
     TemplatebackendUserToJSON,
 } from '../models/index';
 
-export interface UserServiceCreateUserRequest {
+export interface UsersServiceCreateUserRequest {
     body: TemplatebackendUser;
 }
 
-export interface UserServiceDeleteUserRequest {
+export interface UsersServiceDeleteUserRequest {
     id: number;
 }
 
-export interface UserServiceGetUserRequest {
+export interface UsersServiceGetUserRequest {
     id: number;
 }
 
-export interface UserServiceResetPasswordRequest {
+export interface UsersServiceResetPasswordRequest {
     id: number;
     body: object;
 }
 
-export interface UserServiceUpdatePasswordRequest {
+export interface UsersServiceSearchUsersRequest {
+    body: TemplatebackendSearchUsersRequest;
+}
+
+export interface UsersServiceUpdatePasswordRequest {
     body: TemplatebackendUpdatePasswordRequest;
 }
 
 /**
  * 
  */
-export class UsersApi extends runtime.BaseAPI {
+export class UsersServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint creates a user
      * Create a user
      */
-    async userServiceCreateUserRaw(requestParameters: UserServiceCreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateUserReply>> {
+    async usersServiceCreateUserRaw(requestParameters: UsersServiceCreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateUserReply>> {
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling userServiceCreateUser.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling usersServiceCreateUser.');
         }
 
         const queryParameters: any = {};
@@ -106,8 +116,8 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint creates a user
      * Create a user
      */
-    async userServiceCreateUser(requestParameters: UserServiceCreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateUserReply> {
-        const response = await this.userServiceCreateUserRaw(requestParameters, initOverrides);
+    async usersServiceCreateUser(requestParameters: UsersServiceCreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateUserReply> {
+        const response = await this.usersServiceCreateUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -115,9 +125,9 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint deletes a user
      * Delete a user
      */
-    async userServiceDeleteUserRaw(requestParameters: UserServiceDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteUserReply>> {
+    async usersServiceDeleteUserRaw(requestParameters: UsersServiceDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteUserReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling userServiceDeleteUser.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling usersServiceDeleteUser.');
         }
 
         const queryParameters: any = {};
@@ -142,8 +152,8 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint deletes a user
      * Delete a user
      */
-    async userServiceDeleteUser(requestParameters: UserServiceDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteUserReply> {
-        const response = await this.userServiceDeleteUserRaw(requestParameters, initOverrides);
+    async usersServiceDeleteUser(requestParameters: UsersServiceDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteUserReply> {
+        const response = await this.usersServiceDeleteUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -151,9 +161,9 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint returns a user
      * Get a user
      */
-    async userServiceGetUserRaw(requestParameters: UserServiceGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetUserReply>> {
+    async usersServiceGetUserRaw(requestParameters: UsersServiceGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetUserReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling userServiceGetUser.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling usersServiceGetUser.');
         }
 
         const queryParameters: any = {};
@@ -178,8 +188,8 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint returns a user
      * Get a user
      */
-    async userServiceGetUser(requestParameters: UserServiceGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetUserReply> {
-        const response = await this.userServiceGetUserRaw(requestParameters, initOverrides);
+    async usersServiceGetUser(requestParameters: UsersServiceGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetUserReply> {
+        const response = await this.usersServiceGetUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -187,7 +197,7 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint returns the details of the authenticated user
      * Get my own user
      */
-    async userServiceGetUserMeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetUserMeReply>> {
+    async usersServiceGetUserMeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetUserMeReply>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -210,8 +220,8 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint returns the details of the authenticated user
      * Get my own user
      */
-    async userServiceGetUserMe(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetUserMeReply> {
-        const response = await this.userServiceGetUserMeRaw(initOverrides);
+    async usersServiceGetUserMe(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetUserMeReply> {
+        const response = await this.usersServiceGetUserMeRaw(initOverrides);
         return await response.value();
     }
 
@@ -219,13 +229,13 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint resets a user\'s password
      * Reset password
      */
-    async userServiceResetPasswordRaw(requestParameters: UserServiceResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendResetPasswordReply>> {
+    async usersServiceResetPasswordRaw(requestParameters: UsersServiceResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendResetPasswordReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling userServiceResetPassword.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling usersServiceResetPassword.');
         }
 
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling userServiceResetPassword.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling usersServiceResetPassword.');
         }
 
         const queryParameters: any = {};
@@ -253,8 +263,47 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint resets a user\'s password
      * Reset password
      */
-    async userServiceResetPassword(requestParameters: UserServiceResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendResetPasswordReply> {
-        const response = await this.userServiceResetPasswordRaw(requestParameters, initOverrides);
+    async usersServiceResetPassword(requestParameters: UsersServiceResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendResetPasswordReply> {
+        const response = await this.usersServiceResetPasswordRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint searches for users
+     * Search users
+     */
+    async usersServiceSearchUsersRaw(requestParameters: UsersServiceSearchUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendSearchUsersReply>> {
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling usersServiceSearchUsers.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/rest/v1/users/search`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TemplatebackendSearchUsersRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendSearchUsersReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint searches for users
+     * Search users
+     */
+    async usersServiceSearchUsers(requestParameters: UsersServiceSearchUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendSearchUsersReply> {
+        const response = await this.usersServiceSearchUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -262,9 +311,9 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint updates the password of the authenticated user
      * Update password
      */
-    async userServiceUpdatePasswordRaw(requestParameters: UserServiceUpdatePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdatePasswordReply>> {
+    async usersServiceUpdatePasswordRaw(requestParameters: UsersServiceUpdatePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdatePasswordReply>> {
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling userServiceUpdatePassword.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling usersServiceUpdatePassword.');
         }
 
         const queryParameters: any = {};
@@ -292,8 +341,8 @@ export class UsersApi extends runtime.BaseAPI {
      * This endpoint updates the password of the authenticated user
      * Update password
      */
-    async userServiceUpdatePassword(requestParameters: UserServiceUpdatePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdatePasswordReply> {
-        const response = await this.userServiceUpdatePasswordRaw(requestParameters, initOverrides);
+    async usersServiceUpdatePassword(requestParameters: UsersServiceUpdatePasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdatePasswordReply> {
+        const response = await this.usersServiceUpdatePasswordRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

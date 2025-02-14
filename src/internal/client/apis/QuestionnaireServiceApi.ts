@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  QuestionnaireServiceShareReplyRequest,
   RpcStatus,
   TemplatebackendCreateQuestionnaireReply,
   TemplatebackendCreateQuestionnaireRequest,
@@ -27,8 +28,11 @@ import type {
   TemplatebackendGetReplyReply,
   TemplatebackendListQuestionnaireReply,
   TemplatebackendListRepliesReply,
+  TemplatebackendShareReplyReply,
 } from '../models/index';
 import {
+    QuestionnaireServiceShareReplyRequestFromJSON,
+    QuestionnaireServiceShareReplyRequestToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
     TemplatebackendCreateQuestionnaireReplyFromJSON,
@@ -53,6 +57,8 @@ import {
     TemplatebackendListQuestionnaireReplyToJSON,
     TemplatebackendListRepliesReplyFromJSON,
     TemplatebackendListRepliesReplyToJSON,
+    TemplatebackendShareReplyReplyFromJSON,
+    TemplatebackendShareReplyReplyToJSON,
 } from '../models/index';
 
 export interface QuestionnaireServiceCreateQuestionnaireRequest {
@@ -89,10 +95,15 @@ export interface QuestionnaireServiceListRepliesRequest {
     limit?: number;
 }
 
+export interface QuestionnaireServiceShareReplyOperationRequest {
+    id: number;
+    body: QuestionnaireServiceShareReplyRequest;
+}
+
 /**
  * 
  */
-export class QuestionnaireApi extends runtime.BaseAPI {
+export class QuestionnaireServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint creates a questionnaire
@@ -396,6 +407,49 @@ export class QuestionnaireApi extends runtime.BaseAPI {
      */
     async questionnaireServiceListReplies(requestParameters: QuestionnaireServiceListRepliesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendListRepliesReply> {
         const response = await this.questionnaireServiceListRepliesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allows sharing a user\'s questionnaires reply
+     * Share questionnaires reply
+     */
+    async questionnaireServiceShareReplyRaw(requestParameters: QuestionnaireServiceShareReplyOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendShareReplyReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling questionnaireServiceShareReply.');
+        }
+
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling questionnaireServiceShareReply.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/questionnaire/replies/{id}/share`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: QuestionnaireServiceShareReplyRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendShareReplyReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allows sharing a user\'s questionnaires reply
+     * Share questionnaires reply
+     */
+    async questionnaireServiceShareReply(requestParameters: QuestionnaireServiceShareReplyOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendShareReplyReply> {
+        const response = await this.questionnaireServiceShareReplyRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

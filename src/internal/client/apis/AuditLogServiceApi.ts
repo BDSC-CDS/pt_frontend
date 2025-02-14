@@ -43,7 +43,7 @@ export interface AuditLogServiceGetLogsForUserRequest {
 /**
  * 
  */
-export class AuditLogApi extends runtime.BaseAPI {
+export class AuditLogServiceApi extends runtime.BaseAPI {
 
     /**
      * Gets a list of logs.

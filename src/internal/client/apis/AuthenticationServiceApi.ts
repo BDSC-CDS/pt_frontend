@@ -35,7 +35,7 @@ export interface AuthenticationServiceAuthenticateRequest {
 /**
  * 
  */
-export class AuthenticationApi extends runtime.BaseAPI {
+export class AuthenticationServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint authenticates a user

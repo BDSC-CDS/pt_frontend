@@ -4,6 +4,7 @@ import { getMyUser } from "./user";
 import { jwtDecode } from 'jwt-decode';
 
 type UserInfo = {
+    id: number;
     token: string;
     email: string;
     username: string;
@@ -45,14 +46,17 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
             const user = response?.result?.me;
             if (user) {
                 const updatedUserInfo: UserInfo = {
+                    id: user.id || 0,
                     token: token,
                     email: user.email || "",
                     username: user.username || "",
                     roles: user.roles || [],
                     isAdmin: (user.roles || []).includes("admin"),
                 };
-    
+                
                 setUserInfo(updatedUserInfo);
+                localStorage.setItem('userInfo', token);
+                console.log("userInfo", updatedUserInfo)
             }
         } catch (error) {
             console.error("Error retrieving user info:", error);
@@ -65,6 +69,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
 
     const logout = () => {
         localStorage.removeItem('token')
+        localStorage.removeItem('userInfo')
         setLoggedIn(false);
         setUserInfo(null)
         setIsAuthModalOpen(false)
@@ -88,6 +93,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
 
     const checkAuth = useCallback(() => {
         const token = localStorage.getItem('token');
+        const userInfo = localStorage.getItem('userInfo');
         if (!token || isTokenExpired(token)) {
             logout();
             setIsAuthModalOpen(true)

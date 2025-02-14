@@ -1,23 +1,37 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { TemplatebackendQuestionnaireReply } from '../internal/client/index';
+import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../internal/client/index';
 import { listReplies } from "../utils/questionnaire";
 import { useAuth } from '~/utils/authContext';
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
 import Spinner from '~/components/ui/Spinner';
 import { showToast } from '~/utils/showToast';
+import { HiShare } from "react-icons/hi";
+
+interface Reply {
+    id?: number;
+    questionnaireVersionId?: number;
+    projectName?: string;
+    replies?: Array<TemplatebackendQuestionnaireQuestionReply>;
+    userId?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+
+    shared: boolean;
+    status: JSX.Element;
+}
 
 function RiskAssessment() {
     // Authentication
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, userInfo } = useAuth();
 
     // Routing
     const router = useRouter();
 
     // States
-    const [replies, setReplies] = useState<Array<TemplatebackendQuestionnaireReply>>([]);
+    const [replies, setReplies] = useState<Array<Reply>>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const loadReplies = async () => {
@@ -31,7 +45,17 @@ function RiskAssessment() {
             router.push('/questionnaire/new');
         }
 
-        setReplies(replies);
+        const rep = replies.map(r=>{
+            const shared = r.userId == userInfo?.id;
+            console.log(shared, r.userId, userInfo)
+            return {
+                ...r,
+                shared: shared,
+                status: shared ? <HiShare /> : <></> 
+            };
+        })
+
+        setReplies(rep);
         setIsLoading(false)
     };
 
