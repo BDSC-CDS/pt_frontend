@@ -24,15 +24,12 @@ interface Reply {
 }
 
 function RiskAssessment() {
-    // Authentication
     const { isLoggedIn, userInfo } = useAuth();
 
-    // Routing
     const router = useRouter();
 
-    // States
     const [replies, setReplies] = useState<Array<Reply>>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const loadReplies = async () => {
         const replies = await listReplies();
@@ -99,6 +96,7 @@ function RiskAssessment() {
                                 {name:"id", header:"ID"},
                                 {name:"projectName", header:"Project Name"},
                                 // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
+                                {name:"status", header:"Status"},
                                 {name:"createdAt", header:"Created At"},
                             ]}
                             onRowClick={(row) => handleRowClick(row.id)}
