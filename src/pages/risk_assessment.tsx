@@ -18,7 +18,6 @@ function RiskAssessment() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const loadReplies = async () => {
-        setIsLoading(true)
         const replies = await listReplies();
         if (!replies) {
             return;
@@ -34,9 +33,12 @@ function RiskAssessment() {
 
     useEffect(() => {
         try {
+            setIsLoading(true)
             loadReplies();
         } catch (error) {
             showToast("error", "Error listing the replies.")
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
