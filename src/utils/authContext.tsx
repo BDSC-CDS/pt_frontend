@@ -39,6 +39,7 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
     
     const login = async (token: string) => {
+        setIsLoading(true)
         localStorage.setItem('token', token);
         setLoggedIn(true);
         try {
