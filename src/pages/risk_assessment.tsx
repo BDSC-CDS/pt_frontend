@@ -66,22 +66,18 @@ function RiskAssessment() {
                 ) : (
                     <>
                         {/* Questionnaire replies table */}
-                        {replies.length > 0 ? (
-                            <DataTable 
-                                data={replies}
-                                columns={[
-                                    {name:"id", header:"ID"},
-                                    {name:"projectName", header:"Project Name"},
-                                    // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
-                                    {name:"createdAt", header:"Created At"},
-                                ]}
-                                onRowClick={(row) => handleRowClick(row.id)}
-                                actions={undefined} // NOT IMPLEMENTED: DELETE REPLY
-                                addRow={{label: "New project", onRowClick: () => router.push('/questionnaire/new')}}
-                            />
-                        ) : (
-                            <div className="text-center text-gray-500 mt-20">No questionnaire replies yet.</div>
-                        )}            
+                        <DataTable 
+                            data={replies}
+                            columns={[
+                                {name:"id", header:"ID"},
+                                {name:"projectName", header:"Project Name"},
+                                // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
+                                {name:"createdAt", header:"Created At"},
+                            ]}
+                            onRowClick={(row) => handleRowClick(row.id)}
+                            actions={undefined} // NOT IMPLEMENTED: DELETE REPLY
+                            addRow={{label: "New project", onRowClick: () => router.push('/questionnaire/new')}}
+                        />               
                     </>
                 )}
             </div>

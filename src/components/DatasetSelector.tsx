@@ -107,26 +107,22 @@ const DatasetSelector = ({
             ) : (
                 <div>
                     {/* Dataset List */}
-                    { datasetsList.length > 0 ? (
-                        <DataTable
-                            data={datasetsList.map(dataset => ({ ...dataset, id: dataset.id ?? 0 }))}
-                            columns={[
-                                { name: "id", header: "Dataset ID" },
-                                { name: "datasetName", header: "Dataset Name" },
-                                // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" }, // NOT IMPLEMENTED: query dataset quasi-identifiers
-                                { name: "createdAt", header: "Created At" },
-                            ]}
-                            onRowClick={(row) => handleRowClick(row.id)}
-                            iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
-                            actions={mappedActions}
-                            addRow={{
-                                label: "New dataset",
-                                onRowClick: () => setIsUploadModalOpen(true),
-                            }}
-                        />
-                    ) : (
-                        <div className="text-center text-gray-500 mt-20">No datasets yet.</div>
-                    )}
+                    <DataTable
+                        data={datasetsList.map(dataset => ({ ...dataset, id: dataset.id ?? 0 }))}
+                        columns={[
+                            { name: "id", header: "Dataset ID" },
+                            { name: "datasetName", header: "Dataset Name" },
+                            // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" }, // NOT IMPLEMENTED: query dataset quasi-identifiers
+                            { name: "createdAt", header: "Created At" },
+                        ]}
+                        onRowClick={(row) => handleRowClick(row.id)}
+                        iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
+                        actions={mappedActions}
+                        addRow={{
+                            label: "New dataset",
+                            onRowClick: () => setIsUploadModalOpen(true),
+                        }}
+                    />
                     
                     {/* Upload modal */}
                     {isUploadModalOpen && (
