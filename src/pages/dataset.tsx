@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { deleteDataset } from "../utils/dataset"
 import DatasetSelector from '~/components/DatasetSelector';
 import withAuth from '~/components/withAuth';
+import { showToast } from '~/utils/showToast';
 
 function Dataset() {
     // Routing
@@ -29,6 +30,8 @@ function Dataset() {
                 router.push("/dataset")// Needed to trigger a refresh for the dataset list
             } catch (error) {
                 console.error("Error while trying to delete a dataset: ", error)
+            } finally {
+                showToast("success", "Dataset successfully deleted.")
             }
         }
     };

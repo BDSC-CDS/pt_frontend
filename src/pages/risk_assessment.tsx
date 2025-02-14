@@ -18,7 +18,6 @@ function RiskAssessment() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const loadReplies = async () => {
-        setIsLoading(true)
         const replies = await listReplies();
         if (!replies) {
             return;
@@ -34,9 +33,12 @@ function RiskAssessment() {
 
     useEffect(() => {
         try {
+            setIsLoading(true)
             loadReplies();
         } catch (error) {
             showToast("error", "Error listing the replies.")
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
@@ -64,22 +66,18 @@ function RiskAssessment() {
                 ) : (
                     <>
                         {/* Questionnaire replies table */}
-                        {replies.length > 0 ? (
-                            <DataTable 
-                                data={replies}
-                                columns={[
-                                    {name:"id", header:"ID"},
-                                    {name:"projectName", header:"Project Name"},
-                                    // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
-                                    {name:"createdAt", header:"Created At"},
-                                ]}
-                                onRowClick={(row) => handleRowClick(row.id)}
-                                actions={undefined} // NOT IMPLEMENTED: DELETE REPLY
-                                addRow={{label: "New project", onRowClick: () => router.push('/questionnaire/new')}}
-                            />
-                        ) : (
-                            <div className="text-center text-gray-500 mt-20">No questionnaire replies yet.</div>
-                        )}            
+                        <DataTable 
+                            data={replies}
+                            columns={[
+                                {name:"id", header:"ID"},
+                                {name:"projectName", header:"Project Name"},
+                                // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
+                                {name:"createdAt", header:"Created At"},
+                            ]}
+                            onRowClick={(row) => handleRowClick(row.id)}
+                            actions={undefined} // NOT IMPLEMENTED: DELETE REPLY
+                            addRow={{label: "New project", onRowClick: () => router.push('/questionnaire/new')}}
+                        />               
                     </>
                 )}
             </div>
