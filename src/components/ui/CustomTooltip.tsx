@@ -17,7 +17,6 @@ export const CustomTooltip: FC<CustomTooltipProps> = ({ content, children, class
     const handleMouseEnter = () => {
         if (triggerRef.current) {
             const { top, left, width, height } = triggerRef.current.getBoundingClientRect();
-            console.log(top, left, width, height);
             setTooltipStyles({
                 top: top + window.scrollY + 3*height/4, // Position below the trigger element
                 left: left + window.scrollX + width/2, // Center horizontally
