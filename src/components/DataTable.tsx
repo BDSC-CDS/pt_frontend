@@ -1,4 +1,5 @@
 import { CustomFlowbiteTheme, Flowbite, ListGroup, Table, Tooltip } from "flowbite-react";
+import {CustomTooltip} from "./ui/CustomTooltip";
 import { ElementType, ReactNode} from "react";
 import { MdMoreHoriz, MdOutlineAdd } from "react-icons/md";
 
@@ -126,7 +127,7 @@ const DataTable = <T extends {}>({
                                                 <div>
                                                     {iconActions.map((iconAction, actionIndex) => (
                                                         <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
-                                                            <Tooltip content={iconAction.tooltip} style="light" className="text-sm p-2">
+                                                            <Tooltip content={iconAction.tooltip} className="text-sm p-2">
                                                                 <iconAction.Icon className="text-lg"/>
                                                             </Tooltip>
                                                         </div>
@@ -154,7 +155,7 @@ const DataTable = <T extends {}>({
                                         {/* Render actions list */}
                                         <div className="flex items-center gap-3 justify-center">
                                             {actions && (
-                                                <Tooltip 
+                                                <CustomTooltip 
                                                     content={
                                                         <ListGroup className="shadow">
                                                             {actions.map((action, actionIndex) => (
@@ -166,12 +167,9 @@ const DataTable = <T extends {}>({
                                                                 </ListGroup.Item>
                                                             ))}
                                                         </ListGroup>} 
-                                                    placement="bottom" 
-                                                    style="light"
-                                                    className="border-0 p-0"
                                                 >
                                                     <MdMoreHoriz size={20}/>
-                                                </Tooltip>
+                                                </CustomTooltip>
                                             )}
                                         </div>
                                     </Table.Cell>

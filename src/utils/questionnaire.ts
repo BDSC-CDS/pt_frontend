@@ -17,6 +17,7 @@ export const createQuestionnaire = async (questionnaire: TemplatebackendQuestion
         return response?.result?.id
     } catch (error) {
         console.log("Error creating questionnaire:" + error);
+        throw error;
     }
 }
 
@@ -31,6 +32,7 @@ export const createQuestionnaireVersion = async (questionnaireId:number, version
         return response?.result?.id;
     } catch (error) {
         console.log("Error creating questionnaire version:" + error);
+        throw error;
     }
 };
 
@@ -40,6 +42,7 @@ export const listQuestionnaires = async (offset: number = 0, limit: number|undef
         return response?.result?.questionnaires;
     } catch (error) {
         console.log("Error creating questionnaire:" + error);
+        throw error;
     }
 };
 
@@ -49,6 +52,7 @@ export const listReplies = async (offset: number = 0, limit: number|undefined = 
         return response?.result?.replies;
     } catch (error) {
         console.log("Error listing replies:" + error);
+        throw error;
     }
 };
 
@@ -58,6 +62,7 @@ export const getReply = async (replyId: number) => {
         return response?.result?.reply;
     } catch (error) {
         console.log("Error getting reply:" + error);
+        throw error;
     }
 };
 
@@ -71,17 +76,16 @@ export const createReply = async (reply: TemplatebackendQuestionnaireReply) => {
         return response?.result?.id;
     } catch (error) {
         console.log("Error creating reply:" + error);
+        throw error;
     }
 };
 
 export const getQuestionnaire = async (id: number = 0) => {
     try {
         const response = await apiClientQuestionnaire.questionnaireServiceGetQuestionnaire({id}, getAuthInitOverrides());
-        console.log("response", response);
-        console.log("response", response?.result);
-        console.log("response", response?.result?.questionnaire);
         return response?.result?.questionnaire;
     } catch (error) {
         console.log("Error creating questionnaire:" + error);
+        throw error;
     }
 };
