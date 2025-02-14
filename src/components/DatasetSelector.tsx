@@ -7,9 +7,12 @@ import DataTable from '~/components/DataTable';
 import DatasetPreviewModal from './modals/DatasetPreviewModal';
 import { MdSearch } from 'react-icons/md';
 import { showToast } from '~/utils/showToast';
+import Spinner from './ui/Spinner';
+import DatasetUploadModal from './modals/DatasetUploadModal';
 
 
 interface DatasetSelectorProps {
+    onRowClick: (row: number) => void;
     actions?: {
         name: string;
         callback: (row: number | undefined) => void;
@@ -19,36 +22,39 @@ interface DatasetSelectorProps {
 
 const DatasetSelector = ({
     actions,
+    onRowClick,
     preview,
 }: DatasetSelectorProps): JSX.Element => {
     const router = useRouter();
 
     const [datasetsList, setDatasetsList] = useState<Array<TemplatebackendDataset>>([]);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
     const [datasetToPreview, setDatasetToPreview] = useState<number>()
-
-    const handleRowClick = (id: number | undefined) => {
-        if (id) {
-            router.push(`/dataset/${id}`);
-        }
-    };
+    const [isLoading, setIsLoading] = useState(true);
 
     const getListDatasets = async (offset?: number, limit?: number) => {
-        let response;
-        if (!offset && !limit) {
-            response = await listDatasets();
-        } else if (offset && limit) {
-            response = await listDatasets(
-            );
-        } else {
-            console.log("ERROR You have to define both the offset and the limit") // TODO
-            return;
+        setIsLoading(true);
+        try {
+            let response;
+            if (!offset && !limit) {
+                response = await listDatasets();
+            } else if (offset && limit) {
+                response = await listDatasets(offset, limit);
+            } else {
+                console.log("ERROR: You have to define both the offset and the limit");
+                return;
+            }
+            const result = response?.result?.datasets;
+            if (result) {
+                setDatasetsList(result);
+            }
+        } catch (error) {
+            showToast("error", "Error listing datasets: " + error);
+        } finally {
+            setIsLoading(false);
         }
-        const result = response?.result?.datasets
-        if (result) {
-            setDatasetsList(result);
-        }
-    }
+    };
 
     useEffect(() => {
         const handleRouteChange = () => {
@@ -79,7 +85,13 @@ const DatasetSelector = ({
         mappedActions?.push()
     }
 
-    const previewDataset = async (id: number | undefined) => {     
+    const handleRowClick = (id: number | undefined) => {
+        if (id) {
+            onRowClick(id);
+        }
+    }
+
+    const handlePreview = async (id: number | undefined) => {     
         if(id){
             setDatasetToPreview(id)
             setIsPreviewModalOpen(true)
@@ -88,27 +100,44 @@ const DatasetSelector = ({
 
     return (
         <>
-            {/* Dataset list */}
-            {datasetsList.length > 0 ? (
-                <DataTable
-                    data={datasetsList.map(dataset => ({ ...dataset, id: dataset.id ?? 0 }))}
-                    columns={[
-                        { name: "id", header: "Dataset ID" },
-                        { name: "datasetName", header: "Dataset Name" },
-                        // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" }, // NOT IMPLEMENTED: query dataset quasi-identifiers
-                        { name: "createdAt", header: "Created At" },
-                    ]}
-                    onRowClick={(row) => handleRowClick(row.id)}
-                    iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => previewDataset(row.id)}] : undefined}
-                    actions={mappedActions}
-                />
+            {isLoading ? (
+                <div className="flex justify-center items-center h-96">
+                    <Spinner />
+                </div>
             ) : (
-                <div className="text-center text-gray-500 mt-20">No datasets yet</div>
-            )}
+                <div>
+                    {/* Dataset List */}
+                    { datasetsList.length > 0 ? (
+                        <DataTable
+                            data={datasetsList.map(dataset => ({ ...dataset, id: dataset.id ?? 0 }))}
+                            columns={[
+                                { name: "id", header: "Dataset ID" },
+                                { name: "datasetName", header: "Dataset Name" },
+                                // { name: "datasetQuasiIdentifiers", header: "Quasi-identifiers" }, // NOT IMPLEMENTED: query dataset quasi-identifiers
+                                { name: "createdAt", header: "Created At" },
+                            ]}
+                            onRowClick={(row) => handleRowClick(row.id)}
+                            iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
+                            actions={mappedActions}
+                            addRow={{
+                                label: "New dataset",
+                                onRowClick: () => setIsUploadModalOpen(true),
+                            }}
+                        />
+                    ) : (
+                        <div className="text-center text-gray-500 mt-20">No datasets yet.</div>
+                    )}
+                    
+                    {/* Upload modal */}
+                    {isUploadModalOpen && (
+                        <DatasetUploadModal show={isUploadModalOpen} datasetNames={datasetsList.map(d => d.datasetName || "")} onSuccess={handleRowClick} onClose={() => setIsUploadModalOpen(false)} />
+                    )}
 
-            {/* Preview modal */}
-            {preview && (
-                <DatasetPreviewModal show={isPreviewModalOpen} datasetId={datasetToPreview!} onClose={()=>setIsPreviewModalOpen(false)}/>
+                    {/* Preview modal */}
+                    {preview && (
+                        <DatasetPreviewModal show={isPreviewModalOpen} datasetId={datasetToPreview!} onClose={() => setIsPreviewModalOpen(false)} />
+                    )}
+                </div>
             )}
         </>
     );

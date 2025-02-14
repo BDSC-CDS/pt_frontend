@@ -1,14 +1,7 @@
 import { Button, Modal } from "flowbite-react"
-import { ChangeEvent, useState } from "react"
 import { useRouter } from "next/router"
 import { useAuth } from "~/utils/authContext"
-import { authenticateUser } from "~/utils/authentication"
-import { createUser } from "~/utils/user"
 import { showToast } from "~/utils/showToast"
-import Spinner from "../ui/Spinner"
-import { ResponseError } from "~/internal/client"
-import InputField from "../ui/InputField"
-import { z } from "zod"
 
 interface LogoutModalProps {
     show: boolean
