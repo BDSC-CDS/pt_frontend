@@ -43,7 +43,7 @@ export const CustomTooltip: FC<CustomTooltipProps> = ({ content, children, class
             {isVisible && ReactDOM.createPortal(
                 <div 
                     ref={tooltipRef}
-                    style={{ position: 'absolute', top: tooltipStyles.top, left: tooltipStyles.left, transform: 'translateX(-75%)' }} 
+                    style={{ position: 'absolute', top: tooltipStyles.top, left: tooltipStyles.left, transform: 'translateX(-65%)' }} 
                     className="fixed z-50 w-40"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
