@@ -70,6 +70,12 @@ export interface TemplatebackendQuestionnaireQuestion {
     tooltip?: string;
     /**
      * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireQuestion
+     */
+    tmpUUID?: string;
+    /**
+     * 
      * @type {Array<TemplatebackendQuestionnaireQuestionAnswer>}
      * @memberof TemplatebackendQuestionnaireQuestion
      */
@@ -114,6 +120,7 @@ export function TemplatebackendQuestionnaireQuestionFromJSONTyped(json: any, ign
         'answerType': !exists(json, 'answerType') ? undefined : json['answerType'],
         'flag': !exists(json, 'flag') ? undefined : json['flag'],
         'tooltip': !exists(json, 'tooltip') ? undefined : json['tooltip'],
+        'tmpUUID': !exists(json, 'tmpUUID') ? undefined : json['tmpUUID'],
         'answers': !exists(json, 'answers') ? undefined : ((json['answers'] as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerFromJSON)),
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
@@ -136,6 +143,7 @@ export function TemplatebackendQuestionnaireQuestionToJSON(value?: Templatebacke
         'answerType': value.answerType,
         'flag': value.flag,
         'tooltip': value.tooltip,
+        'tmpUUID': value.tmpUUID,
         'answers': value.answers === undefined ? undefined : ((value.answers as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerToJSON)),
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),

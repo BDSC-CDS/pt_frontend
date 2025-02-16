@@ -52,6 +52,18 @@ export interface TemplatebackendQuestionnaireQuestionAnswer {
     highRisk?: boolean;
     /**
      * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireQuestionAnswer
+     */
+    tmpUUID?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireQuestionAnswer
+     */
+    jSONConfiguration?: string;
+    /**
+     * 
      * @type {Array<TemplatebackendQuestionnaireQuestionAnswerRulePrefill>}
      * @memberof TemplatebackendQuestionnaireQuestionAnswer
      */
@@ -93,6 +105,8 @@ export function TemplatebackendQuestionnaireQuestionAnswerFromJSONTyped(json: an
         'text': !exists(json, 'text') ? undefined : json['text'],
         'riskLevel': !exists(json, 'riskLevel') ? undefined : json['riskLevel'],
         'highRisk': !exists(json, 'highRisk') ? undefined : json['highRisk'],
+        'tmpUUID': !exists(json, 'tmpUUID') ? undefined : json['tmpUUID'],
+        'jSONConfiguration': !exists(json, 'JSONConfiguration') ? undefined : json['JSONConfiguration'],
         'rulePrefills': !exists(json, 'rulePrefills') ? undefined : ((json['rulePrefills'] as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerRulePrefillFromJSON)),
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
@@ -112,6 +126,8 @@ export function TemplatebackendQuestionnaireQuestionAnswerToJSON(value?: Templat
         'text': value.text,
         'riskLevel': value.riskLevel,
         'highRisk': value.highRisk,
+        'tmpUUID': value.tmpUUID,
+        'JSONConfiguration': value.jSONConfiguration,
         'rulePrefills': value.rulePrefills === undefined ? undefined : ((value.rulePrefills as Array<any>).map(TemplatebackendQuestionnaireQuestionAnswerRulePrefillToJSON)),
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),

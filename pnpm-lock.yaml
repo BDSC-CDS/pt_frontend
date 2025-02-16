@@ -47,6 +47,9 @@ dependencies:
   react-markdown:
     specifier: ^9.0.3
     version: 9.0.3(@types/react@18.2.42)(react@18.2.0)
+  react-simple-code-editor:
+    specifier: ^0.14.1
+    version: 0.14.1(react-dom@18.2.0)(react@18.2.0)
   react-syntax-highlighter:
     specifier: ^15.6.1
     version: 15.6.1(react@18.2.0)
@@ -59,6 +62,9 @@ dependencies:
   superjson:
     specifier: ^2.2.1
     version: 2.2.1
+  uuid:
+    specifier: ^11.0.5
+    version: 11.0.5
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -6426,6 +6432,16 @@ packages:
       - supports-color
     dev: false
 
+  /react-simple-code-editor@0.14.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-BR5DtNRy+AswWJECyA17qhUDvrrCZ6zXOCfkQY5zSmb96BVUbpVAv03WpcjcwtCwiLbIANx3gebHOcXYn1EHow==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-syntax-highlighter@15.6.1(react@18.2.0):
     resolution: {integrity: sha512-OqJ2/vL7lEeV5zTJyG7kmARppUjiB9h9udl4qHQjjgEos66z00Ia0OckwYfRxCSFrW8RJIBnsBwQsHZbVPspqg==}
     peerDependencies:
@@ -7316,6 +7332,11 @@ packages:
     resolution: {integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw==}
     dependencies:
       base64-arraybuffer: 1.0.2
+    dev: false
+
+  /uuid@11.0.5:
+    resolution: {integrity: sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==}
+    hasBin: true
     dev: false
 
   /v8-compile-cache-lib@3.0.1:

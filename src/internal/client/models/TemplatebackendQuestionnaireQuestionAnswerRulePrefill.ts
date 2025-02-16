@@ -45,6 +45,18 @@ export interface TemplatebackendQuestionnaireQuestionAnswerRulePrefill {
     answerText?: string;
     /**
      * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireQuestionAnswerRulePrefill
+     */
+    tmpQuestionUUID?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireQuestionAnswerRulePrefill
+     */
+    tmpAnswerUUID?: string;
+    /**
+     * 
      * @type {Date}
      * @memberof TemplatebackendQuestionnaireQuestionAnswerRulePrefill
      */
@@ -80,6 +92,8 @@ export function TemplatebackendQuestionnaireQuestionAnswerRulePrefillFromJSONTyp
         'questionId': !exists(json, 'questionId') ? undefined : json['questionId'],
         'answerId': !exists(json, 'answerId') ? undefined : json['answerId'],
         'answerText': !exists(json, 'answerText') ? undefined : json['answerText'],
+        'tmpQuestionUUID': !exists(json, 'tmpQuestionUUID') ? undefined : json['tmpQuestionUUID'],
+        'tmpAnswerUUID': !exists(json, 'tmpAnswerUUID') ? undefined : json['tmpAnswerUUID'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
     };
@@ -98,6 +112,8 @@ export function TemplatebackendQuestionnaireQuestionAnswerRulePrefillToJSON(valu
         'questionId': value.questionId,
         'answerId': value.answerId,
         'answerText': value.answerText,
+        'tmpQuestionUUID': value.tmpQuestionUUID,
+        'tmpAnswerUUID': value.tmpAnswerUUID,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),
     };

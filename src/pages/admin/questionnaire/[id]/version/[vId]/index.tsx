@@ -2,7 +2,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Alert, Tooltip } from 'flowbite-react';
+import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Textarea, Alert, Tooltip } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
@@ -14,6 +14,9 @@ import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionn
 import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
 import withAdmin from '~/components/withAdmin';
 import { showToast } from '~/utils/showToast';
+import { set } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -40,6 +43,7 @@ function QuestionnaireVersion() {
 
     // Enable unsaved changes warning
     const [isDirty, setIsDirty] = useState(false);
+    useUnsavedChangesWarning(isDirty)
     useUnsavedChangesWarning(isDirty)
 
     // Questionnaire States
@@ -100,6 +104,25 @@ function QuestionnaireVersion() {
 
     // Process 
     const processQuestionnaireVersion = (v: Version) => {
+        // fix pointers on uuid
+        for (let question of v.questions || []) {
+            question.tmpUUID = uuid();
+            question.answers?.forEach(a => {
+                a.tmpUUID = uuid();
+            });
+        }
+        for (let question of v.questions || []) {
+            question.answers?.forEach(a => {
+                a.rulePrefills?.forEach(r => {
+                    const question = v.questions?.find(q => q.id == r.questionId);
+                    r.tmpQuestionUUID = question?.tmpUUID;
+
+                    const answer = question?.answers?.find(a => a.id == r.answerId);
+                    r.tmpAnswerUUID = answer?.tmpUUID;
+                });
+            });
+        }
+
         if (!v.tabs) {
             const tabMap: any = {};
             v.questions?.forEach(q => {
@@ -197,20 +220,24 @@ function QuestionnaireVersion() {
         version.questions = version.questions?.filter(q => q.id !== questionToRemove?.id);
 
         processQuestionnaireVersion(version);
-        setIsDirty(true)
-    }
+        setIsDirty(true);
+    };
 
     // Everything to create a new question
     const createNewQuestion = () => {
-        editQuestion({id:( questionToEdit?.id || 0) + 1, tab: tabs[activeTabIndex]?.tabName})
-    }
+        editQuestion({
+            id:( questionToEdit?.id || 0) + 1, 
+            tmpUUID: uuid(),
+            tab: tabs[activeTabIndex]?.tabName,
+        });
+    };
 
     // Everything to edit a question
     const [openEditQuestionModal, setOpenEditQuestionModal] = useState(false);
     const [questionToEdit, setQuestionToEdit] = useState<TemplatebackendQuestionnaireQuestion>();
     const editQuestion = (question: TemplatebackendQuestionnaireQuestion) => {
-        setOpenEditQuestionModal(false)
-        setQuestionToEdit(cloneDeep(question))
+        setOpenEditQuestionModal(false);
+        setQuestionToEdit(cloneDeep(question));
         setOpenEditQuestionModal(true);
     };
 
@@ -260,6 +287,7 @@ function QuestionnaireVersion() {
             text: addAnswerText,
             riskLevel: addAnswerRiskLevel,
             highRisk: addAnswerHighRisk,
+            tmpUUID: uuid(),
         };
 
         setAddAnswerText("")
@@ -280,13 +308,40 @@ function QuestionnaireVersion() {
 
     const [openAddRulePrefillModal, setAddRulePrefillModal] = useState(false);
     const [rulePrefillModalAnswer, setRulePrefillModalAnswer] = useState<TemplatebackendQuestionnaireQuestionAnswer>();
+    const [rulePrefillModalAnswerIndex, setRulePrefillModalAnswerIndex] = useState<number>();
     const [rulePrefillModalQuestion, setRulePrefillModalQuestion] = useState<TemplatebackendQuestionnaireQuestion>();
+    const [rulePrefillModalQuestionAnswer, setRulePrefillModalQuestionAnswer] = useState<TemplatebackendQuestionnaireQuestionAnswer>();
     const [rulePrefillFilter, setRulePrefillFilter] = useState("");
 
-    const addRulePrefil = (answer: TemplatebackendQuestionnaireQuestionAnswer) => {
+    const addRulePrefil = (answer: TemplatebackendQuestionnaireQuestionAnswer, n: number) => {
         // console.log("rule prefill answerId", answerID);
         setRulePrefillModalAnswer(answer);
+        setRulePrefillModalAnswerIndex(n);
         setAddRulePrefillModal(true);
+    }
+
+    const saveRulePrefill = () => {
+        rulePrefillModalAnswer?.rulePrefills?.push({
+            answerId: rulePrefillModalQuestionAnswer?.id,
+            answerText: rulePrefillModalQuestionAnswer?.text,
+            questionId: rulePrefillModalQuestion?.id
+        });
+
+        handleAnswerInputChange(rulePrefillModalAnswerIndex || 0, rulePrefillModalAnswer?.rulePrefills, "rulePrefills");
+
+        setAddRulePrefillModal(false);
+        setRulePrefillModalAnswer(undefined);
+        setRulePrefillModalAnswerIndex(undefined);
+        setRulePrefillModalQuestion(undefined);
+        setRulePrefillModalQuestionAnswer(undefined);
+        setRulePrefillFilter("");
+    }
+
+    const removeRulePrefill = ( answer: TemplatebackendQuestionnaireQuestionAnswer, answerIndex: number, rulePrefillIndex: number) => {
+        console.log("remove rule prefill", answer, answerIndex, rulePrefillIndex);
+        answer.rulePrefills?.splice(rulePrefillIndex, 1);
+        console.log("remove rule prefill after", answer.rulePrefills);
+        handleAnswerInputChange(answerIndex, answer.rulePrefills, "rulePrefills");
     }
 
     return (
@@ -572,26 +627,41 @@ function QuestionnaireVersion() {
                                                                         <Table.HeadCell>Rule Prefills</Table.HeadCell>
                                                                         <Table.Cell>
 
-                                                                            {(answer.rulePrefills || []).map((rulePrefill, n) => (
-
-                                                                                <div className="w-48 text-sm font-medium bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                                                                    <div className="w-full px-4 py-2">
-
-                                                                                        {rulePrefill.answerId}
-                                                                                    </div>
-                                                                                </div>
+                                                                            {(answer.rulePrefills || []).map((rulePrefill, m) => (
+                                                                                    <>
+                                                                                    <Button.Group className="w-72">
+                                                                                        <Button color="gray" disabled={true}>{version.questions?.find(q => q.id == rulePrefill.questionId)?.question}</Button>
+                                                                                        <Button color="gray" disabled={true}>{rulePrefill.answerText}</Button>
+                                                                                        <Button color="gray"><HiTrash size={20} className='cursor-pointer inline-block' onClick={() => removeRulePrefill(answer, n, m)}/></Button>
+                                                                                    </Button.Group>
+                                                                                    <br/>
+                                                                                    </>
+                                                                                //<div className="w-48 text-sm font-medium bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                                                //</div>
                                                                             )).concat(
                                                                                 // <div className="w-48 text-sm font-medium bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                                                                 //     <div className="w-full px-4 py-2">
                                                                                 //         <MdOutlineAdd className='inline' /> Add rule prefill
                                                                                 //     </div>
                                                                                 // </div>
-                                                                                <Button color="gray" onClick={() => addRulePrefil(answer)}>
+                                                                                <Button color="gray" onClick={() => addRulePrefil(answer, n)}>
                                                                                     <MdOutlineAdd className='inline' /> Add rule prefill
                                                                                 </Button>
                                                                             )}
 
 
+                                                                        </Table.Cell>
+                                                                    </Table.Row>
+                                                                    <Table.Row >
+                                                                        <Table.HeadCell>SPHN JSON config</Table.HeadCell>
+                                                                        <Table.Cell>
+                                                                            <Textarea
+                                                                                id={"sphn-" + { n }}
+                                                                                name={"sphn-" + { n }}
+                                                                                placeholder="SPHN JSON config"
+                                                                                value={questionToEdit?.answers?.[n]?.jSONConfiguration || ""}
+                                                                                onChange={(event) => handleAnswerInputChange(n, event.target.value, "jSONConfiguration")}
+                                                                            />
                                                                         </Table.Cell>
                                                                     </Table.Row>
                                                                 </Table.Body>
@@ -673,7 +743,7 @@ function QuestionnaireVersion() {
                 <Modal.Body>
                     <Accordion collapseAll>
                         <Accordion.Panel>
-                            <Accordion.Title>
+                            <Accordion.Title id="accordion-title">
                                 Select a question
                             </Accordion.Title>
                             <Accordion.Content>
@@ -692,7 +762,12 @@ function QuestionnaireVersion() {
                                                 JSON.stringify(question).toLowerCase().includes(rulePrefillFilter)
                                             )
                                             .map((question, n) => (
-                                                <Table.Row onClick={() => { setRulePrefillModalQuestion(question) }}>
+                                                <Table.Row className="cursor-pointer" onClick={() => { 
+                                                    setRulePrefillModalQuestion(question);
+                                                    // get title and click
+                                                    document.getElementById("accordion-title")?.click();
+                                                    document.getElementById("accordion-answer-title")?.click();
+                                                }}>
                                                     <Table.Cell>{question.tab}</Table.Cell>
                                                     <Table.Cell>{question.question}</Table.Cell>
                                                 </Table.Row>
@@ -702,7 +777,7 @@ function QuestionnaireVersion() {
                             </Accordion.Content>
                         </Accordion.Panel>
                         <Accordion.Panel>
-                            <Accordion.Title>
+                            <Accordion.Title id="accordion-answer-title">
                                 Select the answer that it will automatically select.
                             </Accordion.Title>
                             <Accordion.Content>
@@ -719,7 +794,10 @@ function QuestionnaireVersion() {
                                                         <Table.Row >
                                                             <Table.Cell>{answer.text}</Table.Cell>
                                                             <Table.Cell>
-                                                                <Button color="blue" onClick={() => {/*TODO*/ }}>
+                                                                <Button color="blue" onClick={() => {
+                                                                    setRulePrefillModalQuestionAnswer(answer);
+                                                                    document.getElementById("accordion-answer-title")?.click();
+                                                                  }}>
                                                                     Select
                                                                 </Button>
                                                             </Table.Cell>
@@ -735,7 +813,9 @@ function QuestionnaireVersion() {
                     </Accordion>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-4 border-t-2 bg-gray-50">
-                    <Button color="success" onClick={() => {/*TODO*/ }}>
+                    <Button color="success" onClick={() => {
+                        saveRulePrefill();
+                     }}>
                         Add
                     </Button>
                     <Button color="gray" onClick={() => setAddRulePrefillModal(false)}>

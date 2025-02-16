@@ -1651,6 +1651,13 @@ definitions:
         type: string
       tooltip:
         type: string
+      tmpUUID:
+        type: string
+        title: |-
+          to be used for rule prefills as the id of the question
+          is still unknown at the time of creation
+          this will be used by the backend to compute the id but will not be
+          stored in the database
       answers:
         type: array
         items:
@@ -1662,7 +1669,7 @@ definitions:
       updatedAt:
         type: string
         format: date-time
-        title: google.protobuf.Timestamp deletedAt = 11;
+        title: google.protobuf.Timestamp deletedAt = 12;
   templatebackendQuestionnaireQuestionAnswer:
     type: object
     properties:
@@ -1676,6 +1683,15 @@ definitions:
         format: int64
       highRisk:
         type: boolean
+      tmpUUID:
+        type: string
+        title: |-
+          to be used for rule prefills as the id of the answer
+          is still unknown at the time of creation
+          this will be used by the backend to compute the id but will not be
+          stored in the database
+      JSONConfiguration:
+        type: string
       rulePrefills:
         type: array
         items:
@@ -1702,13 +1718,17 @@ definitions:
         format: int64
       answerText:
         type: string
+      tmpQuestionUUID:
+        type: string
+      tmpAnswerUUID:
+        type: string
       createdAt:
         type: string
         format: date-time
       updatedAt:
         type: string
         format: date-time
-        title: google.protobuf.Timestamp deletedAt = 7;
+        title: google.protobuf.Timestamp deletedAt = 9;
   templatebackendQuestionnaireQuestionReply:
     type: object
     properties:
