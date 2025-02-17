@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/config"
+import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/configuration"
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
