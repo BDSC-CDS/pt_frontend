@@ -291,7 +291,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
 
             {/* All Questionnaire Tabs */}
             <div id="all-tabs" className="flex flex-col flex-grow">
-                {activeTab !== '8' && (
+                {activeTab !== String(tabs.length) && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                         <h1 className='mt-4 text-md font-semibold flex flex-row'>
                             Current score

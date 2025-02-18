@@ -222,7 +222,9 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                     const topQuestions = allQuestions
                         .sort((a, b) => b.risk - a.risk)
                         .slice(0, 5);
-    
+                    if (topQuestions.length === 0) {
+                        return <p>No high-risk questions found.</p>;
+                    }
                     // Render top 5 high-risk questions with their tabs
                     return topQuestions.map(({ tab, question, risk }, index) => (
                         <div key={question.questionId} className="mb-4">
