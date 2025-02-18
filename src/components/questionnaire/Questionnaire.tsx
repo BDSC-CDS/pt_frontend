@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Question, Questions } from '../utils/questions';
-import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../internal/client/index';
-import { createReply } from "../utils/questionnaire"
+import { Question, Questions } from '../../utils/questions';
+import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../../internal/client/index';
+import { createReply } from "../../utils/questionnaire"
 import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
 import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
 
-interface TabsComponentProps {
+interface QuestionnaireProps {
     questions: Questions;
     questionnaireVersionId?: number;
     reply?: TemplatebackendQuestionnaireReply;
@@ -27,7 +27,10 @@ type Tabs = {
 }[]
 
 
-const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireVersionId, reply }) => {
+/**
+ * The questionnaire component used for qualitative risk assessment.
+ */
+const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireVersionId, reply }) => {
     const router = useRouter()
     const [activeTab, setActiveTab] = useState<string>('1');
 
@@ -765,4 +768,4 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ questions, questionnaireV
     );
 };
 
-export default TabsComponent;
+export default Questionnaire;
