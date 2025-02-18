@@ -61,14 +61,10 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         return [maxRisk, minRisk];
     };
     const [maxRisk, minRisk] =  computeRiskBounds(questions);
-    
 
-    // Populate the questionnaire with the reply given reply data
+    // Populate the questionnaire with the reply data
     if (reply) {
-        interface QuestionMap {
-            [key: string]: Question;
-        }
-        let allQuestions: QuestionMap = {};
+        const allQuestions: { [key: string]: Question } = {};
         Object.keys(questions).map((tab) => {
             const tabQuestions = questions[tab];
             if (!tabQuestions) return;
@@ -78,11 +74,21 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             if (!r.questionnaireQuestionId) return;
             const q = allQuestions[r.questionnaireQuestionId];
             if (!q) return;
-            const a = q.answers.find(a => a.answerId == r.answer);
+            const a = q.answers.find(a => a.answerId === r.answer);
             if (a) {
                 a.selected = true;
                 if (a.highRisk) {
                     q.highRiskAnswerSelected = true;
+                }
+                if (a.rulePrefills && a.rulePrefills.length > 0) {
+                    a.rulePrefills.forEach(rp => {
+                        const prefilledQuestion = Object.keys(questions)
+                            .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
+                            .find(q => q !== undefined);
+                        if (prefilledQuestion) {
+                            prefilledQuestion.disabled = true;
+                        }
+                    });
                 }
             }
         });
@@ -90,6 +96,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     
     // Function to set the selected answer for a question
     const setSelectedAnswer = (question: Question, answerId: string) => {
+        console.log("setSelectedAnswer", question.questionId, answerId, question);
         question.answers.forEach(a => {
             a.selected = false;
             if (a.answerId == answerId) {
@@ -106,7 +113,8 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                             setSelectedAnswer(q, rp.answerId);
                         }
                     });
-                    showToast("info", "Some answer were prefilled.");
+                    
+                    showToast("info", "Some answers were prefilled.");
                 }
             }
         });
