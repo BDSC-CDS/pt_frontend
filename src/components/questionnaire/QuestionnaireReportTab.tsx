@@ -182,7 +182,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
     }
     
     return (
-        <div key="report" className="p-4 bg-white shadow rounded-lg">
+        <div key="report" className="p-4 rounded-lg">
             <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
             <div className="mb-2">
                 <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
@@ -236,14 +236,15 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                     ));
                 })()}
             </div>
-            <div className="flex flex-row mt-4">
+            <hr className="my-4" />
+            <div className="flex flex-row justify-center mt-4">
                 <span onClick={() => handleExportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <FaFilePdf />
-                    <p className='ml-2 text-sm'> Export PDF</p>
+                    <p className='ml-2 text-sm'>Export PDF</p>
                 </span>
                 <span onClick={() => handleExportSPHNConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <GrDocumentConfig />
-                    <p className='ml-2 text-sm'> Export connector configuration</p>
+                    <p className='ml-2 text-sm'>Export connector configuration</p>
                 </span>
             </div>
         </div>

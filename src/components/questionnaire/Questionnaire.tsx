@@ -7,6 +7,7 @@ import ReplySaveModal from '../modals/ReplySaveModal';
 import QuestionnaireTab from './QuestionnaireTab';
 import QuestionnaireReportTab from './QuestionnaireReportTab';
 import { showToast } from '~/utils/showToast';
+import { Pagination } from 'flowbite-react';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -277,8 +278,8 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     }, []);
 
     return (
-        <>
-            <div className="flex flex-row items-end p-5">
+        <div className="flex flex-col h-full gap-2">
+            <div className="flex flex-row items-end">
                 <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'> Save</p>
@@ -289,7 +290,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)} />
 
             {/* All Questionnaire Tabs */}
-            <div id="all-tabs">
+            <div id="all-tabs" className="flex flex-col flex-grow">
                 {activeTab !== '8' && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
                         <h1 className='mt-4 text-md font-semibold flex flex-row'>
@@ -361,28 +362,20 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                     </ul>
                 </div>
 
-                <div className="py-5 px-3 border rounded-b-lg shadow-lg">
-                    {tabs.find((tab) => tab.id === activeTab)?.content}
-                    <div className="flex w-full justify-center items-center mt-4">
-                        <button
-                            onClick={goToPreviousTab}
-                            disabled={activeTab === '1'}
-                            className="w-1/6 mx-1 px-4 py-2 text-center bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            onClick={goToNextTab}
-                            disabled={activeTab === '8'}
-                            className="w-1/6 mx-1 px-4 py-2 text-center bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400"
-                        >
-                            Next
-                        </button>
+                <div className="flex flex-col flex-grow items-center justify-between py-5 px-3 border rounded-b-lg shadow-lg">
+                    <div className="w-full">
+                        {tabs.find((tab) => tab.id === activeTab)?.content}
                     </div>
+                    <Pagination 
+                        layout="navigation"
+                        currentPage={Number(activeTab)}
+                        totalPages={tabs.length}
+                        onPageChange={(page) => setActiveTab(String(page))}
+                        showIcons
+                    />
                 </div>
             </div>
 
-        </>
-
+        </div>
     );
 }
