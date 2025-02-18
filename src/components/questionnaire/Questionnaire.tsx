@@ -6,11 +6,10 @@ import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
 import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
 import jsPDF from 'jspdf';
-import { useRouter } from 'next/router';
 import ReplySaveModal from '../modals/ReplySaveModal';
+import QuestionnaireTab from './QuestionnaireTab';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
-
 
 interface QuestionnaireProps {
     questions: Questions;
@@ -24,13 +23,12 @@ type Tabs = {
     content: any,
 }[]
 
-
 /**
  * The questionnaire component used for qualitative risk assessment.
  */
-const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireVersionId, reply }) => {
-    const router = useRouter()
+export default function Questionnaire({ questions, questionnaireVersionId, reply }: QuestionnaireProps) {
     const [activeTab, setActiveTab] = useState<string>('1');
+    const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
 
     const setSelectedAnswer = (question: Question, answerId: string) => {
         question.answers.forEach(a => {
@@ -43,8 +41,8 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
 
         computeCurrentRisk();
         computeCurrentReport();
-        computeHighRiskCount()
-    }
+        computeHighRiskCount();
+    };
 
     if (reply) {
         interface QuestionMap {
@@ -54,20 +52,20 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         Object.keys(questions).map((tab) => {
             const tabQuestions = questions[tab];
             if (!tabQuestions) return;
-            tabQuestions.forEach(q => { allQuestions[q.questionId] = q; })
-        })
+            tabQuestions.forEach(q => { allQuestions[q.questionId] = q; });
+        });
         reply.replies?.forEach(r => {
             if (!r.questionnaireQuestionId) return;
             const q = allQuestions[r.questionnaireQuestionId];
             if (!q) return;
-            const a = q.answers.find(a => a.answerId == r.answer)
+            const a = q.answers.find(a => a.answerId == r.answer);
             if (a) {
                 a.selected = true;
-                if(a.highRisk){
-                    q.highRiskAnswerSelected = true
+                if (a.highRisk) {
+                    q.highRiskAnswerSelected = true;
                 }
             }
-        })
+        });
     }
 
     // Function to go to the previous tab
@@ -89,7 +87,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
     const getSelectedAnswer = (question: Question) => {
         for (let answer of question.answers) {
             if (answer.selected) {
-                return answer.answerId
+                return answer.answerId;
             }
         }
     };
@@ -102,10 +100,10 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         }
         return false;
     };
-    
+
     const computeHighRiskCount = () => {
         let totalHighRiskAnswers = 0;
-        
+
         Object.keys(questions).forEach((tab) => {
             questions[tab]?.forEach((question) => {
                 // Count answers with highRisk = false
@@ -115,7 +113,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                 }
             });
         });
-        
+
         setTotalHighRiskAnswers(totalHighRiskAnswers);
 
         // uncomment to make score goes to 100% in case of any high risk answers selected
@@ -125,79 +123,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         // } 
     };
 
-    const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
 
-    const getQuestionsForTab = (tab: string) => {
-        return (
-            <div>
-                {questions[tab]?.map((question) => (
-                    <div key={question.questionId} className="flex flex-col my-4">
-                        <form className="w-1/2">
-                            {/* Form question & Tooltip */}
-                            <div className="flex justify-between gap-4 items-center">
-                                <label className="block mb-2 text-sm font-medium text-gray-900">
-                                    {question.questionDescription}
-                                </label>
-                                {question.tooltip && (
-                                    <div className="group relative flex">
-                                        <div className="p-1">
-                                            <FaCircleInfo className="text-gray-300 group-hover:text-gray-400 cursor-pointer" />
-                                        </div>
-                                        
-                                        {/* Tooltip */}
-                                        <div className="absolute z-10 left-full hidden w-80 bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700 shadow-lg group-hover:block">
-                                            <div className="font-sans leading-relaxed text-gray-800 text-justify">
-                                                {question.tooltip}
-                                            </div>
-                                            </div>
-                                        </div>
-                                )}
-                               
-                            </div>
-                            
-                            {/* Form select dropdown */}
-                            <select
-                                id={question.questionId}
-                                className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
-                                    }`}
-                                value={getSelectedAnswer(question)}
-                                onChange={(e) => setSelectedAnswer(question, e.target.value)}
-                            >
-                                <option>Select an option</option>
-                                {question.answers.map((answer) => (
-                                    <option key={answer.answerId} value={answer.answerId}>
-                                        {answer.answerDescription}
-                                    </option>
-                                ))}
-                            </select>
-                        </form>
-
-                        {/* Warning Message for High-Risk Answer */}
-                        {question.highRiskAnswerSelected && (
-                            <div className="mt-2 text-red-500 text-sm font-medium flex items-center">
-                                <svg
-                                    className="inline w-5 h-5 text-red-500 mr-2"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                    />
-                                </svg>
-                                You've selected a high-risk answer!
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
-        );
-    };
 
     const getRiskBounds = () => {
         let allQuestions: Question[] = [];
@@ -205,10 +131,9 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             const tabQuestions = questions[tab];
             if (!tabQuestions) return;
             allQuestions = allQuestions.concat(tabQuestions);
-        })
+        });
 
         // console.log("allQuestions", allQuestions.map(q => q.riskWeight))
-
         let maxRisk = 0;
         let minRisk = 0;
         allQuestions?.forEach(q => {
@@ -220,7 +145,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             minRisk += q.riskWeight * minRiskLevel;
         });
         return [maxRisk, minRisk];
-    }
+    };
 
 
 
@@ -235,14 +160,14 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             const tabQuestions = questions[tab];
             if (!tabQuestions) return;
             allQuestions = allQuestions.concat(tabQuestions);
-        })
+        });
 
         let cRisk = 0;
         allQuestions?.forEach(q => {
             const riskLevels = q.answers.map(a => a.riskLevel);
             const maxRiskLevel = Math.max(...riskLevels) * q.riskWeight;
             let selectedRisk;
-            
+
             q.answers.forEach(a => {
                 if (a.selected) {
                     cRisk += a.riskLevel * q.riskWeight;
@@ -266,20 +191,20 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
 
         console.log("cRisk", cRisk);
         console.log("maxRisk", maxRisk);
-        console.log("cRiskPc",cRiskPc);
-        console.log("displayCRiskPc",displayCRiskPc);
+        console.log("cRiskPc", cRiskPc);
+        console.log("displayCRiskPc", displayCRiskPc);
 
         setCurrentRisk(cRisk);
         setCurrentRiskPc(cRiskPc);
         setCurrentDisplayRiskPc(displayCRiskPc);
-    }
+    };
 
     useEffect(() => {
         computeCurrentRisk();
         computeCurrentReport();
-    }, [])
+    }, []);
 
-    const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false)
+    const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false);
 
     const [reportData, setReportData] = useState({
         totalQuestionsAnswered: 42,
@@ -331,11 +256,11 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             overallCompletionRate: (completionRate * 100).toFixed(2) + "%",
         });
 
-    }
+    };
 
     const isTabCompleted = (tab: string) => {
         return reportData.sectionsCompleted.includes(tab);
-    }
+    };
 
     const [exportInProgress, setExportInProgress] = useState(false);
 
@@ -346,6 +271,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         const pageHeight = pdf.internal.pageSize.getHeight();
         const headerHeight = 20; // Header height in mm
         let cursorY = margin + headerHeight; // Starting Y position for text
+
 
         // Function to add the header with logo on the left (only on the first page)
         const addHeader = async (firstPage = false) => {
@@ -416,8 +342,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                 `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
                 `Missing Data Sections: ${reportData.missingDataSections.length > 0
                     ? reportData.missingDataSections.join(", ")
-                    : "None"
-                }`,
+                    : "None"}`,
                 `Overall Completion Rate: ${reportData.overallCompletionRate}`,
                 `Current Risk Score: ${(currentRiskPc * 100).toFixed(2)}%`,
                 `Total High Risk Answers: ${totalHighRiskAnswers}`,
@@ -435,6 +360,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         // Step 2: Add Questions and Answers
         tabs.forEach((tab) => {
             if (tab.title === "Results") return; // Skip the summary tab
+
 
             // Page break check
             if (cursorY + 10 > pageHeight - margin) {
@@ -496,94 +422,97 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
   "hasDateShift": true,
   "dateShiftLowrange": -30,
   "dateShiftHighrange": 30
-}`
+}`;
         const element = document.createElement("a");
         const file = new Blob([txt], { type: 'application/json' });
         element.href = URL.createObjectURL(file);
         element.download = "connector-config.json";
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
-    }
+    };
 
-    const report_tab =
-        <div key="report" className="p-4 bg-white shadow rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
-            <div className="mb-2">
-                <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
-            </div>
-            <div className="mb-2">
-                <strong>Sections Completed:</strong> {reportData.sectionsCompleted.join(', ')}
-            </div>
-            <div className="mb-2">
-                <strong>Missing Data Sections:</strong> {reportData.missingDataSections.join(', ') || 'None'}
-            </div>
-            <div className="mb-2">
-                <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
-            </div>
-            <div className="mb-2">
-                <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
-            </div>
-            <div className="mb-2 text-red-500">
-                <strong>High-Risk Answers:</strong> {totalHighRiskAnswers}
-            </div>
-            <hr className="my-4" />
-            <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
-            <div>
-                {(() => {
-                    // Gather all questions into a single array with their tab
-                    let allQuestions: { tab: string; question: Question; risk: number }[] = [];
-                    Object.keys(questions).forEach((tab) => {
-                        questions[tab]?.forEach((question) => {
-                            const selectedAnswer = question.answers.find((answer) => answer.selected);
-                            if (selectedAnswer) {
-                                const risk = selectedAnswer.riskLevel * question.riskWeight;
-                                allQuestions.push({ tab, question, risk });
-                            }
-                        });
+    const report_tab = <div key="report" className="p-4 bg-white shadow rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
+        <div className="mb-2">
+            <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
+        </div>
+        <div className="mb-2">
+            <strong>Sections Completed:</strong> {reportData.sectionsCompleted.join(', ')}
+        </div>
+        <div className="mb-2">
+            <strong>Missing Data Sections:</strong> {reportData.missingDataSections.join(', ') || 'None'}
+        </div>
+        <div className="mb-2">
+            <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
+        </div>
+        <div className="mb-2">
+            <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
+        </div>
+        <div className="mb-2 text-red-500">
+            <strong>High-Risk Answers:</strong> {totalHighRiskAnswers}
+        </div>
+        <hr className="my-4" />
+        <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
+        <div>
+            {(() => {
+                // Gather all questions into a single array with their tab
+                let allQuestions: { tab: string; question: Question; risk: number; }[] = [];
+                Object.keys(questions).forEach((tab) => {
+                    questions[tab]?.forEach((question) => {
+                        const selectedAnswer = question.answers.find((answer) => answer.selected);
+                        if (selectedAnswer) {
+                            const risk = selectedAnswer.riskLevel * question.riskWeight;
+                            allQuestions.push({ tab, question, risk });
+                        }
                     });
+                });
 
-                    // Sort questions by risk descending and take the top 5
-                    const topQuestions = allQuestions
-                        .sort((a, b) => b.risk - a.risk)
-                        .slice(0, 5);
+                // Sort questions by risk descending and take the top 5
+                const topQuestions = allQuestions
+                    .sort((a, b) => b.risk - a.risk)
+                    .slice(0, 5);
 
-                    // Render top 5 high-risk questions with their tabs
-                    return topQuestions.map(({ tab, question, risk }, index) => (
-                        <div key={question.questionId} className="mb-4">
-                            <p className="text-sm">
-                                <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
-                            </p>
-                            <p className="text-xs text-gray-500">
-                                Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
-                            </p>
-                        </div>
-                    ));
-                })()}
-            </div>
-            <div className="flex flex-row mt-4">
-                <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <FaFilePdf />
-                    <p className='ml-2 text-sm'> Export PDF</p>
-                </span>
-                <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                    <GrDocumentConfig />
-                    <p className='ml-2 text-sm'> Export connector configuration</p>
-                </span>
-            </div>
-        </div>;
+                // Render top 5 high-risk questions with their tabs
+                return topQuestions.map(({ tab, question, risk }, index) => (
+                    <div key={question.questionId} className="mb-4">
+                        <p className="text-sm">
+                            <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
+                        </p>
+                    </div>
+                ));
+            })()}
+        </div>
+        <div className="flex flex-row mt-4">
+            <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <FaFilePdf />
+                <p className='ml-2 text-sm'> Export PDF</p>
+            </span>
+            <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <GrDocumentConfig />
+                <p className='ml-2 text-sm'> Export connector configuration</p>
+            </span>
+        </div>
+    </div>;
 
     const tabs: Tabs = Object.keys(questions).map((tab, n) => ({
         id: (n + 1).toString(),
         title: tab,
-        content: getQuestionsForTab(tab),
+        content: <QuestionnaireTab
+            tabQuestions={questions[tab]}
+            setSelectedAnswer={setSelectedAnswer}
+            getSelectedAnswer={getSelectedAnswer}
+            isQuestionAnswered={isQuestionAnswered} />
     })).concat([{
-        id: '8',
+        id: String(Object.keys(questions).length + 1),
         title: 'Results',
         content: report_tab,
-    }])
+    }]);
 
     // Everything to save
-    const [openSaveModal, setOpenSaveModal] = useState(false);    
+    const [openSaveModal, setOpenSaveModal] = useState(false);
 
     return (
         <>
@@ -594,7 +523,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                 </span>
             </div>
             <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)} />
-            
+
             <div id="all-tabs">
                 {activeTab !== '8' && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
@@ -621,9 +550,9 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                         </div>
 
                         {/* currentRisk {currentRisk}<br />
-                    currentRiskPc {currentRiskPc}<br />
-                    maxRisk {maxRisk}<br />
-                    minRisk {minRisk}<br /> */}
+                currentRiskPc {currentRiskPc}<br />
+                maxRisk {maxRisk}<br />
+                minRisk {minRisk}<br /> */}
                         <GaugeChart id="gauge-chart2"
                             nrOfLevels={30}
                             // arcsLength={[0.4, 0.4, 0.2]}
@@ -631,15 +560,14 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                             // colors={['#5BE12C', '#F5CD19', '#EA4228']}
                             percent={currentDisplayRiskPc}
                             // formatTextValue={value=>value+"%"}
-                            formatTextValue={value=>currentRisk + ""}
+                            formatTextValue={value => currentRisk + ""}
                             textColor='black'
-                            animate={false}
-                        />
+                            animate={false} />
 
                         {(totalHighRiskAnswers > 0) && (
                             <div className="flex items-center">
-                                <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block"/>
-                                <div className="inline-block items-center text-red-700" >You've selected a <br/>high-risk answer</div>
+                                <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block" />
+                                <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
                             </div>
                         )}
                     </div>
@@ -671,10 +599,10 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
 
                 <div className="py-5 px-3 border rounded-b-lg shadow-lg">
                     {/* {
-                        exportInProgress ?
-                            tabs.map(t => t?.content) :
-                            tabs.find((tab) => tab.id === activeTab)?.content
-                    } */}
+                exportInProgress ?
+                    tabs.map(t => t?.content) :
+                    tabs.find((tab) => tab.id === activeTab)?.content
+            } */}
                     {tabs.find((tab) => tab.id === activeTab)?.content}
                     {/* {tabs.map(tab => tab.content)} */}
                     <div className="flex items-center mt-4">
@@ -699,6 +627,4 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
         </>
 
     );
-};
-
-export default Questionnaire;
+}
