@@ -37,30 +37,30 @@ import {
     TemplatebackendGetConfigsReplyToJSON,
 } from '../models/index';
 
-export interface ConfigServiceCreateConfigRequest {
+export interface ConfigurationServiceCreateConfigRequest {
     body: TemplatebackendConfig;
 }
 
-export interface ConfigServiceDeleteConfigRequest {
+export interface ConfigurationServiceDeleteConfigRequest {
     id: number;
 }
 
-export interface ConfigServiceExportConfigRequest {
+export interface ConfigurationServiceExportConfigRequest {
     id: number;
 }
 
 /**
  * 
  */
-export class ConfigurationApi extends runtime.BaseAPI {
+export class ConfigurationServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint creates a usconfigurationer
      * Create a configuration
      */
-    async configServiceCreateConfigRaw(requestParameters: ConfigServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateConfigReply>> {
+    async configurationServiceCreateConfigRaw(requestParameters: ConfigurationServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendCreateConfigReply>> {
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling configServiceCreateConfig.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling configurationServiceCreateConfig.');
         }
 
         const queryParameters: any = {};
@@ -88,8 +88,8 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint creates a usconfigurationer
      * Create a configuration
      */
-    async configServiceCreateConfig(requestParameters: ConfigServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateConfigReply> {
-        const response = await this.configServiceCreateConfigRaw(requestParameters, initOverrides);
+    async configurationServiceCreateConfig(requestParameters: ConfigurationServiceCreateConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendCreateConfigReply> {
+        const response = await this.configurationServiceCreateConfigRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -97,9 +97,9 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint deletes a config
      * Deletes a config
      */
-    async configServiceDeleteConfigRaw(requestParameters: ConfigServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteConfigReply>> {
+    async configurationServiceDeleteConfigRaw(requestParameters: ConfigurationServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendDeleteConfigReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configServiceDeleteConfig.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configurationServiceDeleteConfig.');
         }
 
         const queryParameters: any = {};
@@ -124,8 +124,8 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint deletes a config
      * Deletes a config
      */
-    async configServiceDeleteConfig(requestParameters: ConfigServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteConfigReply> {
-        const response = await this.configServiceDeleteConfigRaw(requestParameters, initOverrides);
+    async configurationServiceDeleteConfig(requestParameters: ConfigurationServiceDeleteConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteConfigReply> {
+        const response = await this.configurationServiceDeleteConfigRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -133,9 +133,9 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint returns the JSON of a configuration
      * Export a configuration as json (SPHN Connector format)
      */
-    async configServiceExportConfigRaw(requestParameters: ConfigServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendExportConfigReply>> {
+    async configurationServiceExportConfigRaw(requestParameters: ConfigurationServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendExportConfigReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configServiceExportConfig.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling configurationServiceExportConfig.');
         }
 
         const queryParameters: any = {};
@@ -160,8 +160,8 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint returns the JSON of a configuration
      * Export a configuration as json (SPHN Connector format)
      */
-    async configServiceExportConfig(requestParameters: ConfigServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendExportConfigReply> {
-        const response = await this.configServiceExportConfigRaw(requestParameters, initOverrides);
+    async configurationServiceExportConfig(requestParameters: ConfigurationServiceExportConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendExportConfigReply> {
+        const response = await this.configurationServiceExportConfigRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -169,7 +169,7 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint returns the configuration files for a given user
      * Get configuration files
      */
-    async configServiceGetConfigsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetConfigsReply>> {
+    async configurationServiceGetConfigsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendGetConfigsReply>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -192,8 +192,8 @@ export class ConfigurationApi extends runtime.BaseAPI {
      * This endpoint returns the configuration files for a given user
      * Get configuration files
      */
-    async configServiceGetConfigs(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetConfigsReply> {
-        const response = await this.configServiceGetConfigsRaw(initOverrides);
+    async configurationServiceGetConfigs(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendGetConfigsReply> {
+        const response = await this.configurationServiceGetConfigsRaw(initOverrides);
         return await response.value();
     }
 

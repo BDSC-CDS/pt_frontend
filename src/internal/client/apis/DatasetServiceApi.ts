@@ -125,7 +125,7 @@ export interface DatasetServiceTransformDatasetRequest {
 /**
  * 
  */
-export class DatasetApi extends runtime.BaseAPI {
+export class DatasetServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint changes the types of a dataset

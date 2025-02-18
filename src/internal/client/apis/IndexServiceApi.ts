@@ -39,7 +39,7 @@ export interface IndexServiceCreateHelloOperationRequest {
 /**
  * 
  */
-export class IndexApi extends runtime.BaseAPI {
+export class IndexServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint returns a hello

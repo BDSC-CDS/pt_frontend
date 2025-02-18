@@ -12,10 +12,10 @@ interface InputFieldProps {
 export default function InputField({ label, name, value, onChange, error, type = "text" }:  InputFieldProps){
     return (
         <div className="mb-3 w-full">
-            <label htmlFor={name} className="block mb-1">{label}:</label>
             <input
                 id={name}
                 name={name}
+                placeholder={label}
                 type={type}
                 value={value}
                 onChange={onChange}

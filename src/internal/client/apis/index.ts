@@ -1,10 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './AuditLogApi';
-export * from './AuthenticationApi';
-export * from './ConfigurationApi';
-export * from './DatasetApi';
-export * from './IndexApi';
-export * from './QuestionnaireApi';
-export * from './RiskAssessmentApi';
-export * from './UsersApi';
+export * from './AuditLogServiceApi';
+export * from './AuthenticationServiceApi';
+export * from './ConfigurationServiceApi';
+export * from './DatasetServiceApi';
+export * from './IndexServiceApi';
+export * from './QuestionnaireServiceApi';
+export * from './RiskAssessmentServiceApi';
+export * from './UsersServiceApi';

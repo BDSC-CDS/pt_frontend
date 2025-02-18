@@ -32,7 +32,7 @@ export interface RiskAssessmentServiceGetRiskAssessmentRequest {
 /**
  * 
  */
-export class RiskAssessmentApi extends runtime.BaseAPI {
+export class RiskAssessmentServiceApi extends runtime.BaseAPI {
 
     /**
      * This endpoint allow getting a single user\'s risk assessment
