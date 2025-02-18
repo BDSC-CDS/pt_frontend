@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Question, Questions } from '../../utils/questions';
-import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireQuestionReply } from '../../internal/client/index';
-import { createReply } from "../../utils/questionnaire"
+import { TemplatebackendQuestionnaireReply } from '../../internal/client/index';
 import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
 import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
 import { GrDocumentConfig } from "react-icons/gr";
-import { Button, Modal, TextInput } from 'flowbite-react';
 import jsPDF from 'jspdf';
-import { showToast } from '~/utils/showToast';
 import { useRouter } from 'next/router';
+import ReplySaveModal from '../modals/ReplySaveModal';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -392,7 +390,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             pdf.setFont("helvetica", "italic");
             pdf.setFontSize(10);
             pdf.setTextColor("#000000");
-            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${saveName}`, margin, pageHeight - 10);
+            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${reply?.projectName || ""}`, margin, pageHeight - 10);
             pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
         };
 
@@ -413,7 +411,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
             cursorY += 10;
 
             const summaryContent = [
-                `Project Title: ${saveName}`,
+                `Project Title: ${reply?.projectName || ""}`,
                 `Total Questions Answered: ${reportData.totalQuestionsAnswered}`,
                 `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
                 `Missing Data Sections: ${reportData.missingDataSections.length > 0
@@ -585,44 +583,7 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
     }])
 
     // Everything to save
-    const [openSaveModal, setOpenSaveModal] = useState(false);
-    const [saveName, setSaveName] = useState("");
-    const save = async () => {
-        setOpenSaveModal(false);
-
-        let allQuestions: Question[] = [];
-        Object.keys(questions).map((tab) => {
-            const tabQuestions = questions[tab];
-            if (!tabQuestions) return;
-            allQuestions = allQuestions.concat(tabQuestions);
-        })
-
-        const allAnsweredQuestions = allQuestions.filter(q => q.answers?.find(a => a.selected));
-        const replies: Array<TemplatebackendQuestionnaireQuestionReply> = allAnsweredQuestions.map(q => {
-            const reply: TemplatebackendQuestionnaireQuestionReply = {
-                questionnaireQuestionId: Number(q.questionId),
-                answer: q.answers.find(a => a.selected)?.answerId
-            };
-            return reply;
-        })
-
-        const replyToSave: TemplatebackendQuestionnaireReply = {
-            questionnaireVersionId: reply?.questionnaireVersionId ? reply.questionnaireVersionId : questionnaireVersionId,
-            projectName: saveName,
-            replies: replies,
-        }
-
-        try {
-            const id = await createReply(replyToSave);
-            if(!id) {
-                throw "Error creating the new version."
-            }
-            showToast("success", "New reply successfully saved.")
-            router.push("/risk_assessment")
-        } catch (error) {
-            showToast("error", String(error))
-        }
-    }
+    const [openSaveModal, setOpenSaveModal] = useState(false);    
 
     return (
         <>
@@ -632,36 +593,8 @@ const Questionnaire: React.FC<QuestionnaireProps> = ({ questions, questionnaireV
                     <p className='ml-2 text-sm'> Save</p>
                 </span>
             </div>
-            <Modal show={openSaveModal} size="md" onClose={() => setOpenSaveModal(false)} popup>
-                <Modal.Header />
-                <Modal.Body>
-                    <div className="text-center">
-                        <div className="flex flex-col mb-8">
-                            <TextInput
-                                placeholder="Project name"
-                                required
-                                onChange={(event) => { setSaveName(event.target.value) }}
-                            />
-                        </div>
-
-                        <hr />
-                        {/* <div className="flex flex-col mb-8">
-                            <ToggleSwitch checked={savePublish} label="Publish version" onChange={setSavePublish} />
-                        </div> */}
-
-                        <hr />
-
-                        <div className="flex justify-center gap-4">
-                            <Button color="success" onClick={() => save()}>
-                                Save
-                            </Button>
-                            <Button color="gray" onClick={() => setOpenSaveModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
+            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)} />
+            
             <div id="all-tabs">
                 {activeTab !== '8' && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
