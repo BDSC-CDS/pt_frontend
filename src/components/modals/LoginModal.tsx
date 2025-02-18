@@ -96,7 +96,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
     }
 
     // Handle input changes
-    const handleInpuChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setFormData(prevState => ({
             ...prevState,
@@ -126,14 +126,14 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                 >
                     {isRegister && (
                         <>
-                            <InputField label="First name" name="firstName" value={formData.firstName} onChange={handleInpuChange} error={errors.firstName} />
-                            <InputField label="Last name" name="lastName" value={formData.lastName} onChange={handleInpuChange} error={errors.lastName} />
+                            <InputField label="First name" name="firstName" value={formData.firstName} onChange={handleInputChange} error={errors.firstName} />
+                            <InputField label="Last name" name="lastName" value={formData.lastName} onChange={handleInputChange} error={errors.lastName} />
                         </>
                     )}
-                    <InputField label="Email" name="email" value={formData.email} onChange={handleInpuChange} error={errors.email} type="email"/>
-                    <InputField label="Password" name="password" value={formData.password} onChange={handleInpuChange} error={errors.password} type="password" />
+                    <InputField label="Email" name="email" value={formData.email} onChange={handleInputChange} error={errors.email} type="email"/>
+                    <InputField label="Password" name="password" value={formData.password} onChange={handleInputChange} error={errors.password} type="password" />
                     {isRegister && (
-                        <InputField label="Confirm password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInpuChange} error={errors.confirmPassword} type="password" />
+                        <InputField label="Confirm password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} error={errors.confirmPassword} type="password" />
                     )}
 
                     <button type="submit" className="hidden"></button> {/* Ensures Enter works */}
