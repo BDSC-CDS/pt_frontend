@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Question, Questions } from '../../utils/questions';
 import { TemplatebackendQuestionnaireReply } from '../../internal/client/index';
 import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
-import { FaFilePdf, FaCircleInfo } from "react-icons/fa6";
-import { GrDocumentConfig } from "react-icons/gr";
-import jsPDF from 'jspdf';
 import ReplySaveModal from '../modals/ReplySaveModal';
 import QuestionnaireTab from './QuestionnaireTab';
+import QuestionnaireReportTab from './QuestionnaireReportTab';
+import { showToast } from '~/utils/showToast';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -20,7 +19,7 @@ interface QuestionnaireProps {
 type Tabs = {
     id: string,
     title: string,
-    content: any,
+    content: ReactNode,
 }[]
 
 /**
@@ -28,22 +27,43 @@ type Tabs = {
  */
 export default function Questionnaire({ questions, questionnaireVersionId, reply }: QuestionnaireProps) {
     const [activeTab, setActiveTab] = useState<string>('1');
-    const [totalHighRiskAnswers, setTotalHighRiskAnswers] = useState(0);
-
-    const setSelectedAnswer = (question: Question, answerId: string) => {
-        question.answers.forEach(a => {
-            a.selected = false;
-            if (a.answerId == answerId) {
-                a.selected = true;
-                question.highRiskAnswerSelected = a.highRisk;
-            }
+    const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false);
+    const [openSaveModal, setOpenSaveModal] = useState(false);
+    const [reportData, setReportData] = useState({
+        totalQuestionsAnswered: 0,
+        totalHighRiskAnswers: 0,
+        sectionsCompleted: [] as string[],
+        missingDataSections: [] as string[],
+        overallCompletionRate: "",
+    });
+    const [currentRisk, setCurrentRisk] = useState(0);
+    const [currentRiskPc, setCurrentRiskPc] = useState(0);
+    const [currentDisplayRiskPc, setCurrentDisplayRiskPc] = useState(0);
+    const computeRiskBounds = (questions: Questions): [number, number] => {
+        let allQuestions: Question[] = [];
+        Object.keys(questions).map((tab) => {
+            const tabQuestions = questions[tab];
+            if (!tabQuestions) return;
+            allQuestions = allQuestions.concat(tabQuestions);
         });
 
-        computeCurrentRisk();
-        computeCurrentReport();
-        computeHighRiskCount();
+        // console.log("allQuestions", allQuestions.map(q => q.riskWeight))
+        let maxRisk = 0;
+        let minRisk = 0;
+        allQuestions?.forEach(q => {
+            const riskLevels = q.answers.map(a => a.riskLevel);
+            const maxRiskLevel = Math.max(...riskLevels);
+            const minRiskLevel = Math.min(...riskLevels);
+            // console.log("q risk", q.riskWeight, maxRiskLevel, minRiskLevel);
+            maxRisk += q.riskWeight * maxRiskLevel;
+            minRisk += q.riskWeight * minRiskLevel;
+        });
+        return [maxRisk, minRisk];
     };
+    const [maxRisk, minRisk] =  computeRiskBounds(questions);
+    
 
+    // Populate the questionnaire with the reply given reply data
     if (reply) {
         interface QuestionMap {
             [key: string]: Question;
@@ -67,21 +87,32 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             }
         });
     }
+    
+    // Function to set the selected answer for a question
+    const setSelectedAnswer = (question: Question, answerId: string) => {
+        question.answers.forEach(a => {
+            a.selected = false;
+            if (a.answerId == answerId) {
+                a.selected = true;
+                question.highRiskAnswerSelected = a.highRisk;
 
-    // Function to go to the previous tab
-    const goToPreviousTab = () => {
-        const currentTabIndex = Number(activeTab);
-        if (currentTabIndex > 1) {
-            setActiveTab(String(currentTabIndex - 1));
-        }
-    };
+                if (a.rulePrefills && a.rulePrefills.length > 0) {
+                    a.rulePrefills.forEach(rp => {
+                        const q = Object.keys(questions)
+                                    .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
+                                    .find(q => q !== undefined);
+                        if (q) {
+                            q.disabled = true;
+                            setSelectedAnswer(q, rp.answerId);
+                        }
+                    });
+                    showToast("info", "Some answer were prefilled.");
+                }
+            }
+        });
 
-    // Function to go to the next tab
-    const goToNextTab = () => {
-        const currentTabIndex = Number(activeTab);
-        if (currentTabIndex < tabs.length) {
-            setActiveTab(String(currentTabIndex + 1));
-        }
+        computeCurrentRisk();
+        computeCurrentReport();
     };
 
     const getSelectedAnswer = (question: Question) => {
@@ -100,59 +131,6 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         }
         return false;
     };
-
-    const computeHighRiskCount = () => {
-        let totalHighRiskAnswers = 0;
-
-        Object.keys(questions).forEach((tab) => {
-            questions[tab]?.forEach((question) => {
-                // Count answers with highRisk = false
-                const isHighRiskSelected = question.answers.some((answer) => answer.selected && answer.highRisk);
-                if (isHighRiskSelected) {
-                    totalHighRiskAnswers += 1;
-                }
-            });
-        });
-
-        setTotalHighRiskAnswers(totalHighRiskAnswers);
-
-        // uncomment to make score goes to 100% in case of any high risk answers selected
-        // if (totalHighRiskAnswers > 0) {
-        //     setCurrentRiskPc(1);
-        //     setCurrentDisplayRiskPc(1);
-        // } 
-    };
-
-
-
-    const getRiskBounds = () => {
-        let allQuestions: Question[] = [];
-        Object.keys(questions).map((tab) => {
-            const tabQuestions = questions[tab];
-            if (!tabQuestions) return;
-            allQuestions = allQuestions.concat(tabQuestions);
-        });
-
-        // console.log("allQuestions", allQuestions.map(q => q.riskWeight))
-        let maxRisk = 0;
-        let minRisk = 0;
-        allQuestions?.forEach(q => {
-            const riskLevels = q.answers.map(a => a.riskLevel);
-            const maxRiskLevel = Math.max(...riskLevels);
-            const minRiskLevel = Math.min(...riskLevels);
-            // console.log("q risk", q.riskWeight, maxRiskLevel, minRiskLevel);
-            maxRisk += q.riskWeight * maxRiskLevel;
-            minRisk += q.riskWeight * minRiskLevel;
-        });
-        return [maxRisk, minRisk];
-    };
-
-
-
-    const [currentRisk, setCurrentRisk] = useState(0);
-    const [currentRiskPc, setCurrentRiskPc] = useState(0);
-    const [currentDisplayRiskPc, setCurrentDisplayRiskPc] = useState(0);
-    const [maxRisk, minRisk] = getRiskBounds();
 
     const computeCurrentRisk = () => {
         let allQuestions: Question[] = [];
@@ -197,21 +175,13 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         setCurrentRisk(cRisk);
         setCurrentRiskPc(cRiskPc);
         setCurrentDisplayRiskPc(displayCRiskPc);
+
+        // uncomment to make score goes to 100% in case of any high risk answers selected
+        // if (totalHighRiskAnswers > 0) {
+        //     setCurrentRiskPc(1);
+        //     setCurrentDisplayRiskPc(1);
+        // } 
     };
-
-    useEffect(() => {
-        computeCurrentRisk();
-        computeCurrentReport();
-    }, []);
-
-    const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false);
-
-    const [reportData, setReportData] = useState({
-        totalQuestionsAnswered: 42,
-        sectionsCompleted: ['Basic Info', 'Structured Data', 'Multimedia', 'IT Infrastructure'],
-        missingDataSections: ['Genomic Variables', 'Data Users'],
-        overallCompletionRate: '86%',
-    });
 
     const computeCurrentReport = () => {
         const sectionsCompleted: string[] = [];
@@ -239,280 +209,64 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         });
 
         let numAnswered = 0;
-
+        let numHighRisk = 0;
         allQuestions?.forEach(q => {
-            const answered = !!q.answers.find(a => a.selected);
+            const answered = q.answers.find(a => a.selected);
             if (answered) {
                 numAnswered++;
+                if (q.highRiskAnswerSelected) {
+                    numHighRisk++;
+                }
             }
         });
 
         const completionRate = numAnswered / allQuestions.length;
 
         setReportData({
+            totalHighRiskAnswers: numHighRisk,
             totalQuestionsAnswered: numAnswered,
             sectionsCompleted: sectionsCompleted,
             missingDataSections: sectionsMissing,
-            overallCompletionRate: (completionRate * 100).toFixed(2) + "%",
+            overallCompletionRate: (completionRate * 100).toFixed(2)+"%",
         });
-
     };
 
-    const isTabCompleted = (tab: string) => {
-        return reportData.sectionsCompleted.includes(tab);
-    };
-
-    const [exportInProgress, setExportInProgress] = useState(false);
-
-    const exportPDF = async () => {
-        const pdf = new jsPDF('p', 'mm', 'a4'); // A4 page size
-        const margin = 10; // Margin in mm
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const headerHeight = 20; // Header height in mm
-        let cursorY = margin + headerHeight; // Starting Y position for text
-
-
-        // Function to add the header with logo on the left (only on the first page)
-        const addHeader = async (firstPage = false) => {
-            if (!firstPage) return;
-
-            pdf.setFillColor("#306278");
-            pdf.rect(0, 0, pageWidth, headerHeight, "F");
-
-            // Fetch the logo as Base64
-            const response = await fetch("/sphn-logo-white.png"); // Keep the existing path
-            const blob = await response.blob();
-
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            return new Promise((resolve) => {
-                reader.onloadend = () => {
-                    const base64Logo = reader.result as string;
-                    const logoWidth = 15;
-                    const logoHeight = 10;
-                    pdf.addImage(
-                        base64Logo,
-                        "PNG",
-                        margin, // Left align the logo
-                        (headerHeight - logoHeight) / 2, // Center vertically within the header
-                        logoWidth,
-                        logoHeight
-                    );
-
-                    // Add the title "Privacy Toolbox" next to the logo
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setFontSize(14);
-                    pdf.setTextColor("#FFFFFF");
-                    pdf.text("Privacy Toolbox", margin + logoWidth + 5, headerHeight / 1.5);
-
-                    resolve(null);
-                };
-            });
-        };
-
-        // Function to add footer with title and page number
-        const addFooter = (pageNumber: number) => {
-            pdf.setFont("helvetica", "italic");
-            pdf.setFontSize(10);
-            pdf.setTextColor("#000000");
-            pdf.text(`Privacy Toolbox Questionnaire Report - Project: ${reply?.projectName || ""}`, margin, pageHeight - 10);
-            pdf.text(`Page ${pageNumber}`, pageWidth - margin - 20, pageHeight - 10);
-        };
-
-        let pageNumber = 1;
-
-        // Add header to the first page
-        await addHeader(true);
-        addFooter(pageNumber);
-
-        // Step 1: Add Summary
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "normal");
-
-        const summaryTab = tabs.find((tab) => tab.title === "Results");
-        if (summaryTab) {
-            pdf.setFont("helvetica", "bold");
-            pdf.text("Summary", margin, cursorY);
-            cursorY += 10;
-
-            const summaryContent = [
-                `Project Title: ${reply?.projectName || ""}`,
-                `Total Questions Answered: ${reportData.totalQuestionsAnswered}`,
-                `Sections Completed: ${reportData.sectionsCompleted.join(", ")}`,
-                `Missing Data Sections: ${reportData.missingDataSections.length > 0
-                    ? reportData.missingDataSections.join(", ")
-                    : "None"}`,
-                `Overall Completion Rate: ${reportData.overallCompletionRate}`,
-                `Current Risk Score: ${(currentRiskPc * 100).toFixed(2)}%`,
-                `Total High Risk Answers: ${totalHighRiskAnswers}`,
-            ];
-
-            summaryContent.forEach((line) => {
-                const wrappedLines = pdf.splitTextToSize(line, pageWidth - 2 * margin);
-                pdf.text(wrappedLines, margin, cursorY);
-                cursorY += wrappedLines.length * 6;
-            });
-
-            cursorY += 10;
-        }
-
-        // Step 2: Add Questions and Answers
-        tabs.forEach((tab) => {
-            if (tab.title === "Results") return; // Skip the summary tab
-
-
-            // Page break check
-            if (cursorY + 10 > pageHeight - margin) {
-                pdf.addPage();
-                cursorY = margin + headerHeight;
-                pageNumber++;
-                addFooter(pageNumber);
-            }
-
-            // Tab Title: Bold, Size 14
-            pdf.setFont("helvetica", "bold");
-            pdf.setFontSize(14);
-            pdf.text(`Tab: ${tab.title}`, margin, cursorY);
-            cursorY += 10;
-
-            // Questions and Answers
-            const tabQuestions = questions[tab.title] || [];
-            tabQuestions.forEach((question, questionIndex) => {
-                // Page break check
-                if (cursorY + 15 > pageHeight - margin) {
-                    pdf.addPage();
-                    cursorY = margin + headerHeight;
-                    pageNumber++;
-                    addFooter(pageNumber);
-                }
-
-                // Question: Normal, Size 12
-                pdf.setFont("helvetica", "normal");
-                pdf.setFontSize(12);
-                const questionText = `${questionIndex + 1}. ${question.questionDescription}`;
-                const questionLines = pdf.splitTextToSize(questionText, pageWidth - 2 * margin);
-                pdf.text(questionLines, margin, cursorY);
-                cursorY += questionLines.length * 6;
-
-                // Answer: Italic, Size 12
-                pdf.setFont("helvetica", "italic");
-                const selectedAnswer = question.answers.find((a) => a.selected);
-                const answerText = selectedAnswer
-                    ? `Answer: ${selectedAnswer.answerDescription}`
-                    : "Answer: Not Answered";
-                const answerLines = pdf.splitTextToSize(answerText, pageWidth - 2 * margin);
-                pdf.text(answerLines, margin + 10, cursorY);
-                cursorY += answerLines.length * 6 + 5;
-            });
-
-            // Add spacing between tabs
-            cursorY += 5;
-        });
-
-
-        // Save the PDF
-        pdf.save("questions-and-answers-with-summary-and-header.pdf");
-    };
-
-
-
-    const exportConfig = () => {
-        const txt = `{
-  "hasDateShift": true,
-  "dateShiftLowrange": -30,
-  "dateShiftHighrange": 30
-}`;
-        const element = document.createElement("a");
-        const file = new Blob([txt], { type: 'application/json' });
-        element.href = URL.createObjectURL(file);
-        element.download = "connector-config.json";
-        document.body.appendChild(element); // Required for this to work in FireFox
-        element.click();
-    };
-
-    const report_tab = <div key="report" className="p-4 bg-white shadow rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Survey Results Summary</h2>
-        <div className="mb-2">
-            <strong>Total Questions Answered:</strong> {reportData.totalQuestionsAnswered}
-        </div>
-        <div className="mb-2">
-            <strong>Sections Completed:</strong> {reportData.sectionsCompleted.join(', ')}
-        </div>
-        <div className="mb-2">
-            <strong>Missing Data Sections:</strong> {reportData.missingDataSections.join(', ') || 'None'}
-        </div>
-        <div className="mb-2">
-            <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
-        </div>
-        <div className="mb-2">
-            <strong>Current Risk (%):</strong> {(currentRiskPc * 100).toFixed(2) + "%"}
-        </div>
-        <div className="mb-2 text-red-500">
-            <strong>High-Risk Answers:</strong> {totalHighRiskAnswers}
-        </div>
-        <hr className="my-4" />
-        <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
-        <div>
-            {(() => {
-                // Gather all questions into a single array with their tab
-                let allQuestions: { tab: string; question: Question; risk: number; }[] = [];
-                Object.keys(questions).forEach((tab) => {
-                    questions[tab]?.forEach((question) => {
-                        const selectedAnswer = question.answers.find((answer) => answer.selected);
-                        if (selectedAnswer) {
-                            const risk = selectedAnswer.riskLevel * question.riskWeight;
-                            allQuestions.push({ tab, question, risk });
-                        }
-                    });
-                });
-
-                // Sort questions by risk descending and take the top 5
-                const topQuestions = allQuestions
-                    .sort((a, b) => b.risk - a.risk)
-                    .slice(0, 5);
-
-                // Render top 5 high-risk questions with their tabs
-                return topQuestions.map(({ tab, question, risk }, index) => (
-                    <div key={question.questionId} className="mb-4">
-                        <p className="text-sm">
-                            <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
-                        </p>
-                        <p className="text-xs text-gray-500">
-                            Risk: {risk.toFixed(2)} | Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
-                        </p>
-                    </div>
-                ));
-            })()}
-        </div>
-        <div className="flex flex-row mt-4">
-            <span onClick={() => exportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                <FaFilePdf />
-                <p className='ml-2 text-sm'> Export PDF</p>
-            </span>
-            <span onClick={() => exportConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
-                <GrDocumentConfig />
-                <p className='ml-2 text-sm'> Export connector configuration</p>
-            </span>
-        </div>
-    </div>;
-
+    // Construct the tabs for the questionnaire
     const tabs: Tabs = Object.keys(questions).map((tab, n) => ({
         id: (n + 1).toString(),
         title: tab,
         content: <QuestionnaireTab
-            tabQuestions={questions[tab]}
-            setSelectedAnswer={setSelectedAnswer}
-            getSelectedAnswer={getSelectedAnswer}
-            isQuestionAnswered={isQuestionAnswered} />
+                    tabQuestions={questions[tab]}
+                    setSelectedAnswer={setSelectedAnswer}
+                    getSelectedAnswer={getSelectedAnswer}
+                    isQuestionAnswered={isQuestionAnswered} 
+                />
     })).concat([{
         id: String(Object.keys(questions).length + 1),
         title: 'Results',
-        content: report_tab,
+        content: <QuestionnaireReportTab replyName={reply?.projectName} questions={questions} reportData={reportData} currentRiskPc={currentRiskPc}/>
     }]);
 
-    // Everything to save
-    const [openSaveModal, setOpenSaveModal] = useState(false);
+    // Function to go to the previous tab
+    const goToPreviousTab = () => {
+        const currentTabIndex = Number(activeTab);
+        if (currentTabIndex > 1) {
+            setActiveTab(String(currentTabIndex - 1));
+        }
+    };
+
+    // Function to go to the next tab
+    const goToNextTab = () => {
+        const currentTabIndex = Number(activeTab);
+        if (currentTabIndex < tabs.length) {
+            setActiveTab(String(currentTabIndex + 1));
+        }
+    };
+
+    useEffect(() => {
+        computeCurrentRisk();
+        computeCurrentReport();
+    }, []);
 
     return (
         <>
@@ -522,8 +276,11 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                     <p className='ml-2 text-sm'> Save</p>
                 </span>
             </div>
+
+            {/* Save reply modal */}
             <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)} />
 
+            {/* All Questionnaire Tabs */}
             <div id="all-tabs">
                 {activeTab !== '8' && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
@@ -564,7 +321,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                             textColor='black'
                             animate={false} />
 
-                        {(totalHighRiskAnswers > 0) && (
+                        {(reportData.totalHighRiskAnswers > 0) && (
                             <div className="flex items-center">
                                 <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block" />
                                 <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
@@ -572,7 +329,6 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                         )}
                     </div>
                 )}
-                {/* <TabsComponent questions={questions} /> */}
 
                 <div className="overflow-auto border rounded-t-lg scroll-mt-2">
                     <ul className="flex w-full">
@@ -598,14 +354,8 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                 </div>
 
                 <div className="py-5 px-3 border rounded-b-lg shadow-lg">
-                    {/* {
-                exportInProgress ?
-                    tabs.map(t => t?.content) :
-                    tabs.find((tab) => tab.id === activeTab)?.content
-            } */}
                     {tabs.find((tab) => tab.id === activeTab)?.content}
-                    {/* {tabs.map(tab => tab.content)} */}
-                    <div className="flex items-center mt-4">
+                    <div className="flex w-full justify-center items-center mt-4">
                         <button
                             onClick={goToPreviousTab}
                             disabled={activeTab === '1'}

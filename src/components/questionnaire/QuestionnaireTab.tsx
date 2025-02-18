@@ -43,6 +43,7 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
                                 }`}
                             value={getSelectedAnswer(question)}
                             onChange={(e) => setSelectedAnswer(question, e.target.value)}
+                            disabled={question.disabled}
                         >
                             <option>Select an option</option>
                             {question.answers.map((answer) => (
