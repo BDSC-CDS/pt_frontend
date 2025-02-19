@@ -62,7 +62,7 @@ function RiskAssessment() {
             {name:"projectName", header:"Project Name"},
         ];
 
-        if(replies.filter(r => r.sharedBy).length > 0) {
+        if(replies.filter(r => r.shared).length > 0) {
             cols.push({name:"sharedBy", header:"Shared By"});
         }
 
