@@ -58,6 +58,12 @@ export interface TemplatebackendQuestionnaireReply {
     userId?: number;
     /**
      * 
+     * @type {string}
+     * @memberof TemplatebackendQuestionnaireReply
+     */
+    userName?: string;
+    /**
+     * 
      * @type {Date}
      * @memberof TemplatebackendQuestionnaireReply
      */
@@ -94,6 +100,7 @@ export function TemplatebackendQuestionnaireReplyFromJSONTyped(json: any, ignore
         'projectName': !exists(json, 'projectName') ? undefined : json['projectName'],
         'replies': !exists(json, 'replies') ? undefined : ((json['replies'] as Array<any>).map(TemplatebackendQuestionnaireQuestionReplyFromJSON)),
         'userId': !exists(json, 'userId') ? undefined : json['userId'],
+        'userName': !exists(json, 'userName') ? undefined : json['userName'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'updatedAt': !exists(json, 'updatedAt') ? undefined : (new Date(json['updatedAt'])),
     };
@@ -113,6 +120,7 @@ export function TemplatebackendQuestionnaireReplyToJSON(value?: TemplatebackendQ
         'projectName': value.projectName,
         'replies': value.replies === undefined ? undefined : ((value.replies as Array<any>).map(TemplatebackendQuestionnaireQuestionReplyToJSON)),
         'userId': value.userId,
+        'userName': value.userName,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'updatedAt': value.updatedAt === undefined ? undefined : (value.updatedAt.toISOString()),
     };
