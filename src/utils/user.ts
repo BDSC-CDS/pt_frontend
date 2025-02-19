@@ -41,3 +41,17 @@ export const getMyUser = async (token?: string) => {
         throw error
     }
 };
+
+export const searchUsers = async (emailLike: string) => {
+    try {
+        const response = await apiClientUser.usersServiceSearchUsers({
+            body: {
+                emailLike: emailLike
+            }
+        }, getAuthInitOverrides());
+        return response?.result;
+    } catch (error) {
+        console.log("Error listing users:" + error);
+        throw error;
+    }
+};

@@ -80,6 +80,21 @@ export const createReply = async (reply: TemplatebackendQuestionnaireReply) => {
     }
 };
 
+export const shareReply = async (replyId: number, sharedwithUserid: number) => {
+    try {
+        const response = await apiClientQuestionnaire.questionnaireServiceShareReply({
+            id:replyId,
+            body: {
+                sharedwithUserid: sharedwithUserid,
+            }
+        }, getAuthInitOverrides());
+        return response?.result?.success;
+    } catch (error) {
+        console.log("Error sharing reply:" + error);
+        throw error;
+    }
+};
+
 export const getQuestionnaire = async (id: number = 0) => {
     try {
         const response = await apiClientQuestionnaire.questionnaireServiceGetQuestionnaire({id}, getAuthInitOverrides());
