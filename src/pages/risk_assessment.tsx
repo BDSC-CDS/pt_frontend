@@ -20,7 +20,7 @@ interface Reply {
     createdAt?: Date;
     updatedAt?: Date;
     shared: boolean;
-    status: JSX.Element;
+    sharedBy: JSX.Element;
 }
 
 function RiskAssessment() {
@@ -49,11 +49,26 @@ function RiskAssessment() {
             return {
                 ...r,
                 shared: shared,
-                status: shared ? <HiShare /> : <></> 
+                sharedBy: shared ? (<div className="flex items-center gap-2"><HiShare /> {r.userName}</div>) : <></>
             };
         })
 
         setReplies(rep);
+    };
+
+    const getColumns = () => {
+        const cols = [
+            {name:"id", header:"ID"},
+            {name:"projectName", header:"Project Name"},
+        ];
+
+        if(replies.filter(r => r.sharedBy).length > 0) {
+            cols.push({name:"sharedBy", header:"Shared By"});
+        }
+
+        cols.push({name:"createdAt", header:"Created At"},)
+
+        return cols
     };
 
     useEffect(() => {
@@ -102,13 +117,7 @@ function RiskAssessment() {
                         {/* Questionnaire replies table */}
                         <DataTable 
                             data={replies}
-                            columns={[
-                                {name:"id", header:"ID"},
-                                {name:"projectName", header:"Project Name"},
-                                // {name:"projectStatus", header:"Status"}, // NOT IMPLEMENTED
-                                {name:"status", header:"Status"},
-                                {name:"createdAt", header:"Created At"},
-                            ]}
+                            columns={getColumns()}
                             onRowClick={(row) => handleRowClick(row.id)}
                             actions={[
                                 { name: "Share reply", callback: (row) => handleShare(row.id) },
