@@ -97,7 +97,6 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     
     // Function to set the selected answer for a question
     const setSelectedAnswer = (question: Question, answerId: string) => {
-        console.log("setSelectedAnswer", question.questionId, answerId, question);
         question.answers.forEach(a => {
             a.selected = false;
             if (a.answerId == answerId) {
@@ -161,10 +160,10 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                     selectedRisk = a.riskLevel * q.riskWeight;
                 }
             });
-            console.log("max", maxRiskLevel, selectedRisk);
+            // console.log("max", maxRiskLevel, selectedRisk);
         });
 
-        console.log("cRisk bef", cRisk);
+        // console.log("cRisk bef", cRisk);
         cRisk = Math.max(cRisk, 0);
 
         // const riskRange = (maxRisk || 1) - (minRisk || 0);
@@ -176,10 +175,10 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         // const displayCRiskPc = cRiskPc * 0.8;
         const displayCRiskPc = cRiskPc;
 
-        console.log("cRisk", cRisk);
-        console.log("maxRisk", maxRisk);
-        console.log("cRiskPc", cRiskPc);
-        console.log("displayCRiskPc", displayCRiskPc);
+        // console.log("cRisk", cRisk);
+        // console.log("maxRisk", maxRisk);
+        // console.log("cRiskPc", cRiskPc);
+        // console.log("displayCRiskPc", displayCRiskPc);
 
         setCurrentRisk(cRisk);
         setCurrentRiskPc(cRiskPc);
