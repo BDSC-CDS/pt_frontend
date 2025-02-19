@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import TabsComponent from '../../../components/Tabs';
+import Questionnaire from '../../../components/questionnaire/Questionnaire';
 import { getQuestionnaire, getReply } from "../../../utils/questionnaire"
 import { useRouter } from 'next/router';
 import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
@@ -41,6 +41,7 @@ const QuestionnairePage = () => {
         }
 
         const result = await getQuestionnaire(questionnaireId);
+        console.log("result", result)
         if (!result) {
             return
         }
@@ -72,7 +73,7 @@ const QuestionnairePage = () => {
     return (
         <>
             {!isLoading && questions ? (
-                <TabsComponent questions={questions} questionnaireVersionId={questionnaireVersionId} reply={reply} />
+                <Questionnaire questions={questions} questionnaireVersionId={questionnaireVersionId} reply={reply} />
             ) : (
                 <Spinner/>
             )}

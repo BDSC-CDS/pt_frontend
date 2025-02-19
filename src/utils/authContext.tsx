@@ -57,7 +57,6 @@ export const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children })
                 
                 setUserInfo(updatedUserInfo);
                 localStorage.setItem('userInfo', token);
-                console.log("userInfo", updatedUserInfo)
             }
         } catch (error) {
             console.error("Error retrieving user info:", error);
