@@ -7,6 +7,8 @@ import { showToast } from "~/utils/showToast"
 import { searchUsers } from "~/utils/user"
 import DataTable from "../DataTable"
 import Spinner from "../ui/Spinner"
+import { $schema } from ".eslintrc.cjs"
+import { set } from "lodash"
 
 interface ReplyShareModalProps {
     show: boolean
@@ -23,14 +25,17 @@ type User = {
  * Modal to Share a reply to another user.
  */
 export default function ReplyShareModal({ show, shareReplyId, onClose }: ReplyShareModalProps) {
-    const [emailLike, setEmailLike] = useState<string>('')
+    const [emailLike, setEmailLike] = useState<string>("")
     const [users, setUsers] = useState<Array<User>>([])
-    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null)
 
     const handleSearchUsers = async (emailLike: string) => {
+        setIsLoading(true)
         setEmailLike(emailLike)
         if(emailLike.length == 0) {
+            setIsLoading(false)
             setUsers([])
             return
         }
@@ -46,9 +51,27 @@ export default function ReplyShareModal({ show, shareReplyId, onClose }: ReplySh
                 }
             }))
         } catch (error) {
-            console.log("Error searching users:" + error)
+            showToast("error", "Error searching users:"+error)
+        } finally {
+            setIsLoading(false)
         }
     }
+
+    const handleEmailLikeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setEmailLike(value);
+        setIsLoading(true);
+
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+        }
+
+        const newTimeout = setTimeout(() => {
+            handleSearchUsers(value);
+        }, 500); // Adjust the debounce delay as needed
+
+        setDebounceTimeout(newTimeout);
+    };
 
     const handleSelectUser = (user: User) => {
         if(!selectedUsers.find(u => u.id === user.id)){
@@ -107,10 +130,11 @@ export default function ReplyShareModal({ show, shareReplyId, onClose }: ReplySh
                 <TextInput
                     placeholder="Search email"
                     value={emailLike}
-                    onChange={(event) => { handleSearchUsers(event.target.value) }}
+                    onChange={handleEmailLikeChange}
                 />
                 <div className="h-80 overflow-auto">
-                    {users.length == 0 && (
+                    {isLoading && <Spinner />}
+                    {!isLoading && users.length == 0 && (
                         <div className="flex justify-center text-sm items-center h-full">
                             <p>No users found.</p>
                         </div>
@@ -123,7 +147,7 @@ export default function ReplyShareModal({ show, shareReplyId, onClose }: ReplySh
             </Modal.Body>
 
             <Modal.Footer className="flex justify-center gap-3">
-                <Button onClick={handleShare} disabled={selectedUsers.length==0}>{isLoading ? <Spinner/> : "Share"}</Button>
+                <Button onClick={handleShare} disabled={selectedUsers.length==0}>Share</Button>
                 <Button color="gray" onClick={handleCancel}>Cancel</Button>
             </Modal.Footer>
         </Modal>
