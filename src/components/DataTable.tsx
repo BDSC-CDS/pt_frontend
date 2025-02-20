@@ -207,7 +207,7 @@ const DataTable = <T extends {}>({
                         )).concat( addRow ? (
                             // Add a row at the end of the table
                             <Table.Row key="addRow" className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                <Table.Cell colSpan={columns.length + (leftIconActions ? 1 : 0) + (actions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={addRow.onRowClick}>
+                                <Table.Cell colSpan={columns.length + (leftIconActions ? 1 : 0) + (actions ? 1 : 0) + (rightIconActions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={addRow.onRowClick}>
                                     <div className="flex justify-center items-center text-sm gap-2">
                                         <MdOutlineAdd size={20}/>
                                         <span>{addRow.label}</span>
