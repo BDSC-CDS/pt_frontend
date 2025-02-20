@@ -255,22 +255,6 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         content: <QuestionnaireReportTab replyName={reply?.projectName} questions={questions} reportData={reportData} currentRiskPc={currentRiskPc}/>
     }]);
 
-    // Function to go to the previous tab
-    const goToPreviousTab = () => {
-        const currentTabIndex = Number(activeTab);
-        if (currentTabIndex > 1) {
-            setActiveTab(String(currentTabIndex - 1));
-        }
-    };
-
-    // Function to go to the next tab
-    const goToNextTab = () => {
-        const currentTabIndex = Number(activeTab);
-        if (currentTabIndex < tabs.length) {
-            setActiveTab(String(currentTabIndex + 1));
-        }
-    };
-
     useEffect(() => {
         computeCurrentRisk();
         computeCurrentReport();
