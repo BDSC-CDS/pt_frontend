@@ -135,7 +135,7 @@ const DataTable = <T extends {}>({
                                                     {leftIconActions.map((iconAction, actionIndex) => (
                                                         <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
                                                             <Tooltip content={iconAction.tooltip} className="text-sm p-2">
-                                                                <iconAction.Icon className="text-lg"/>
+                                                                <iconAction.Icon className="text-base"/>
                                                             </Tooltip>
                                                         </div>
                                                     ))}
@@ -166,7 +166,7 @@ const DataTable = <T extends {}>({
                                                     {rightIconActions.map((iconAction, actionIndex) => (
                                                         <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
                                                             <Tooltip content={iconAction.tooltip} className="text-sm p-2">
-                                                                <iconAction.Icon className="text-lg"/>
+                                                                <iconAction.Icon className="text-base"/>
                                                             </Tooltip>
                                                         </div>
                                                         
