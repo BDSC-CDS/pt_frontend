@@ -56,7 +56,12 @@ interface DataTableProps<T> {
         tooltip?: ReactNode;
     }[];
     onRowClick?: (row: T) => void;
-    iconActions?: {
+    leftIconActions?: {
+        Icon: ElementType;
+        tooltip: string;
+        callback: (row: T) => void;
+    }[];
+    rightIconActions?: {
         Icon: ElementType;
         tooltip: string;
         callback: (row: T) => void;
@@ -87,7 +92,8 @@ const DataTable = <T extends {}>({
     data,
     columns,
     onRowClick,
-    iconActions,
+    leftIconActions,
+    rightIconActions,
     actions,
     addRow,
 }: DataTableProps<T>): JSX.Element => {
@@ -97,7 +103,7 @@ const DataTable = <T extends {}>({
                 <Table hoverable={!!onRowClick}>
                     {/* DataTable Header */}
                     <Table.Head>
-                        {iconActions && <Table.HeadCell className="w-1"/>}
+                        {leftIconActions && <Table.HeadCell className="w-1"/>}
                         {columns.map((col, colIndex) => (
                             <Table.HeadCell key={col.name}>
                                 {col.tooltip && (
@@ -108,6 +114,7 @@ const DataTable = <T extends {}>({
                                 {!col.tooltip && col.header}
                             </Table.HeadCell>
                         ))}
+                        {rightIconActions && <Table.HeadCell className="w-1"/>}
                         {actions && <Table.HeadCell className="w-1"/>}
                     </Table.Head>
 
@@ -119,16 +126,47 @@ const DataTable = <T extends {}>({
                                 onClick={() => onRowClick?.(row)} 
                                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
                             >
-                                {(iconActions) && (
+                                {(leftIconActions) && (
                                     <Table.Cell key="iconActionCell" className="p-0" onClick={(e) => e.stopPropagation()}>
                                         {/* Render icon actions */}
                                         <div className="flex items-center justify-center">
-                                            {iconActions && (
+                                            {leftIconActions && (
                                                 <div>
-                                                    {iconActions.map((iconAction, actionIndex) => (
+                                                    {leftIconActions.map((iconAction, actionIndex) => (
                                                         <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
                                                             <Tooltip content={iconAction.tooltip} className="text-sm p-2">
-                                                                <iconAction.Icon className="text-lg"/>
+                                                                <iconAction.Icon className="text-base"/>
+                                                            </Tooltip>
+                                                        </div>
+                                                    ))}
+
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                    </Table.Cell>
+                                )}
+
+                                {/* Render data row cells */}
+                                {columns.map((col, colIndex) => (
+                                    <Table.Cell 
+                                        key={"cell"+rowIndex+colIndex}
+                                        className=""
+                                    >
+                                        {renderCell(row[col.name as keyof T])}
+                                    </Table.Cell>
+                                ))} 
+
+                                {(rightIconActions) && (
+                                    <Table.Cell key="iconActionCell" className="p-0 pr-5" onClick={(e) => e.stopPropagation()}>
+                                        {/* Render icon actions */}
+                                        <div className="flex items-center justify-center gap-2">
+                                            {rightIconActions && (
+                                                <div>
+                                                    {rightIconActions.map((iconAction, actionIndex) => (
+                                                        <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
+                                                            <Tooltip content={iconAction.tooltip} className="text-sm p-2">
+                                                                <iconAction.Icon className="text-base"/>
                                                             </Tooltip>
                                                         </div>
                                                         
@@ -139,16 +177,7 @@ const DataTable = <T extends {}>({
                                         </div>
                                         
                                     </Table.Cell>
-                                )}
-                                {/* Render data row cells */}
-                                {columns.map((col, colIndex) => (
-                                    <Table.Cell 
-                                        key={"cell"+rowIndex+colIndex}
-                                        className=""
-                                    >
-                                        {renderCell(row[col.name as keyof T])}
-                                    </Table.Cell>
-                                ))}       
+                                )}      
 
                                 {(actions) && (
                                     <Table.Cell key="actionCell" onClick={(e) => e.stopPropagation()}>
@@ -178,7 +207,7 @@ const DataTable = <T extends {}>({
                         )).concat( addRow ? (
                             // Add a row at the end of the table
                             <Table.Row key="addRow" className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                <Table.Cell colSpan={columns.length + (iconActions ? 1 : 0) + (actions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={addRow.onRowClick}>
+                                <Table.Cell colSpan={columns.length + (leftIconActions ? 1 : 0) + (actions ? 1 : 0)} className="hover:bg-gray-100 cursor-pointer" onClick={addRow.onRowClick}>
                                     <div className="flex justify-center items-center text-sm gap-2">
                                         <MdOutlineAdd size={20}/>
                                         <span>{addRow.label}</span>

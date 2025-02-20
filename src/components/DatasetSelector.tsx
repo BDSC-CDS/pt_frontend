@@ -116,7 +116,7 @@ const DatasetSelector = ({
                             { name: "createdAt", header: "Created At" },
                         ]}
                         onRowClick={(row) => handleRowClick(row.id)}
-                        iconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
+                        leftIconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
                         actions={mappedActions}
                         addRow={{
                             label: "New dataset",

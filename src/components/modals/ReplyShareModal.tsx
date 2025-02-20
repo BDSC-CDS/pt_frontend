@@ -1,5 +1,5 @@
-import { Badge, Button, Modal, Table, TextInput } from "flowbite-react"
-import { use, useState } from "react"
+import { Badge, Button, Modal, TextInput } from "flowbite-react"
+import { useState } from "react"
 import { FaUser } from "react-icons/fa6"
 import { MdCancel } from "react-icons/md"
 import { shareReply } from "~/utils/questionnaire"
@@ -7,8 +7,6 @@ import { showToast } from "~/utils/showToast"
 import { searchUsers } from "~/utils/user"
 import DataTable from "../DataTable"
 import Spinner from "../ui/Spinner"
-import { $schema } from ".eslintrc.cjs"
-import { set } from "lodash"
 
 interface ReplyShareModalProps {
     show: boolean
@@ -68,7 +66,7 @@ export default function ReplyShareModal({ show, shareReplyId, onClose }: ReplySh
 
         const newTimeout = setTimeout(() => {
             handleSearchUsers(value);
-        }, 500); // Adjust the debounce delay as needed
+        }, 300); // Adjust the debounce delay as needed
 
         setDebounceTimeout(newTimeout);
     };

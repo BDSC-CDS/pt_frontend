@@ -8,8 +8,8 @@ import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
 import Spinner from '~/components/ui/Spinner';
 import { showToast } from '~/utils/showToast';
-import { HiShare } from "react-icons/hi";
 import ReplyShareModal from '~/components/modals/ReplyShareModal';
+import { MdShare } from 'react-icons/md';
 
 interface Reply {
     id?: number;
@@ -49,7 +49,7 @@ function RiskAssessment() {
             return {
                 ...r,
                 shared: shared,
-                sharedBy: shared ? (<div className="flex items-center gap-2"><HiShare /> {r.userName}</div>) : <></>
+                sharedBy: shared ? (<div className="flex items-center gap-2"><MdShare /> {r.userName}</div>) : <></>
             };
         })
 
@@ -119,8 +119,8 @@ function RiskAssessment() {
                             data={replies}
                             columns={getColumns()}
                             onRowClick={(row) => handleRowClick(row.id)}
-                            actions={[
-                                { name: "Share reply", callback: (row) => handleShare(row.id) },
+                            rightIconActions={[
+                                { Icon: MdShare, tooltip: "Share", callback: (row) => handleShare(row.id) },
                             ]}
                             addRow={{label: "New project", onRowClick: () => router.push('/questionnaire/new')}}
                         />
