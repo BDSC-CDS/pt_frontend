@@ -32,7 +32,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: API_URL
-              value: {{ .Values.env.apiUrl }}
+              value: {{ .Values.config.apiUrl }}
+            - name: LOGO_FILE_NAME
+              value: {{ .Values.config.logoFileName }}
+            - name: CSS_THEME
+              value: {{ .Values.config.cssTheme }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
