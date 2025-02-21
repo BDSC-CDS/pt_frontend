@@ -73,7 +73,7 @@ export default function ReplySaveModal({ show, questions, questionnaireVersionId
                 <Button onClick={handleSave}>
                     Save
                 </Button>
-                <Button color="gray" onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>Cancel</Button>
             </Modal.Footer>
         </Modal>
     )   

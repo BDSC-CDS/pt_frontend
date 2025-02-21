@@ -12,7 +12,7 @@ const logoStyleChuv = {
 
 export default function FooterMenu() {
     return (
-        <Footer container className="fixed bottom-0 left-0 right-0 z-20 h-12 text-white rounded-none footer-bg">
+        <Footer container className="fixed bottom-0 left-0 right-0 z-20 h-12 bg-[#306278] text-white rounded-none">
             <div className="w-full text-center">
                 <div className="w-full justify-between  sm:flex sm:items-center sm:justify-between">
 

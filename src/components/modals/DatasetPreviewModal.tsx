@@ -160,7 +160,7 @@ export default function DatasetPreviewModal({show, datasetId, onClose}: DatasetP
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
                     <Button onClick={() => router.push(`/dataset/${datasetId}`)}>Go to Dataset</Button>
-                    <Button color="gray" onClick={handleCloseModal}>Cancel</Button>
+                    <Button onClick={handleCloseModal}>Close</Button>
                 </Modal.Footer>
             </Modal>
         </>

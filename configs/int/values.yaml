@@ -3,8 +3,6 @@ ingress:
   host: "pt-frontend.rdeid.unil.ch"
 
 apiUrl: "https://pt-backend.rdeid.unil.ch"
-logoFileName: "sphn-logo-white.png"
-cssTheme: "sphn-theme"
 
 service:
   port: 16080
