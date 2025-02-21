@@ -98,7 +98,20 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     // Function to set the selected answer for a question
     const setSelectedAnswer = (question: Question, answerId: string) => {
         question.answers.forEach(a => {
+            if (a.selected && a.rulePrefills) {
+                a.rulePrefills.forEach(rp => {
+                    const q = Object.keys(questions)
+                                .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
+                                .find(q => q !== undefined);
+                    if (q) {
+                        q.prefilled = false;
+                        q.answers.forEach(a => a.selected = false);
+                    }
+                });
+            }
+                    
             a.selected = false;
+            
             if (a.answerId == answerId) {
                 a.selected = true;
                 question.highRiskAnswerSelected = a.highRisk;
