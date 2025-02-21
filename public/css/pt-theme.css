@@ -1,8 +1,10 @@
 :root {
-    --primary-color: #059032;
-    --secondary-color: #CBEAD5;
+    /* --primary-color: #059032; */
+    /* --secondary-color: #CBEAD5; */
+    /* --footer-bg-color: #B0B0B0; */
+    --primary-color: #002C5C;
+    --secondary-color: #E2EBF5;
     --accent-color: #e74c3c;
-    --footer-bg-color: #B0B0B0;
 }
 
 .header-bg {
@@ -10,7 +12,7 @@
 }
 
 .footer-bg {
-    background-color: var(--footer-bg-color);
+    background-color: var(--primary-color);
 }
 
 .bg-primary {
