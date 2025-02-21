@@ -40,7 +40,7 @@ function ToolCard({
                     : "hover:scale-105"
             }`}
         >
-            <div className="flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-secondary">
+            <div className="flex items-center justify-center w-16 h-16 bg-[#A1C6D9] rounded-full mb-4">
                 {icon}
             </div>
             <h3 className="text-lg font-semibold">{title}</h3>

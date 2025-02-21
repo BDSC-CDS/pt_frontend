@@ -148,7 +148,7 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                 <Button onClick={handleSubmit} disabled={isLoading}>
                     {isLoading ? <Spinner /> : (isRegister ? "Register" : "Log in")}
                 </Button>
-                <Button color="gray" onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleClose}>Close</Button>
             </Modal.Footer>
         </Modal>
     )   

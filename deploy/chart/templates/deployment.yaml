@@ -27,9 +27,5 @@ spec:
           env:
             - name: API_URL
               value: {{ .Values.apiUrl }}
-            - name: LOGO_FILE_NAME
-              value: {{ .Values.logoFileName }}
-            - name: CSS_THEME
-              value: {{ .Values.cssTheme }}
       imagePullSecrets:
         - name: registry-auth

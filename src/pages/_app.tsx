@@ -1,6 +1,5 @@
 import { type AppType } from "next/app";
 import "../styles/globals.css";
-import '../../public/css/pt-theme.css';
 import { Layout } from '../components/Layout'
 import Script from "next/script";
 

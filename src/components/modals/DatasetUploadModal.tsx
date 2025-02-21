@@ -333,7 +333,7 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
                 <Button onClick={handleUpload}>
                     Upload
                 </Button>
-                <Button color="gray" onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleClose}>Close</Button>
             </Modal.Footer>
         </Modal>
     )   

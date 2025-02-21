@@ -4,12 +4,12 @@ import AuthWidget from "./AuthWidget";
 export default function Header() {
 
     const logoStyle = {
-        backgroundImage: `url('pt-logo.png')`
+        backgroundImage: `url('/sphn-logo-white.png')`
     };
 
     return (
         <>
-            <header className="text-white  h-14 fixed top-0 left-0 right-0 z-20 header-bg">
+            <header className="text-white bg-[#306278] h-14 fixed top-0 left-0 right-0 z-20">
                 <nav className="flex justify-between items-center h-full">
                     <Link href="/">
                         <div className="flex items-center">

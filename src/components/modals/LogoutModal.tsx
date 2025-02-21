@@ -34,7 +34,7 @@ export default function LogoutModal({ show, onClose }: LogoutModalProps) {
                 <Button onClick={handleLogout}>
                     Yes
                 </Button>
-                <Button color="gray" onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>Close</Button>
             </Modal.Footer>
         </Modal>
     )   
