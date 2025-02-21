@@ -2,21 +2,19 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Textarea, Alert, Tooltip } from 'flowbite-react';
+import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Textarea } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
 import { MdSave, MdOutlineAdd } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
-import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswerToJSON, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
+import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
 import NewQuestionnaireVersionModal from '~/components/modals/admin/NewQuestionnaireVersionModal';
 import useUnsavedChangesWarning from '~/hooks/useUnsavedChangesWarning';
 import withAdmin from '~/components/withAdmin';
 import { showToast } from '~/utils/showToast';
-import { set } from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 
 
 interface Version extends TemplatebackendQuestionnaireVersion {
@@ -505,7 +503,7 @@ function QuestionnaireVersion() {
                     />
                 </Modal.Body>
                 <Modal.Footer className="p-2 flex justify-center gap-4">
-                    <Button color="success" onClick={() => createTab()}>
+                    <Button onClick={() => createTab()}>
                         Save
                     </Button>
                     <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
@@ -708,7 +706,7 @@ function QuestionnaireVersion() {
                                                                     </Table.Row>
                                                                 </Table.Body>
                                                             </Table>
-                                                            <Button color="success" onClick={() => addAnswer()}>
+                                                            <Button onClick={() => addAnswer()}>
                                                                 Add
                                                             </Button>
                                                         </Accordion.Content>
@@ -724,8 +722,8 @@ function QuestionnaireVersion() {
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-4 border-t-2 bg-gray-50">
-                    <Button color="success" onClick={() => saveEditedQuestion()}>
-                        Edit
+                    <Button onClick={() => saveEditedQuestion()}>
+                        Save
                     </Button>
                     <Button color="gray" onClick={() => setOpenEditQuestionModal(false)}>
                         Cancel
@@ -813,7 +811,7 @@ function QuestionnaireVersion() {
                     </Accordion>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-4 border-t-2 bg-gray-50">
-                    <Button color="success" onClick={() => {
+                    <Button onClick={() => {
                         saveRulePrefill();
                      }}>
                         Add

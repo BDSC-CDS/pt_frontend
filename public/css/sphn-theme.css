@@ -1,0 +1,22 @@
+:root {
+    --primary-color: #306278;
+    --secondary-color: #A1C6D9;
+    --accent-color: #e74c3c;
+}
+
+.header-bg {
+    background-color: var(--primary-color);
+}
+
+.footer-bg {
+    background-color: var(--primary-color);
+}
+
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color);
+}

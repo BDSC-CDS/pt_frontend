@@ -32,9 +32,11 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
-# Backend api url.   
-env:
-  apiUrl: ""
+# Configuration   
+config:
+  - apiUrl: "" # Backend API URL
+  - logoFileName: "chuv-logo-white.png" # Filename of the logo to display in the header (usz-logo-white.png, chuv-logo-white.png, sphn-logo-white.png)
+  - cssTheme: "chuv-theme" # CSS theme to use (usz-theme, chuv-theme, sphn-theme)
 
 # Deployment specific options
 podAnnotations: {}
