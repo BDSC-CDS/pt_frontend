@@ -1,3 +1,4 @@
+import { Tooltip } from 'flowbite-react';
 import React from 'react';
 import { FaCircleInfo } from "react-icons/fa6";
 import { Question } from '~/utils/questions';
@@ -20,19 +21,22 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
                             <label className="block mb-2 text-sm font-medium text-gray-900">
                                 {question.questionDescription}
                             </label>
+                            {/* Question tooltip */}
                             {question.tooltip && (
-                                <div className="group relative flex">
+                                <Tooltip style="light" 
+                                    arrow={false} 
+                                    placement="right" 
+                                    className="text-sm"
+                                    content={(
+                                        <div className="w-80 text-gray-800 text-wrap">
+                                            {question.tooltip}
+                                        </div>
+                                    )}
+                                >
                                     <div className="p-1">
                                         <FaCircleInfo className="text-gray-300 group-hover:text-gray-400 cursor-pointer" />
                                     </div>
-                                    
-                                    {/* Tooltip */}
-                                    <div className="absolute z-10 left-full hidden w-80 bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700 shadow-lg group-hover:block">
-                                        <div className="font-sans leading-relaxed text-gray-800 text-justify">
-                                            {question.tooltip}
-                                        </div>
-                                    </div>
-                                </div>
+                                </Tooltip>
                             )}
                         </div>
                         
