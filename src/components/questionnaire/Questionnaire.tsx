@@ -87,7 +87,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                             .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                             .find(q => q !== undefined);
                         if (prefilledQuestion) {
-                            prefilledQuestion.disabled = true;
+                            prefilledQuestion.prefilled = true;
                         }
                     });
                 }
@@ -109,7 +109,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                                     .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                     .find(q => q !== undefined);
                         if (q) {
-                            q.disabled = true;
+                            q.prefilled = true;
                             setSelectedAnswer(q, rp.answerId);
                         }
                     });

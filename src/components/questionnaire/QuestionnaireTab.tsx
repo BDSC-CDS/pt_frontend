@@ -39,11 +39,10 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
                         {/* Form select dropdown */}
                         <select
                             id={question.questionId}
-                            className={`bg-gray-50 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${question.disabled ? "border-gray-200 text-gray-400 cursor-not-allowed" : isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
+                            className={`bg-gray-50 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${question.prefilled ? "border-blue-400" : isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
                                 }`}
                             value={getSelectedAnswer(question)}
                             onChange={(e) => setSelectedAnswer(question, e.target.value)}
-                            disabled={question.disabled}
                         >
                             <option>Select an option</option>
                             {question.answers.map((answer) => (
