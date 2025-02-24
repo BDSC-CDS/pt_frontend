@@ -4,6 +4,5 @@ kind: ConfigMap
 metadata:
   name: configmap-logo
 data:
-  logo.png: |
-{{ .Files.Get "files/logo.png" | b64enc | indent 4 }}
+  logo.png: {{ .Files.Get "files/logo.png" | b64enc }}
 {{- end }}
