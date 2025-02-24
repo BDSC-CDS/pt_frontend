@@ -15,7 +15,7 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
         <div>
             {tabQuestions && tabQuestions.map((question) => (
                 <div key={question.questionId} className="flex flex-col my-4">
-                    <form className="w-1/2">
+                    <form className="">
                         {/* Form question & Tooltip */}
                         <div className="flex justify-between gap-4 items-center">
                             <label className="block mb-2 text-sm font-medium text-gray-900">

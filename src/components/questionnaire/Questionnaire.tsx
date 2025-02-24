@@ -7,7 +7,7 @@ import ReplySaveModal from '../modals/ReplySaveModal';
 import QuestionnaireTab from './QuestionnaireTab';
 import QuestionnaireReportTab from './QuestionnaireReportTab';
 import { showToast } from '~/utils/showToast';
-import { Pagination } from 'flowbite-react';
+import { Pagination, Tooltip } from 'flowbite-react';
 import ReplyShareModal from '../modals/ReplyShareModal';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
@@ -295,74 +295,10 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             )}
 
             {/* Save reply modal */}
-            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)}/>
+            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} replyName={reply? reply.projectName : undefined} onClose={() => setOpenSaveModal(false)}/>
                   
             {/* All Questionnaire Tabs */}
             <div id="all-tabs" className="flex flex-col flex-grow">
-                {activeTab !== String(tabs.length) && (
-                    <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                    <h1 className='mt-4 text-md font-semibold'>
-                        Current score
-                        <button
-                            onMouseEnter={() => setRiskPopoverDisplayed(true)}
-                            onMouseLeave={() => setRiskPopoverDisplayed(false)}
-                            className="ml-3 inline-flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0">
-                            ?
-                        </button>
-                        <div className="mt-2">
-                            {
-                                reportData.totalHighRiskAnswers > 0
-                                    ? <span style={{ color: '#e76f51' }}>High Risk</span> // Red
-                                    : currentRisk > 45
-                                        ? <span style={{ color: '#e9c46a' }}>Medium Risk</span> // Yellow
-                                        : <span style={{ color: '#2a9d8f' }}>Low to Medium Risk</span> // Green
-                            }
-                        </div>
-                    </h1>
-
-                        <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
-                            <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                                <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
-                            </div>
-                            <div className="px-3 py-2">
-                                Current risk: {currentRisk} <p className='text-xs text-gray-400 inline-block'>({(currentRiskPc * 100).toFixed(2) + "%"})</p><br />
-                                Max. possible risk: {maxRisk}<br />
-                                Min. possible risk: {minRisk} <br />
-                                <p className='text-xs text-gray-400'>Note that some questions have negative risk so the minimum could be less but is clamped</p>
-                            </div>
-                            <div data-popper-arrow></div>
-                        </div>
-
-                        {/* currentRisk {currentRisk}<br />
-                currentRiskPc {currentRiskPc}<br />
-                maxRisk {maxRisk}<br />
-                minRisk {minRisk}<br /> */}
-                        <GaugeChart id="gauge-chart2"
-                            nrOfLevels={3}
-                            arcsLength={[0.43, 0.46, 0.1]}
-                            // cornerRadius={0}
-                            colors={['#2a9d8f', '#e9c46a', '#e76f51']}
-                            percent={reportData.totalHighRiskAnswers > 0 ? 99 : currentDisplayRiskPc}
-                            formatTextValue={value=>""}
-                            /*textColor={
-                                reportData.totalHighRiskAnswers > 0
-                                    ? '#e76f51' // Red
-                                    : currentRisk > 45
-                                    ? '#e9c46a' // Orange
-                                    : '#2a9d8f' // Green
-                            }*/
-                            
-                            animate={false} />
-
-                        {(reportData.totalHighRiskAnswers > 0) && (
-                            <div className="flex items-center">
-                                <MdOutlineWarningAmber size={70} color='#e76f51' className="inline-block" />
-                                <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
                 <div className="overflow-auto border rounded-t-lg scroll-mt-2">
                     <ul className="flex w-full">
                         {tabs.map((tab, n) => (
@@ -386,9 +322,85 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                     </ul>
                 </div>
 
-                <div className="flex flex-col flex-grow items-center justify-between py-5 px-3 border rounded-b-lg shadow-lg">
-                    <div className="w-full">
-                        {tabs.find((tab) => tab.id === activeTab)?.content}
+                <div className="flex flex-col flex-grow items-center justify-between py-5 px-5 border rounded-b-lg shadow-lg">
+                    <div className="w-full flex justify-between">
+                        {/* Tabs content */}
+                        <div className="w-1/2">
+                            {tabs.find((tab) => tab.id === activeTab)?.content}
+                        </div>
+                        
+
+                        {activeTab !== String(tabs.length) && (
+                            <div className='w-1/4 text-black flex flex-col items-center justify-start'>
+                                <h1 className='text-md font-semibold'>
+                                    <div className="flex items-center">
+                                        Current score
+
+                                        <Tooltip 
+                                            style="light"
+                                            arrow={false}
+                                            placement="left"
+                                            className="p-0 m-0"
+                                            content={(
+                                                <div className="inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                                                    <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                                        <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
+                                                    </div>
+                                                    <div className="px-3 py-2">
+                                                        Current risk: {currentRisk} <p className='text-xs text-gray-400 inline-block'>({(currentRiskPc * 100).toFixed(2) + "%"})</p><br />
+                                                        Max. possible risk: {maxRisk}<br />
+                                                        Min. possible risk: {minRisk} <br />
+                                                        <p className='text-xs text-gray-400'>Note that some questions have negative risk so the minimum could be less but is clamped</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        >
+                                            <span className="ml-3 inline-flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0">
+                                                ?
+                                            </span>
+                                        </Tooltip>
+                                    </div>
+                                    
+                                    <div className="mt-2">
+                                        {
+                                            reportData.totalHighRiskAnswers > 0
+                                                ? <span style={{ color: '#e76f51' }}>High Risk</span> // Red
+                                                : currentRisk > 45
+                                                    ? <span style={{ color: '#e9c46a' }}>Medium Risk</span> // Yellow
+                                                    : <span style={{ color: '#2a9d8f' }}>Low to Medium Risk</span> // Green
+                                        }
+                                    </div>
+                                </h1>
+
+                                {/* currentRisk {currentRisk}<br />
+                        currentRiskPc {currentRiskPc}<br />
+                        maxRisk {maxRisk}<br />
+                        minRisk {minRisk}<br /> */}
+                                <GaugeChart id="gauge-chart2"
+                                    nrOfLevels={3}
+                                    arcsLength={[0.43, 0.46, 0.1]}
+                                    // cornerRadius={0}
+                                    colors={['#2a9d8f', '#e9c46a', '#e76f51']}
+                                    percent={reportData.totalHighRiskAnswers > 0 ? 99 : currentDisplayRiskPc}
+                                    formatTextValue={value=>""}
+                                    /*textColor={
+                                        reportData.totalHighRiskAnswers > 0
+                                            ? '#e76f51' // Red
+                                            : currentRisk > 45
+                                            ? '#e9c46a' // Orange
+                                            : '#2a9d8f' // Green
+                                    }*/
+                                    
+                                    animate={false} />
+
+                                {(reportData.totalHighRiskAnswers > 0) && (
+                                    <div className="flex items-center">
+                                        <MdOutlineWarningAmber size={70} color='#e76f51' className="inline-block" />
+                                        <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <Pagination 
                         layout="navigation"
