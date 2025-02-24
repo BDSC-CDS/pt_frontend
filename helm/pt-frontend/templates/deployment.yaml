@@ -57,8 +57,8 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Files.Get "files/logo.png" }}
@@ -66,8 +66,8 @@ spec:
               mountPath: /usr/share/nginx/html/logo.png
               subPath: logo.png
           {{- end }}
-      {{- with .Values.volumes }}
       volumes:
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Files.Get "files/logo.png" }}
