@@ -64,7 +64,7 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
-                    <Button color="success" onClick={save} disabled={!versionName.trim()}>
+                    <Button onClick={save} disabled={!versionName.trim()}>
                         Save
                     </Button>
                     <Button color="gray" onClick={onClose}>

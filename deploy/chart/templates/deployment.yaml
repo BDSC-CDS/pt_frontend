@@ -26,6 +26,26 @@ spec:
             - containerPort: 80
           env:
             - name: API_URL
-              value: {{ .Values.apiUrl }}
+              value: {{ .Values.config.apiUrl }}
+            - name: PRIMARY_COLOR
+              value: {{ .Values.config.PrimaryColor }}
+            - name: SECONDARY_COLOR
+              value: {{ .Values.config.SecondaryColor }}
+            - name: HEADER_BG_COLOR
+              value: {{ .Values.config.HeaderBgColor }}
+            - name: FOOTER_BG_COLOR
+              value: {{ .Values.config.FooterBgColor }}
+          volumeMounts:
+          {{- if .Files.Get "files/logo.png" }}
+            - name: configmap-logo
+              mountPath: /usr/share/nginx/html/logo.png
+              subPath: logo.png
+          {{- end }}
       imagePullSecrets:
         - name: registry-auth
+      volumes:
+      {{- if .Files.Get "files/logo.png" }}
+        - name: configmap-logo
+          configMap:
+            name: configmap-logo
+      {{- end }}

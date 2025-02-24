@@ -1,0 +1,22 @@
+:root {
+    --primary-color: ${PRIMARY_COLOR};
+    --secondary-color: ${SECONDARY_COLOR};
+    --header-bg-color: ${HEADER_BG_COLOR};
+    --footer-bg-color: ${FOOTER_BG_COLOR};
+}
+
+.header-bg {
+    background-color: var(--header-bg-color);
+}
+
+.footer-bg {
+    background-color: var(--footer-bg-color);
+}
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color);
+}

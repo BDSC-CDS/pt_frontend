@@ -58,7 +58,7 @@ export default function NewQuestionnaireModal({show, onClose}: NewQuestionnaireM
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
-                    <Button color="success" onClick={() => save()}>
+                    <Button onClick={() => save()}>
                         Save
                     </Button>
                     <Button color="gray" onClick={handleCloseModal}>

@@ -1,0 +1,38 @@
+:root {
+    --primary-color: #306278;
+    --secondary-color: #A1C6D9;
+    --header-bg-color: #306278;
+    --footer-bg-color: #306278;
+
+    /*
+    CHUV's theme
+    --primary-color: #059032;
+    --secondary-color: #CBEAD5;
+    --header-bg-color: #059032;
+    --footer-bg-color: #B0B0B0;
+    */
+
+    /*
+    USZ's theme
+    --primary-color: #002C5C;
+    --secondary-color: #C5D5DB;
+    --header-bg-color: #002C5C;
+    --footer-bg-color: #002C5C;
+    */
+}
+
+.header-bg {
+    background-color: var(--header-bg-color);
+}
+
+.footer-bg {
+    background-color: var(--footer-bg-color);
+}
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color);
+}

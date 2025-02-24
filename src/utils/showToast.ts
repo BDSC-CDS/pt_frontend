@@ -28,7 +28,8 @@ export const showToast = (
 
     switch (type) {
         case "success":
-            optionsToApply.iconTheme={primary: "#316278", secondary: "#FFFFFF"}
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+            optionsToApply.iconTheme={primary: primaryColor, secondary: "#FFFFFF"}
             return toast.success(content, optionsToApply) 
         case "info":
             optionsToApply.icon="ℹ️"

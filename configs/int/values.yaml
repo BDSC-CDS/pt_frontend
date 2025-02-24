@@ -2,7 +2,12 @@ ingress:
   enabled: true
   host: "pt-frontend.rdeid.unil.ch"
 
-apiUrl: "https://pt-backend.rdeid.unil.ch"
+config:
+  apiUrl: "https://pt-backend.rdeid.unil.ch"
+  primaryColor: "#306278"
+  secondaryColor: "#A1C6D9"
+  headerBgColor: "#306278"
+  footerBgColor: "#306278"
 
 service:
   port: 16080

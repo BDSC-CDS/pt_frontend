@@ -32,9 +32,13 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
-# Backend api url.   
-env:
-  apiUrl: ""
+# Configuration   
+config:
+  apiUrl: "" # Backend API URL
+  primaryColor: "#306278"
+  secondaryColor: "#A1C6D9"
+  headerBgColor: "#306278"
+  footerBgColor: "#306278"
 
 # Deployment specific options
 podAnnotations: {}
