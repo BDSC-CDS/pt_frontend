@@ -28,13 +28,13 @@ spec:
             - name: API_URL
               value: {{ .Values.config.apiUrl }}
             - name: PRIMARY_COLOR
-              value: {{ .Values.config.PrimaryColor }}
+              value: {{ .Values.config.primaryColor }}
             - name: SECONDARY_COLOR
-              value: {{ .Values.config.SecondaryColor }}
+              value: {{ .Values.config.secondaryColor }}
             - name: HEADER_BG_COLOR
-              value: {{ .Values.config.HeaderBgColor }}
+              value: {{ .Values.config.headerBgColor }}
             - name: FOOTER_BG_COLOR
-              value: {{ .Values.config.FooterBgColor }}
+              value: {{ .Values.config.footerBgColor }}
           volumeMounts:
           {{- if .Files.Get "files/logo.png" }}
             - name: configmap-logo
