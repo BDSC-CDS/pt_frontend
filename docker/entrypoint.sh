@@ -17,10 +17,10 @@ done
 
 if [ -z "$MISSING_VARS" ]; then
     sed \
-        -e "s#\${PRIMARY_COLOR}#${PRIMARY_COLOR}#g" \
-        -e "s#\${SECONDARY_COLOR}#${SECONDARY_COLOR}#g" \
-        -e "s#\${HEADER_BG_COLOR}#${HEADER_BG_COLOR}#g" \
-        -e "s#\${FOOTER_BG_COLOR}#${FOOTER_BG_COLOR}#g" \
+        -e "s|\${PRIMARY_COLOR}|${PRIMARY_COLOR}|g" \
+        -e "s|\${SECONDARY_COLOR}|${SECONDARY_COLOR}|g" \
+        -e "s|\${HEADER_BG_COLOR}|${HEADER_BG_COLOR}|g" \
+        -e "s|\${FOOTER_BG_COLOR}|${FOOTER_BG_COLOR}|g" \
         /usr/share/nginx/html/css/pt-theme.css.template > /usr/share/nginx/html/css/pt-theme.css
 else
     echo "Warning: Skipping pt-theme.css generation due to missing environment variables."
