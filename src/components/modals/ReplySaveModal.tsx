@@ -15,7 +15,7 @@ interface ReplySaveModalProps {
 
 
 /**
- * Confirmation modal to log out.
+ * Save Reply modal.
  */
 export default function ReplySaveModal({ show, questions, questionnaireVersionId, onClose }: ReplySaveModalProps) {
     const router = useRouter()
@@ -73,7 +73,7 @@ export default function ReplySaveModal({ show, questions, questionnaireVersionId
                 <Button onClick={handleSave}>
                     Save
                 </Button>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button color="gray" onClick={onClose}>Cancel</Button>
             </Modal.Footer>
         </Modal>
     )   
