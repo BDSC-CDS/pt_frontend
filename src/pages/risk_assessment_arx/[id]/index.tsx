@@ -87,11 +87,11 @@ const RiskAssessmentPage = () => {
                 <div className="gauge-section">
                     <div>
                         <h3>Average Prosecutor Risk</h3>
-                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#45ad23', '#b83930']} nrOfLevels={2}  percent={initialAverageProsecutor || 0} textColor='black' />
+                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2}  percent={initialAverageProsecutor || 0} textColor='black' />
                     </div>
                     <div>
                         <h3>Highest Prosecutor Risk</h3>
-                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#45ad23', '#b83930']} nrOfLevels={2}  percent={initialHighestProsecutor || 0} textColor='black' />
+                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2}  percent={initialHighestProsecutor || 0} textColor='black' />
                     </div>
                 </div>
             </div>
