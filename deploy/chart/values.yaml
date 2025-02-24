@@ -5,8 +5,13 @@
 nameOverride: "pt-frontend"
 
 image: registry.rdeid.unil.ch/pt-frontend:latest
-apiUrl: "https://pt-backend.rdeid.unil.ch"
 
+config:
+  apiUrl: "https://pt-backend.rdeid.unil.ch"
+  primaryColor: "#306278"
+  secondaryColor: "#A1C6D9"
+  headerBgColor: "#306278"
+  footerBgColor: "#306278"
 
 version: master
 

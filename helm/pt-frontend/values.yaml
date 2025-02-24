@@ -34,9 +34,11 @@ ingress:
 
 # Configuration   
 config:
-  - apiUrl: "" # Backend API URL
-  - logoFileName: "chuv-logo-white.png" # Filename of the logo to display in the header (usz-logo-white.png, chuv-logo-white.png, sphn-logo-white.png)
-  - cssTheme: "chuv-theme" # CSS theme to use (usz-theme, chuv-theme, sphn-theme)
+  apiUrl: "" # Backend API URL
+  primaryColor: "#306278"
+  secondaryColor: "#A1C6D9"
+  headerBgColor: "#306278"
+  footerBgColor: "#306278"
 
 # Deployment specific options
 podAnnotations: {}

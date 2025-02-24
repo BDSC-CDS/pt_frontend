@@ -1,0 +1,9 @@
+{{- if .Files.Get "logo.png" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-logo
+data:
+  logo.png: |
+{{ .Files.Get "logo.png" | b64enc | indent 4 }}
+{{- end }}

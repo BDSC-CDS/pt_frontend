@@ -37,7 +37,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             pdf.rect(0, 0, pageWidth, headerHeight, "F");
 
             // Fetch the logo as Base64
-            const response = await fetch("/sphn-logo-white.png"); // Keep the existing path
+            const response = await fetch("/logo.png"); // Keep the existing path
             const blob = await response.blob();
 
             const reader = new FileReader();

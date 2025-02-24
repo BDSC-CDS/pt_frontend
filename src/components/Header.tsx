@@ -4,7 +4,7 @@ import AuthWidget from "./AuthWidget";
 export default function Header() {
 
     const logoStyle = {
-        backgroundImage: `url('pt-logo.png')`
+        backgroundImage: `url('logo.png')`
     };
 
     return (
