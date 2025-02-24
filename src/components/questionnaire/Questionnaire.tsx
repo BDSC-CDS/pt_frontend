@@ -179,12 +179,11 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         });
 
         // console.log("cRisk bef", cRisk);
-        cRisk = Math.max(cRisk, 0);
 
-        // const riskRange = (maxRisk || 1) - (minRisk || 0);
+        const riskRange = (maxRisk || 1) - (minRisk);
         // const cRiskPc = ((cRisk - (minRisk || 0)) / riskRange);
-        const riskRange = maxRisk || 1;
-        const cRiskPc = cRisk / riskRange;
+        // const riskRange = maxRisk || 1;
+        const cRiskPc = (cRisk - (minRisk || 0)) / riskRange;
 
         // we set the maxium to 80%, as only high risk answers make the user go in the red.
         // const displayCRiskPc = cRiskPc * 0.8;
@@ -302,15 +301,25 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             <div id="all-tabs" className="flex flex-col flex-grow">
                 {activeTab !== String(tabs.length) && (
                     <div className='fixed top-56 right-44 h-3/4 w-1/6  text-black flex flex-col items-center justify-start'>
-                        <h1 className='mt-4 text-md font-semibold flex flex-row'>
-                            Current score
-                            <button
-                                onMouseEnter={() => setRiskPopoverDisplayed(true)}
-                                onMouseLeave={() => setRiskPopoverDisplayed(false)}
-                                className="ml-3 flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
-                                ?
-                            </button>
-                        </h1>
+                    <h1 className='mt-4 text-md font-semibold'>
+                        Current score
+                        <button
+                            onMouseEnter={() => setRiskPopoverDisplayed(true)}
+                            onMouseLeave={() => setRiskPopoverDisplayed(false)}
+                            className="ml-3 inline-flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0">
+                            ?
+                        </button>
+                        <div className="mt-2">
+                            {
+                                reportData.totalHighRiskAnswers > 0
+                                    ? <span style={{ color: '#e76f51' }}>High Risk</span> // Red
+                                    : currentRisk > 45
+                                        ? <span style={{ color: '#e9c46a' }}>Medium Risk</span> // Yellow
+                                        : <span style={{ color: '#2a9d8f' }}>Low to Medium Risk</span> // Green
+                            }
+                        </div>
+                    </h1>
+
                         <div id="popover-default" className={`${riskPopoverDisplayed || "hidden"} mt-5 mb-5 inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm  dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800`}>
                             <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
                                 <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
@@ -318,7 +327,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                             <div className="px-3 py-2">
                                 Current risk: {currentRisk} <p className='text-xs text-gray-400 inline-block'>({(currentRiskPc * 100).toFixed(2) + "%"})</p><br />
                                 Max. possible risk: {maxRisk}<br />
-                                Min. possible risk: 0 <br />
+                                Min. possible risk: {minRisk} <br />
                                 <p className='text-xs text-gray-400'>Note that some questions have negative risk so the minimum could be less but is clamped</p>
                             </div>
                             <div data-popper-arrow></div>
@@ -329,19 +338,25 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                 maxRisk {maxRisk}<br />
                 minRisk {minRisk}<br /> */}
                         <GaugeChart id="gauge-chart2"
-                            nrOfLevels={30}
-                            // arcsLength={[0.4, 0.4, 0.2]}
+                            nrOfLevels={3}
+                            arcsLength={[0.43, 0.46, 0.1]}
                             // cornerRadius={0}
-                            // colors={['#5BE12C', '#F5CD19', '#EA4228']}
-                            percent={currentDisplayRiskPc}
-                            // formatTextValue={value=>value+"%"}
-                            formatTextValue={value => currentRisk + ""}
-                            textColor='black'
+                            colors={['#2a9d8f', '#e9c46a', '#e76f51']}
+                            percent={reportData.totalHighRiskAnswers > 0 ? 99 : currentDisplayRiskPc}
+                            formatTextValue={value=>""}
+                            /*textColor={
+                                reportData.totalHighRiskAnswers > 0
+                                    ? '#e76f51' // Red
+                                    : currentRisk > 45
+                                    ? '#e9c46a' // Orange
+                                    : '#2a9d8f' // Green
+                            }*/
+                            
                             animate={false} />
 
                         {(reportData.totalHighRiskAnswers > 0) && (
                             <div className="flex items-center">
-                                <MdOutlineWarningAmber size={70} color='#EA4228' className="inline-block" />
+                                <MdOutlineWarningAmber size={70} color='#e76f51' className="inline-block" />
                                 <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
                             </div>
                         )}
