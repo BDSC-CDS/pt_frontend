@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Question, Questions } from '../../utils/questions';
-import { TemplatebackendQuestionnaireReply } from '../../internal/client/index';
+import { TemplatebackendQuestionnaireQuestionReply, TemplatebackendQuestionnaireReply } from '../../internal/client/index';
 import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber, MdShare } from "react-icons/md";
 import ReplySaveModal from '../modals/ReplySaveModal';
@@ -9,6 +9,8 @@ import QuestionnaireReportTab from './QuestionnaireReportTab';
 import { showToast } from '~/utils/showToast';
 import { Pagination, Tooltip } from 'flowbite-react';
 import ReplyShareModal from '../modals/ReplyShareModal';
+import { createReply } from '~/utils/questionnaire';
+import { useRouter } from 'next/router';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -28,8 +30,8 @@ type Tabs = {
  * The questionnaire component used for qualitative risk assessment.
  */
 export default function Questionnaire({ questions, questionnaireVersionId, reply }: QuestionnaireProps) {
+    const router = useRouter()
     const [activeTab, setActiveTab] = useState<string>('1');
-    const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false);
     const [openSaveModal, setOpenSaveModal] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [reportData, setReportData] = useState({
@@ -137,6 +139,58 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         computeCurrentRisk();
         computeCurrentReport();
     };
+
+    const saveReply = async (saveName: string, isShare: boolean=false) => {
+        let allQuestions: Question[] = [];
+        Object.keys(questions).map((tab) => {
+            const tabQuestions = questions[tab];
+            if (!tabQuestions) return;
+            allQuestions = allQuestions.concat(tabQuestions);
+        })
+
+        const allAnsweredQuestions = allQuestions.filter(q => q.answers?.find(a => a.selected));
+        const replies: Array<TemplatebackendQuestionnaireQuestionReply> = allAnsweredQuestions.map(q => {
+            const reply: TemplatebackendQuestionnaireQuestionReply = {
+                questionnaireQuestionId: Number(q.questionId),
+                answer: q.answers.find(a => a.selected)?.answerId
+            };
+            return reply;
+        })
+
+        const replyToSave: TemplatebackendQuestionnaireReply = {
+            questionnaireVersionId: questionnaireVersionId,
+            projectName: saveName,
+            replies: replies,
+        }
+
+        try {
+            const id = await createReply(replyToSave);
+            if(!id) {
+                throw "Error saving reply."
+            }
+            showToast("success", "Successfully saved.")
+            if(!isShare){
+                router.push("/risk_assessment")
+            }
+        } catch (error) {
+            showToast("error", String(error))
+        }
+    };
+
+    const handleSave = async () => {
+        if(reply && reply.projectName){
+            saveReply(reply.projectName)
+        } else {
+            setOpenSaveModal(true)
+        }
+    }
+
+    const handleShare = async () => {
+        if(reply && reply.projectName){
+            saveReply(reply.projectName, true)
+            setIsShareModalOpen(true)
+        }
+    }
 
     const getSelectedAnswer = (question: Question) => {
         for (let answer of question.answers) {
@@ -278,12 +332,12 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         <div className="flex flex-col h-full gap-2">
             <div className="flex justify-end gap-2">
                 {reply && reply.id && (
-                    <span onClick={() => setIsShareModalOpen(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                    <span onClick={handleShare} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                         <MdShare />
                         <p className='ml-2 text-sm'>Share</p>
                     </span>
                 )}
-                <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                <span onClick={handleSave} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <MdSave />
                     <p className='ml-2 text-sm'>Save</p>
                 </span>
@@ -295,7 +349,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             )}
 
             {/* Save reply modal */}
-            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} replyName={reply? reply.projectName : undefined} onClose={() => setOpenSaveModal(false)}/>
+            <ReplySaveModal show={openSaveModal} onSave={saveReply} onClose={() => setOpenSaveModal(false)}/>
                   
             {/* All Questionnaire Tabs */}
             <div id="all-tabs" className="flex flex-col flex-grow">
