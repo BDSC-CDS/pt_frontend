@@ -23,7 +23,7 @@ export interface Question {
   riskWeight: number;
   highRiskAnswerSelected: boolean;
   answers: Answer[];
-  disabled: boolean;
+  prefilled: boolean;
 }
 
 export interface Questions {
@@ -60,7 +60,7 @@ export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questi
           answerText: rulePrefill.answerText || "",
         }))
       })) || [],
-      disabled: false
+      prefilled: false
     })
   });
 
