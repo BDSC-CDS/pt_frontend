@@ -2,12 +2,13 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Question, Questions } from '../../utils/questions';
 import { TemplatebackendQuestionnaireReply } from '../../internal/client/index';
 import dynamic from "next/dynamic";
-import { MdSave, MdOutlineWarningAmber } from "react-icons/md";
+import { MdSave, MdOutlineWarningAmber, MdShare } from "react-icons/md";
 import ReplySaveModal from '../modals/ReplySaveModal';
 import QuestionnaireTab from './QuestionnaireTab';
 import QuestionnaireReportTab from './QuestionnaireReportTab';
 import { showToast } from '~/utils/showToast';
 import { Pagination } from 'flowbite-react';
+import ReplyShareModal from '../modals/ReplyShareModal';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -30,6 +31,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     const [activeTab, setActiveTab] = useState<string>('1');
     const [riskPopoverDisplayed, setRiskPopoverDisplayed] = useState(false);
     const [openSaveModal, setOpenSaveModal] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [reportData, setReportData] = useState({
         totalQuestionsAnswered: 0,
         totalHighRiskAnswers: 0,
@@ -275,16 +277,27 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
 
     return (
         <div className="flex flex-col h-full gap-2">
-            <div className="flex flex-row items-end">
-                <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 ml-auto rounded cursor-pointer">
+            <div className="flex justify-end gap-2">
+                {reply && reply.id && (
+                    <span onClick={() => setIsShareModalOpen(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
+                        <MdShare />
+                        <p className='ml-2 text-sm'>Share</p>
+                    </span>
+                )}
+                <span onClick={() => setOpenSaveModal(true)} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <MdSave />
-                    <p className='ml-2 text-sm'> Save</p>
+                    <p className='ml-2 text-sm'>Save</p>
                 </span>
             </div>
 
-            {/* Save reply modal */}
-            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)} />
+            {/* Share reply modal */}
+            {reply && reply.id && (
+                <ReplyShareModal show={isShareModalOpen} shareReplyId={reply?.id} onClose={() => setIsShareModalOpen(false)} />
+            )}
 
+            {/* Save reply modal */}
+            <ReplySaveModal show={openSaveModal} questions={questions} questionnaireVersionId={reply?.questionnaireVersionId || questionnaireVersionId} onClose={() => setOpenSaveModal(false)}/>
+                  
             {/* All Questionnaire Tabs */}
             <div id="all-tabs" className="flex flex-col flex-grow">
                 {activeTab !== String(tabs.length) && (
