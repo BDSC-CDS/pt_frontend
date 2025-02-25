@@ -61,7 +61,7 @@ spec:
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.config.logo-png-b64 | default (.Files.Get "files/logo.png") }}
+          {{- if .Values.config.logopngb64 | default (.Files.Get "files/logo.png") }}
             - name: configmap-logo
               mountPath: /usr/share/nginx/html/logo.png
               subPath: logo.png
@@ -70,7 +70,7 @@ spec:
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.config.logo-png-b64 | default (.Files.Get "files/logo.png") }}
+      {{- if .Values.config.logopngb64 | default (.Files.Get "files/logo.png") }}
         - name: configmap-logo
           configMap:
             name: configmap-logo
