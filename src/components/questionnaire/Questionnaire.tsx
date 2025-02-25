@@ -320,7 +320,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     })).concat([{
         id: String(Object.keys(questions).length + 1),
         title: 'Results',
-        content: <QuestionnaireReportTab replyName={reply?.projectName} questions={questions} reportData={reportData} currentRiskPc={currentRiskPc}/>
+        content: <QuestionnaireReportTab replyName={reply?.projectName} questions={questions} reportData={reportData} currentRisk={currentRisk}/>
     }]);
 
     useEffect(() => {
