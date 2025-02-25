@@ -3,7 +3,7 @@ import "../styles/globals.css";
 import '../../public/css/pt-theme.css';
 import { Layout } from '../components/Layout'
 import Script from "next/script";
-import Link from "next/link";
+import Head from "next/head";
 
 declare global {
   interface Window {
@@ -14,7 +14,9 @@ declare global {
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
-      <Link rel="stylesheet" href="/css/pt-theme.css" />
+      <Head>
+        <link rel="stylesheet" href="/css/pt-theme.css" />
+      </Head>
       <Script
         src="/config.js"
         strategy="beforeInteractive"
