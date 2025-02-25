@@ -231,34 +231,21 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
 
         let cRisk = 0;
         allQuestions?.forEach(q => {
-            const riskLevels = q.answers.map(a => a.riskLevel);
-            const maxRiskLevel = Math.max(...riskLevels) * q.riskWeight;
-            let selectedRisk;
-
             q.answers.forEach(a => {
                 if (a.selected) {
                     cRisk += a.riskLevel * q.riskWeight;
-                    selectedRisk = a.riskLevel * q.riskWeight;
                 }
             });
-            // console.log("max", maxRiskLevel, selectedRisk);
         });
 
-        // console.log("cRisk bef", cRisk);
+        // Ensure cRisk is at least the minimum risk
+        cRisk = Math.max(cRisk, minRisk);
 
         const riskRange = (maxRisk || 1) - (minRisk);
-        // const cRiskPc = ((cRisk - (minRisk || 0)) / riskRange);
-        // const riskRange = maxRisk || 1;
-        const cRiskPc = (cRisk - (minRisk || 0)) / riskRange;
+        const cRiskPc = (cRisk - minRisk) / riskRange;
 
         // we set the maxium to 80%, as only high risk answers make the user go in the red.
-        // const displayCRiskPc = cRiskPc * 0.8;
         const displayCRiskPc = cRiskPc;
-
-        // console.log("cRisk", cRisk);
-        // console.log("maxRisk", maxRisk);
-        // console.log("cRiskPc", cRiskPc);
-        // console.log("displayCRiskPc", displayCRiskPc);
 
         setCurrentRisk(cRisk);
         setCurrentRiskPc(cRiskPc);
