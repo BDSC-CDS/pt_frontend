@@ -1,23 +1,23 @@
 :root {
-    --primary-color: #306278;
-    --secondary-color: #A1C6D9;
-    --header-bg-color: #306278;
-    --footer-bg-color: #306278;
+    --primary-color: #306278 !important;
+    --secondary-color: #A1C6D9 !important;
+    --header-bg-color: #306278 !important;
+    --footer-bg-color: #306278 !important;
 
     /*
     CHUV's theme
-    --primary-color: #059032;
-    --secondary-color: #CBEAD5;
-    --header-bg-color: #059032;
-    --footer-bg-color: #B0B0B0;
+    --primary-color: #059032 !important;
+    --secondary-color: #CBEAD5 !important;
+    --header-bg-color: #059032 !important;
+    --footer-bg-color: #B0B0B0 !important;
     */
 
     /*
     USZ's theme
-    --primary-color: #002C5C;
-    --secondary-color: #C5D5DB;
-    --header-bg-color: #002C5C;
-    --footer-bg-color: #002C5C;
+    --primary-color: #002C5C !important;
+    --secondary-color: #C5D5DB !important;
+    --header-bg-color: #002C5C !important;
+    --footer-bg-color: #002C5C !important;
     */
 }
 

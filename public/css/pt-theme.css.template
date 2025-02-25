@@ -1,8 +1,8 @@
 :root {
-    --primary-color: ${PRIMARY_COLOR};
-    --secondary-color: ${SECONDARY_COLOR};
-    --header-bg-color: ${HEADER_BG_COLOR};
-    --footer-bg-color: ${FOOTER_BG_COLOR};
+    --primary-color: ${PRIMARY_COLOR} !important;
+    --secondary-color: ${SECONDARY_COLOR} !important;
+    --header-bg-color: ${HEADER_BG_COLOR} !important;
+    --footer-bg-color: ${FOOTER_BG_COLOR} !important;
 }
 
 .header-bg {
