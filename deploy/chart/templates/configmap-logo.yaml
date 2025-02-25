@@ -1,8 +1,8 @@
-{{- if .Files.Get "files/logo.png" }}
+{{- if .Values.config.logo-png-b64 | default (.Files.Get "files/logo.png") }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-logo
 binaryData:
-  logo.png: {{ .Files.Get "files/logo.png" | b64enc }}
+  logo.png: {{ .Values.config.logo-png-b64 | default (.Files.Get "files/logo.png" | b64enc) }}
 {{- end }}
