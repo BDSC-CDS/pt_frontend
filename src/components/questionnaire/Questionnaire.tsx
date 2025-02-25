@@ -52,10 +52,9 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             allQuestions = allQuestions.concat(tabQuestions);
         });
 
-        // console.log("allQuestions", allQuestions.map(q => q.riskWeight))
         let maxRisk = 0;
         let minRisk = 0;
-        allQuestions?.forEach(q => {
+        allQuestions.forEach(q => {
             const riskLevels = q.answers.map(a => a.riskLevel);
             const maxRiskLevel = Math.max(...riskLevels);
             const minRiskLevel = Math.min(...riskLevels);
@@ -101,40 +100,53 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     
     // Function to set the selected answer for a question
     const setSelectedAnswer = (question: Question, answerId: string) => {
-        question.answers.forEach(a => {
-            if (a.selected && a.rulePrefills) {
-                a.rulePrefills.forEach(rp => {
+        // First clean up
+        const previousAnswerId = question.answers.find(a => a.selected)?.answerId;
+        const previousAnswer = question.answers.find(a => a.answerId === previousAnswerId);
+        if (previousAnswer) {
+            previousAnswer.selected = false;
+            question.highRiskAnswerSelected = false;
+
+            if (previousAnswer.rulePrefills) {
+                previousAnswer.rulePrefills.forEach(rp => {
                     const q = Object.keys(questions)
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                     if (q) {
                         q.prefilled = false;
+                        q.highRiskAnswerSelected = false;
                         q.answers.forEach(a => a.selected = false);
                     }
                 });
             }
-                    
-            a.selected = false;
-            
-            if (a.answerId == answerId) {
-                a.selected = true;
-                question.highRiskAnswerSelected = a.highRisk;
+        }
+        
+        // Then set the new answer
+        const newAnswer = question.answers.find(a => a.answerId === answerId);
+        if(newAnswer) {
+            newAnswer.selected = true;
+            question.highRiskAnswerSelected = newAnswer.highRisk;
 
-                if (a.rulePrefills && a.rulePrefills.length > 0) {
-                    a.rulePrefills.forEach(rp => {
-                        const q = Object.keys(questions)
-                                    .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
-                                    .find(q => q !== undefined);
-                        if (q) {
-                            q.prefilled = true;
-                            setSelectedAnswer(q, rp.answerId);
-                        }
-                    });
-                    
-                    showToast("info", "Some answers were prefilled.");
-                }
+            let isPrefilled = false;
+
+            // Apply rulePrefills for the new answer
+            if (newAnswer.rulePrefills) {
+                newAnswer.rulePrefills.forEach(rp => {
+                    const q = Object.keys(questions)
+                                .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
+                                .find(q => q !== undefined);
+                    if (q) {
+                        q.prefilled = true;
+                        setSelectedAnswer(q, rp.answerId);
+                        isPrefilled = true;
+                    }
+                });
             }
-        });
+
+            if(isPrefilled){
+                showToast("info", "Some answers were prefilled.");
+            }
+        }
 
         computeCurrentRisk();
         computeCurrentReport();
