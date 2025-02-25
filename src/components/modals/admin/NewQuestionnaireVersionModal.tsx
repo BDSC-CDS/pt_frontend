@@ -19,8 +19,10 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
 
     const [versionName, setVersionName] = useState("")
     const [isVersionPublished, setIsVersionPublished] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const save = async () => {
+        setIsLoading(true)
         onSave()
         if( versionName != ""){
             try {
@@ -36,6 +38,8 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
                 }
             } catch (error) {
                 showToast("error", "Error creating the version:"+error)
+            } finally {
+                setIsLoading(false)
             }
         } else {
             showToast("error", "The version name cannot be empty.")
@@ -64,7 +68,7 @@ export default function NewQuestionnaireVersionModal({show, questionnaireId, que
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="flex justify-center gap-3">
-                    <Button onClick={save} disabled={!versionName.trim()}>
+                    <Button onClick={save} disabled={!versionName.trim() || isLoading}>
                         Save
                     </Button>
                     <Button color="gray" onClick={onClose}>
