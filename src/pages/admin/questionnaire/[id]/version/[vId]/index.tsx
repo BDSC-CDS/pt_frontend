@@ -441,7 +441,7 @@ function QuestionnaireVersion() {
                                             <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
                                                 <HiPencilAlt size={20} />
                                             </span>
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => removeQuestionConfirmation(question)}>
+                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
                                                 <HiTrash size={20} />
                                             </span>
                                         </div>
