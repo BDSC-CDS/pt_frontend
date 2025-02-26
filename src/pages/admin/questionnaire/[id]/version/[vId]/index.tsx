@@ -415,7 +415,7 @@ function QuestionnaireVersion() {
                 </div>
 
                 {tabs.length > 0 && (
-                    <Table className="border rounded-t-none">
+                    <Table className="border rounded-t-none" hoverable>
                         <Table.Head className='rounded-t-none'>
                             <Table.HeadCell>Question</Table.HeadCell>
                             <Table.HeadCell>Risk weight</Table.HeadCell>
@@ -429,7 +429,7 @@ function QuestionnaireVersion() {
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
-                                <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                <Table.Row onClick={() => editQuestion(question)} key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer">
                                     <Table.Cell>{question.question}</Table.Cell>
                                     <Table.Cell>{question.riskWeight}</Table.Cell>
                                     <Table.Cell>{question.answerType}</Table.Cell>
@@ -449,7 +449,7 @@ function QuestionnaireVersion() {
                                 </Table.Row>
                             )).concat(
                                 <Table.Row key="newQuestion" className="">
-                                    <Table.Cell colSpan={7} className="hover:bg-gray-100 cursor-pointer" onClick={() => createNewQuestion()}>
+                                    <Table.Cell colSpan={7} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
                                         <div className="flex justify-center items-center text-sm gap-2">
                                             <MdOutlineAdd size={20}/>
                                             <span>New question</span>
