@@ -415,7 +415,7 @@ function QuestionnaireVersion() {
                 </div>
 
                 {tabs.length > 0 && (
-                    <Table className="border rounded-t-none">
+                    <Table className="border rounded-t-none" hoverable>
                         <Table.Head className='rounded-t-none'>
                             <Table.HeadCell>Question</Table.HeadCell>
                             <Table.HeadCell>Risk weight</Table.HeadCell>
@@ -429,7 +429,7 @@ function QuestionnaireVersion() {
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
-                                <Table.Row key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                <Table.Row onClick={() => editQuestion(question)} key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer">
                                     <Table.Cell>{question.question}</Table.Cell>
                                     <Table.Cell>{question.riskWeight}</Table.Cell>
                                     <Table.Cell>{question.answerType}</Table.Cell>
@@ -441,7 +441,7 @@ function QuestionnaireVersion() {
                                             <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
                                                 <HiPencilAlt size={20} />
                                             </span>
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => removeQuestionConfirmation(question)}>
+                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
                                                 <HiTrash size={20} />
                                             </span>
                                         </div>
@@ -449,7 +449,7 @@ function QuestionnaireVersion() {
                                 </Table.Row>
                             )).concat(
                                 <Table.Row key="newQuestion" className="">
-                                    <Table.Cell colSpan={7} className="hover:bg-gray-100 cursor-pointer" onClick={() => createNewQuestion()}>
+                                    <Table.Cell colSpan={7} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
                                         <div className="flex justify-center items-center text-sm gap-2">
                                             <MdOutlineAdd size={20}/>
                                             <span>New question</span>
@@ -750,7 +750,7 @@ function QuestionnaireVersion() {
                                     onChange={(event) => { setRulePrefillFilter(event.target.value) }}
                                 />
                                 <Table hoverable>
-                                    <Table.Body className="divide-y">
+                                    <Table.Body className="divide-y border">
                                         <Table.Row >
                                             <Table.Cell>Tab</Table.Cell>
                                             <Table.Cell>Question</Table.Cell>
@@ -780,8 +780,8 @@ function QuestionnaireVersion() {
                             </Accordion.Title>
                             <Accordion.Content>
                                 <div className="text-center">
-                                    <div className="flex flex-col mb-8">
-                                        <div className='flex justify-left p-4'>
+                                    <div className="flex flex-col">
+                                        <div className='flex justify-left'>
                                             <Table >
                                                 <Table.Body className="divide-y">
                                                     <Table.Row >
@@ -792,7 +792,7 @@ function QuestionnaireVersion() {
                                                         <Table.Row >
                                                             <Table.Cell>{answer.text}</Table.Cell>
                                                             <Table.Cell>
-                                                                <Button color="blue" onClick={() => {
+                                                                <Button color="gray" onClick={() => {
                                                                     setRulePrefillModalQuestionAnswer(answer);
                                                                     document.getElementById("accordion-answer-title")?.click();
                                                                   }}>
