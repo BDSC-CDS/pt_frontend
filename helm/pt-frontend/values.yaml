@@ -13,8 +13,6 @@ replicaCount: 1
 image:
   repository: ghcr.io/bdsc-cds/pt-frontend
   pullPolicy: IfNotPresent
-  pullSecrets:
-    - name: registry-auth
 
 # This is for setting up a service for the pt-frontend deployment.
 service:
