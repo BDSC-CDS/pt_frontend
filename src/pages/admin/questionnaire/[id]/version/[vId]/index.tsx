@@ -750,7 +750,7 @@ function QuestionnaireVersion() {
                                     onChange={(event) => { setRulePrefillFilter(event.target.value) }}
                                 />
                                 <Table hoverable>
-                                    <Table.Body className="divide-y">
+                                    <Table.Body className="divide-y border">
                                         <Table.Row >
                                             <Table.Cell>Tab</Table.Cell>
                                             <Table.Cell>Question</Table.Cell>
@@ -780,8 +780,8 @@ function QuestionnaireVersion() {
                             </Accordion.Title>
                             <Accordion.Content>
                                 <div className="text-center">
-                                    <div className="flex flex-col mb-8">
-                                        <div className='flex justify-left p-4'>
+                                    <div className="flex flex-col">
+                                        <div className='flex justify-left'>
                                             <Table >
                                                 <Table.Body className="divide-y">
                                                     <Table.Row >
@@ -792,7 +792,7 @@ function QuestionnaireVersion() {
                                                         <Table.Row >
                                                             <Table.Cell>{answer.text}</Table.Cell>
                                                             <Table.Cell>
-                                                                <Button color="blue" onClick={() => {
+                                                                <Button color="gray" onClick={() => {
                                                                     setRulePrefillModalQuestionAnswer(answer);
                                                                     document.getElementById("accordion-answer-title")?.click();
                                                                   }}>
