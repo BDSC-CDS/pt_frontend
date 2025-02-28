@@ -59,7 +59,7 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
                             {/* Answer prefilled by message */}
                             {question.prefilledBy && (
                                 <div className="m-1 text-gray-500 text-[0.625rem] font-medium">
-                                    Prefilled by answer "{question.prefilledBy.answerDescription}" ({question.prefilledBy.questionTab} Q{question.prefilledBy.questionId})                                </div>
+                                    Prefilled by answer "{question.prefilledBy.answerDescription}" to question "{question.prefilledBy.questionDescription} ({question.prefilledBy.questionTab})                                </div>
                             )}
                         </div>
                     </form>

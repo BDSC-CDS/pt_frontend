@@ -24,8 +24,8 @@ export interface Question {
   highRiskAnswerSelected: boolean;
   answers: Answer[];
   prefilledBy?: {
-    questionId: string;
     questionTab: string;
+    questionDescription: string;
     answerDescription: string;
   };
   tab: string;
@@ -66,7 +66,6 @@ export const questionsFromApi = (q: TemplatebackendQuestionnaireVersion): Questi
         }))
       })) || [],
       tab: question.tab || "",
-      prefilledBy: undefined,
     })
   });
 

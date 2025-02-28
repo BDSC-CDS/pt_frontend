@@ -107,8 +107,8 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 .find(q => q !== undefined);
                     if (q) {
                         q.prefilledBy = {
-                            questionId: question.questionId,
                             questionTab: question.tab,
+                            questionDescription: question.questionDescription,
                             answerDescription: newAnswer.answerDescription
                         }
                         setSelectedAnswer(q, rp.answerId);
@@ -324,8 +324,8 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 .find(q => q !== undefined);
                             if (prefilledQuestion) {
                                 prefilledQuestion.prefilledBy = {
-                                    questionId: q.questionId,
                                     questionTab: q.tab,
+                                    questionDescription: q.questionDescription,
                                     answerDescription: a.answerDescription
                                 }
                             }
