@@ -32,7 +32,6 @@ const QuestionnairePage = () => {
     }
 
     const loadQuestionnaireVersion = async (questionnaireId: number, questionnaireVersionId: number | undefined) => {
-        console.log("Loading questionnaire version", questionnaireId, questionnaireVersionId);
         const result = await getQuestionnaire(questionnaireId);
         if (!result) {
             throw new Error("Questionnaire not found")
@@ -45,7 +44,7 @@ const QuestionnairePage = () => {
                 return v.published;
             }
         });
-        console.log("Found version", v);
+
         if (!v) {
             throw new Error("Questionnaire version not found")
         }
