@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Question, Questions } from '../../utils/questions';
-import { TemplatebackendQuestionnaireQuestionReply, TemplatebackendQuestionnaireReply } from '../../internal/client/index';
+import { Question, Questions, questionsFromApi } from '../../utils/questions';
+import { TemplatebackendQuestionnaireQuestionReply, TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireVersion } from '../../internal/client/index';
 import dynamic from "next/dynamic";
 import { MdSave, MdOutlineWarningAmber, MdShare } from "react-icons/md";
 import ReplySaveModal from '../modals/ReplySaveModal';
@@ -15,9 +15,8 @@ import { useRouter } from 'next/router';
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
 interface QuestionnaireProps {
-    questions: Questions;
-    questionnaireVersionId?: number;
-    reply?: TemplatebackendQuestionnaireReply;
+    questionnaireVersion: TemplatebackendQuestionnaireVersion;
+    questionnaireReply?: TemplatebackendQuestionnaireReply;
 }
 
 type Tabs = {
@@ -29,8 +28,11 @@ type Tabs = {
 /**
  * The questionnaire component used for qualitative risk assessment.
  */
-export default function Questionnaire({ questions, questionnaireVersionId, reply }: QuestionnaireProps) {
+export default function Questionnaire({ questionnaireVersion, questionnaireReply }: QuestionnaireProps) {
     const router = useRouter()
+
+    const [questions, setQuestions] = useState<Questions>(questionsFromApi(questionnaireVersion));
+
     const [activeTab, setActiveTab] = useState<string>('1');
     const [openSaveModal, setOpenSaveModal] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -65,38 +67,6 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         return [maxRisk, minRisk];
     };
     const [maxRisk, minRisk] =  computeRiskBounds(questions);
-
-    // Populate the questionnaire with the reply data
-    if (reply) {
-        const allQuestions: { [key: string]: Question } = {};
-        Object.keys(questions).map((tab) => {
-            const tabQuestions = questions[tab];
-            if (!tabQuestions) return;
-            tabQuestions.forEach(q => { allQuestions[q.questionId] = q; });
-        });
-        reply.replies?.forEach(r => {
-            if (!r.questionnaireQuestionId) return;
-            const q = allQuestions[r.questionnaireQuestionId];
-            if (!q) return;
-            const a = q.answers.find(a => a.answerId === r.answer);
-            if (a) {
-                a.selected = true;
-                if (a.highRisk) {
-                    q.highRiskAnswerSelected = true;
-                }
-                if (a.rulePrefills && a.rulePrefills.length > 0) {
-                    a.rulePrefills.forEach(rp => {
-                        const prefilledQuestion = Object.keys(questions)
-                            .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
-                            .find(q => q !== undefined);
-                        if (prefilledQuestion) {
-                            prefilledQuestion.prefilled = true;
-                        }
-                    });
-                }
-            }
-        });
-    }
     
     // Function to set the selected answer for a question
     const setSelectedAnswer = (question: Question, answerId: string) => {
@@ -113,7 +83,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                     if (q) {
-                        q.prefilled = false;
+                        q.prefilledBy = undefined;
                         q.highRiskAnswerSelected = false;
                         q.answers.forEach(a => a.selected = false);
                     }
@@ -136,7 +106,11 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                     if (q) {
-                        q.prefilled = true;
+                        q.prefilledBy = {
+                            questionTab: question.tab,
+                            questionDescription: question.questionDescription,
+                            answerDescription: newAnswer.answerDescription
+                        }
                         setSelectedAnswer(q, rp.answerId);
                         isPrefilled = true;
                     }
@@ -147,6 +121,8 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
                 showToast("info", "Some answers were prefilled.");
             }
         }
+
+        console.log("New questions state", questions);
 
         computeCurrentRisk();
         computeCurrentReport();
@@ -170,7 +146,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
         })
 
         const replyToSave: TemplatebackendQuestionnaireReply = {
-            questionnaireVersionId: questionnaireVersionId,
+            questionnaireVersionId: questionnaireVersion.id,
             projectName: saveName,
             replies: replies,
         }
@@ -190,16 +166,16 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     };
 
     const handleSave = async () => {
-        if(reply && reply.projectName){
-            saveReply(reply.projectName)
+        if(questionnaireReply && questionnaireReply.projectName){
+            saveReply(questionnaireReply.projectName)
         } else {
             setOpenSaveModal(true)
         }
     }
 
     const handleShare = async () => {
-        if(reply && reply.projectName){
-            saveReply(reply.projectName, true)
+        if(questionnaireReply && questionnaireReply.projectName){
+            saveReply(questionnaireReply.projectName, true)
             setIsShareModalOpen(true)
         }
     }
@@ -319,10 +295,45 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     })).concat([{
         id: String(Object.keys(questions).length + 1),
         title: 'Results',
-        content: <QuestionnaireReportTab replyName={reply?.projectName} questions={questions} reportData={reportData} currentRisk={currentRisk}/>
+        content: <QuestionnaireReportTab replyName={questionnaireReply?.projectName} questions={questions} reportData={reportData} currentRisk={currentRisk}/>
     }]);
 
     useEffect(() => {
+        // Populate the questionnaire with the reply data
+        if (questionnaireReply) {
+            const allQuestions: { [key: string]: Question } = {};
+            Object.keys(questions).map((tab) => {
+                const tabQuestions = questions[tab];
+                if (!tabQuestions) return;
+                tabQuestions.forEach(q => { allQuestions[q.questionId] = q; });
+            });
+            questionnaireReply.replies?.forEach(r => {
+                if (!r.questionnaireQuestionId) return;
+                const q = allQuestions[r.questionnaireQuestionId];
+                if (!q) return;
+                const a = q.answers.find(a => a.answerId === r.answer);
+                if (a) {
+                    a.selected = true;
+                    if (a.highRisk) {
+                        q.highRiskAnswerSelected = true;
+                    }
+                    if (a.rulePrefills && a.rulePrefills.length > 0) {
+                        a.rulePrefills.forEach(rp => {
+                            const prefilledQuestion = Object.keys(questions)
+                                .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
+                                .find(q => q !== undefined);
+                            if (prefilledQuestion) {
+                                prefilledQuestion.prefilledBy = {
+                                    questionTab: q.tab,
+                                    questionDescription: q.questionDescription,
+                                    answerDescription: a.answerDescription
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
         computeCurrentRisk();
         computeCurrentReport();
     }, []);
@@ -330,7 +341,7 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
     return (
         <div className="flex flex-col h-full gap-2">
             <div className="flex justify-end gap-2">
-                {reply && reply.id && (
+                {questionnaireReply && questionnaireReply.id && (
                     <span onClick={handleShare} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                         <MdShare />
                         <p className='ml-2 text-sm'>Share</p>
@@ -343,8 +354,8 @@ export default function Questionnaire({ questions, questionnaireVersionId, reply
             </div>
 
             {/* Share reply modal */}
-            {reply && reply.id && (
-                <ReplyShareModal show={isShareModalOpen} shareReplyId={reply?.id} onClose={() => setIsShareModalOpen(false)} />
+            {questionnaireReply && questionnaireReply.id && (
+                <ReplyShareModal show={isShareModalOpen} shareReplyId={questionnaireReply?.id} onClose={() => setIsShareModalOpen(false)} />
             )}
 
             {/* Save reply modal */}

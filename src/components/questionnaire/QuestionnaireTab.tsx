@@ -1,5 +1,4 @@
 import { Tooltip } from 'flowbite-react';
-import React from 'react';
 import { FaCircleInfo } from "react-icons/fa6";
 import { Question } from '~/utils/questions';
 
@@ -41,20 +40,28 @@ export default function QuestionnaireTab({ tabQuestions, setSelectedAnswer, getS
                         </div>
                         
                         {/* Form select dropdown */}
-                        <select
-                            id={question.questionId}
-                            className={`bg-gray-50 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${question.prefilled ? "border-blue-400" : isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
-                                }`}
-                            value={getSelectedAnswer(question)}
-                            onChange={(e) => setSelectedAnswer(question, e.target.value)}
-                        >
-                            <option>Select an option</option>
-                            {question.answers.map((answer) => (
-                                <option key={answer.answerId} value={answer.answerId}>
-                                    {answer.answerDescription}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="flex flex-col">
+                            <select
+                                id={question.questionId}
+                                className={`bg-gray-50 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block max-w-xs p-2.5 ${question.prefilledBy ? "border-blue-400" : isQuestionAnswered(question) ? "border-green-400" : "border-red-400"
+                                    }`}
+                                value={getSelectedAnswer(question)}
+                                onChange={(e) => setSelectedAnswer(question, e.target.value)}
+                            >
+                                <option>Select an option</option>
+                                {question.answers.map((answer) => (
+                                    <option key={answer.answerId} value={answer.answerId}>
+                                        {answer.answerDescription}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* Answer prefilled by message */}
+                            {question.prefilledBy && (
+                                <div className="m-1 text-gray-500 text-[0.625rem] font-medium">
+                                    Prefilled by answer "{question.prefilledBy.answerDescription}" to question "{question.prefilledBy.questionDescription} ({question.prefilledBy.questionTab})                                </div>
+                            )}
+                        </div>
                     </form>
 
                     {/* Warning Message for High-Risk Answer */}
