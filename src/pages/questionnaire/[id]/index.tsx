@@ -31,13 +31,20 @@ const QuestionnairePage = () => {
         setQuestionnaireVersionId(replyResult.questionnaireVersionId);
     }
 
-    const loadQuestionnaireVersion = async (questionnaireId: number, questionnaireVersionId: number) => {
+    const loadQuestionnaireVersion = async (questionnaireId: number, questionnaireVersionId: number | undefined) => {
         const result = await getQuestionnaire(questionnaireId);
         if (!result) {
             throw new Error("Questionnaire not found")
         }
 
-        const v = (result.versions || []).find(v => questionnaireVersionId ? v.id == questionnaireVersionId : v.published);
+        const v = (result.versions || []).find(v => {
+            if (questionnaireVersionId) {
+                return v.id == questionnaireVersionId;
+            } else {
+                return v.published;
+            }
+        });
+
         if (!v) {
             throw new Error("Questionnaire version not found")
         }
@@ -52,6 +59,8 @@ const QuestionnairePage = () => {
     
                 if (id && id !== "new") {
                     await loadReply(Number(id));
+                } else if (id === "new") {
+                    setQuestionnaireVersionId(undefined);
                 }
             } catch (error) {
                 showToast("error", `Error fetching project: ${error}`);
@@ -64,9 +73,8 @@ const QuestionnairePage = () => {
     }, [id]);
     
     useEffect(() => {
-        if (questionnaireVersionId) {
-            loadQuestionnaireVersion(questionnaireId, questionnaireVersionId);
-        }
+        loadQuestionnaireVersion(questionnaireId, questionnaireVersionId);
+        
     }, [questionnaireVersionId]);
 
     return (
