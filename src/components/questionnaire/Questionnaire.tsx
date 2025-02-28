@@ -83,7 +83,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                     if (q) {
-                        q.prefilled = false;
+                        q.prefilledBy = undefined;
                         q.highRiskAnswerSelected = false;
                         q.answers.forEach(a => a.selected = false);
                     }
@@ -106,7 +106,11 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                     if (q) {
-                        q.prefilled = true;
+                        q.prefilledBy = {
+                            questionId: question.questionId,
+                            questionTab: question.tab,
+                            answerDescription: newAnswer.answerDescription
+                        }
                         setSelectedAnswer(q, rp.answerId);
                         isPrefilled = true;
                     }
@@ -319,7 +323,11 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 .map(tab => questions[tab]?.find(q => q.questionId == rp.questionId))
                                 .find(q => q !== undefined);
                             if (prefilledQuestion) {
-                                prefilledQuestion.prefilled = true;
+                                prefilledQuestion.prefilledBy = {
+                                    questionId: q.questionId,
+                                    questionTab: q.tab,
+                                    answerDescription: a.answerDescription
+                                }
                             }
                         });
                     }
