@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import Questionnaire from '../../../components/questionnaire/Questionnaire';
 import { getQuestionnaire, getReply } from "../../../utils/questionnaire"
 import { useRouter } from 'next/router';
-import { TemplatebackendQuestionnaireReply } from '../../../internal/client/index';
-import { questionsFromApi, Questions } from "../../../utils/questions"
+import { TemplatebackendQuestionnaireReply, TemplatebackendQuestionnaireVersion } from '../../../internal/client/index';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
 import Spinner from '~/components/ui/Spinner';
@@ -19,61 +18,61 @@ const QuestionnairePage = () => {
 
     const [questionnaireVersionId, setQuestionnaireVersionId] = useState<number>();
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [questions, setQuestions] = useState<Questions>();
-    const [reply, setReply] = useState<TemplatebackendQuestionnaireReply>();
+    const [questionnaireVersion, setQuestionnaireVersion] = useState<TemplatebackendQuestionnaireVersion>();
+    const [questionnaireReply, setQuestionnaireReply] = useState<TemplatebackendQuestionnaireReply>();
 
-
-    const load = async () => {
-        setIsLoading(true)
-        let replyId;
-        if (id && id != "new") {
-            replyId = Number(id);
-
-            const replyResult = await getReply(replyId);
-
-            if (replyResult) {
-                setReply(replyResult);
-            }
-
-            if (replyResult?.questionnaireVersionId)  {
-                setQuestionnaireVersionId(replyResult?.questionnaireVersionId);
-            }
+    const loadReply = async (replyId: number) => {
+        const replyResult = await getReply(replyId);
+        if (!replyResult) {
+            throw new Error("Reply not found")
         }
 
+        setQuestionnaireReply(replyResult);
+        setQuestionnaireVersionId(replyResult.questionnaireVersionId);
+    }
+
+    const loadQuestionnaireVersion = async (questionnaireId: number, questionnaireVersionId: number) => {
         const result = await getQuestionnaire(questionnaireId);
-        console.log("result", result)
         if (!result) {
-            return
+            throw new Error("Questionnaire not found")
         }
 
-        const v = (result.versions || []).find(v => {
-            if (questionnaireVersionId) {
-                return v.id == questionnaireVersionId;
-            } else {
-                return v.published;
-            }
-        });
-        setQuestionnaireVersionId(v?.id);
+        const v = (result.versions || []).find(v => questionnaireVersionId ? v.id == questionnaireVersionId : v.published);
         if (!v) {
-            return
+            throw new Error("Questionnaire version not found")
         }
-        const q = questionsFromApi(v);
-        setQuestions(q);
-        setIsLoading(false)
+
+        setQuestionnaireVersion(v);
     }
 
     useEffect(() => {
-        try {
-            load();
-        } catch (error) {
-            showToast("error", `Error listing the replies: ${error}`)
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+    
+                if (id && id !== "new") {
+                    await loadReply(Number(id));
+                }
+            } catch (error) {
+                showToast("error", `Error fetching project: ${error}`);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+    
+        fetchData();
+    }, [id]);
+    
+    useEffect(() => {
+        if (questionnaireVersionId) {
+            loadQuestionnaireVersion(questionnaireId, questionnaireVersionId);
         }
-    }, []);
+    }, [questionnaireVersionId]);
 
     return (
         <>
-            {!isLoading && questions ? (
-                <Questionnaire questions={questions} questionnaireVersionId={questionnaireVersionId} reply={reply} />
+            {!isLoading && questionnaireVersion ? (
+                <Questionnaire questionnaireVersion={questionnaireVersion} questionnaireReply={questionnaireReply} />
             ) : (
                 <Spinner/>
             )}
