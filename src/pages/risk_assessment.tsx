@@ -45,7 +45,6 @@ function RiskAssessment() {
 
         const rep = replies.map(r=>{
             const shared = r.userId !== userInfo?.id;
-            console.log(r.userId, userInfo?.id, shared);
             return {
                 ...r,
                 shared: shared,

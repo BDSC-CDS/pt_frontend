@@ -1,5 +1,4 @@
 import { Tooltip } from 'flowbite-react';
-import React from 'react';
 import { FaCircleInfo } from "react-icons/fa6";
 import { Question } from '~/utils/questions';
 
