@@ -169,28 +169,9 @@ function QuestionnaireVersion() {
     // Save questionnaire version modal
     const [openSaveModal, setOpenSaveModal] = useState(false);
 
-    // Everything to remove a tab and it's questions
-    const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
-    const [tabToRemove, setTabToRemove] = useState<Tab>();
-    const removeTabConfirmation = (n: number) => {
-        setOpenRemoveTabModal(true);
-        setTabToRemove(tabs[n])
-    };
-    const removeTab = () => {
-        setOpenRemoveTabModal(false);
-
-        version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
-        version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
-        processQuestionnaireVersion(version);
-        setIsDirty(true)
-    }
-
     // Everything to add a tab
     const [openCreateTabModal, setOpenCreateTabModal] = useState(false);
     const [createTabName, setCreateTabName] = useState('');
-    const handleCreateTabNameChange = (name: string) => {
-        setCreateTabName(name);
-    };
     const createTab = () => {
         if (!version.tabs) {
             version.tabs = []
@@ -204,6 +185,46 @@ function QuestionnaireVersion() {
         processQuestionnaireVersion(version);
         setIsDirty(true)
     }
+
+    // Everything to edit a tab name
+    const [openEditTabModal, setOpenEditTabModal] = useState(false);
+    const [tabToEdit, setTabToEdit] = useState<Tab>();
+    const [editedTabName, setEditedTabName] = useState<string>('');
+    const handleEditTab = (n: number) => {
+        if(tabs[n]){
+            setOpenEditTabModal(true);
+            setTabToEdit(tabs[n]);
+            setEditedTabName(tabs[n].tabName);
+        }
+    };
+    const editTabName = () => {
+        setOpenEditTabModal(false);
+        version.questions = version.questions?.map(q => {
+            if(q.tab == tabToEdit?.tabName){
+                q.tab = editedTabName;
+            }
+            return q;
+        });
+        version.tabs = (version.tabs || []).map(t => t == tabToEdit?.tabName ? editedTabName : t)
+        processQuestionnaireVersion(version);
+        setIsDirty(true)
+    };
+
+    // Everything to remove a tab and it's questions
+    const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
+    const [tabToRemove, setTabToRemove] = useState<Tab>();
+    const handleRemoveTab = (n: number) => {
+        setOpenRemoveTabModal(true);
+        setTabToRemove(tabs[n])
+    };
+    const removeTab = () => {
+        setOpenRemoveTabModal(false);
+
+        version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
+        version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
+        processQuestionnaireVersion(version);
+        setIsDirty(true)
+    };
 
     // Everything to remove a question
     const [openRemoveQuestionModal, setOpenRemoveQuestionModal] = useState(false);
@@ -380,7 +401,7 @@ function QuestionnaireVersion() {
 
             <div className="flex flex-col w-full">
                 <div className="overflow-auto border rounded-t-lg scroll-mt-2 shadow">
-                    <ul className="flex flex-row">
+                    <ul className="flex flex-row justify-between h-full">
                         {tabs.map((tab, n) => (
                             <li
                                 key={`tab${n}`}
@@ -388,28 +409,33 @@ function QuestionnaireVersion() {
                                 onDragStart={() => handleDragStart(n)}
                                 onDragOver={handleDragOver}
                                 onDrop={() => handleDrop(n)}
-                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-grab text-md text-gray-600 
-                                    ${activeTabIndex === n && 'border-t-2 border-gray-400 bg-gray-50'}
+                                className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-grab text-md text-gray-600 
+                                    ${activeTabIndex === n && ' border-t-2 border-gray-400 bg-gray-50'}
                                 `}
                                 onClick={() => setActiveTabIndex(n)}
                             >
-                                <div className="flex items-center px-2 justify-between">
+                                <div className="flex items-center px-2 justify-between h-full">
                                     <div className="flex items-center">
                                         <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
                                             {n + 1}
                                         </span>
                                         <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
                                     </div>
-                                    
-                                    <span className="p-2 hover:cursor-pointer hover:bg-gray-200 rounded-lg" onClick={() => removeTabConfirmation(n)}>
-                                        <HiTrash />
-                                    </span>
+
+                                    <div className="flex flex-row">
+                                        <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => handleEditTab(n)}>
+                                            <HiPencilAlt />
+                                        </span>
+                                        <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => handleRemoveTab(n)}>
+                                            <HiTrash />
+                                        </span>
+                                    </div>
                                 </div>
                             </li>
                         ))}
-                        <button className="p-4 hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={() => setOpenCreateTabModal(true)}>
-                            <MdOutlineAdd size={20} />
-                            <span>New tab</span>
+                        <button className="px-2 pt-3 pb-4 hover:bg-gray-100 cursor-pointer flex items-center gap-1" onClick={() => setOpenCreateTabModal(true)}>
+                            <MdOutlineAdd size={25}/>
+                            <span className="text-left">New tab</span>
                         </button>
                     </ul>
                 </div>
@@ -468,6 +494,51 @@ function QuestionnaireVersion() {
             {/* SAVE NEW VERSION MODAL */}
             <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onSave={() => setIsDirty(false)} onClose={() => setOpenSaveModal(false)}/>
 
+            {/* CREATE TAB MODAL */}
+            <Modal show={openCreateTabModal} size="xl" onClose={() => setOpenCreateTabModal(false)} popup>
+                <Modal.Header>
+                    <p>Create new tab</p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col py-5 px-10">
+                    <TextInput
+                        placeholder="Name"
+                        required
+                        onChange={(event) => setCreateTabName(event.target.value)}
+                    />
+                </Modal.Body>
+                <Modal.Footer className="p-2 flex justify-center gap-4">
+                    <Button onClick={() => createTab()}>
+                        Save
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* EDIT TAB MODAL */}
+            <Modal show={openEditTabModal} size="xl" onClose={() => setOpenEditTabModal(false)} popup>
+                <Modal.Header>
+                    <p>Rename tab</p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col py-5 px-10">
+                    <TextInput
+                        value={editedTabName}
+                        placeholder="Name"
+                        required
+                        onChange={(event) => setEditedTabName(event.target.value)}
+                    />
+                </Modal.Body>
+                <Modal.Footer className="p-2 flex justify-center gap-4">
+                    <Button onClick={() => editTabName()}>
+                        Save
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenEditTabModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
                 <Modal.Header />
@@ -480,36 +551,14 @@ function QuestionnaireVersion() {
                         </h3>
                         <div className="flex justify-center gap-4">
                             <Button color="failure" onClick={() => removeTab()}>
-                                Yes, I'm sure
+                                Yes
                             </Button>
                             <Button color="gray" onClick={() => setOpenRemoveTabModal(false)}>
-                                No, cancel
+                                Cancel
                             </Button>
                         </div>
                     </div>
                 </Modal.Body>
-            </Modal>
-
-            {/* CREATE TAB MODAL */}
-            <Modal show={openCreateTabModal} size="xl" onClose={() => setOpenCreateTabModal(false)} popup>
-                <Modal.Header>
-                    <p>Create new tab</p>
-                </Modal.Header>
-                <Modal.Body className="flex flex-col py-5 px-10">
-                    <TextInput
-                        placeholder="Name"
-                        required
-                        onChange={(event) => handleCreateTabNameChange(event.target.value)}
-                    />
-                </Modal.Body>
-                <Modal.Footer className="p-2 flex justify-center gap-4">
-                    <Button onClick={() => createTab()}>
-                        Save
-                    </Button>
-                    <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
-                        Cancel
-                    </Button>
-                </Modal.Footer>
             </Modal>
 
             {/* REMOVE QUESTION MODAL */}
@@ -523,10 +572,10 @@ function QuestionnaireVersion() {
                         </h3>
                         <div className="flex justify-center gap-4">
                             <Button color="failure" onClick={() => removeQuestion()}>
-                                Yes, I'm sure
+                                Yes
                             </Button>
                             <Button color="gray" onClick={() => setOpenRemoveQuestionModal(false)}>
-                                No, cancel
+                                Cancel
                             </Button>
                         </div>
                     </div>
