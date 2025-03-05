@@ -61,6 +61,10 @@ function QuestionnaireVersion() {
 
     const handleDragTabOver = (event: React.DragEvent<HTMLLIElement>, index: number) => {
         event.preventDefault()
+        if(draggedTabIndex === null){
+            return
+        }
+
         setDraggedOverTabIndex(index)
     };
 
@@ -96,6 +100,9 @@ function QuestionnaireVersion() {
 
     const handleDragQuestionOver = (event: React.DragEvent<HTMLTableRowElement>, index: number) => {
         event.preventDefault()
+        if(draggedQuestionIndex === null ){
+            return
+        }
         setDraggedOverQuestionIndex(index)
     };
 
@@ -370,7 +377,6 @@ function QuestionnaireVersion() {
     const [rulePrefillFilter, setRulePrefillFilter] = useState("");
 
     const addRulePrefil = (answer: TemplatebackendQuestionnaireQuestionAnswer, n: number) => {
-        // console.log("rule prefill answerId", answerID);
         setRulePrefillModalAnswer(answer);
         setRulePrefillModalAnswerIndex(n);
         setAddRulePrefillModal(true);
@@ -447,8 +453,8 @@ function QuestionnaireVersion() {
                                 onDragOver={(e) => handleDragTabOver(e, n)}
                                 onDrop={() => handleDropTab(n)}
                                 className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-pointer text-md text-gray-600 
-                                    ${activeTabIndex === n && ' border-t-2 border-gray-400 bg-gray-50'}
-                                    ${draggedOverTabIndex === n && draggedTabIndex !== n && 'bg-blue-50'}
+                                    ${draggedOverTabIndex === n && draggedTabIndex !== n ? 'bg-blue-50' : ''}
+                                    ${activeTabIndex === n ? 'border-t-2 border-gray-400 bg-gray-50' : ''}
                                 `}
                                 onClick={() => setActiveTabIndex(n)}
                             >
