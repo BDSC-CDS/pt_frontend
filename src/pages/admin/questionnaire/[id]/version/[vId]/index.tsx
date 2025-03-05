@@ -1,12 +1,12 @@
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Textarea } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
-import { MdSave, MdOutlineAdd } from "react-icons/md";
+import { MdSave, MdOutlineAdd, MdDragIndicator } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
@@ -50,17 +50,21 @@ function QuestionnaireVersion() {
     const [tabs, setTabs] = useState<Tabs>([]);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null)
+    const [draggedOverTabIndex, setDraggedOverTabIndex] = useState<number | null>(null)
+    const [draggedQuestionIndex, setDraggedQuestionIndex] = useState<number | null>(null)
+    const [draggedOverQuestionIndex, setDraggedOverQuestionIndex] = useState<number | null>(null)
 
     // Tabs drag and drop handlers
-    const handleDragStart = (index: number) => {
+    const handleDragTabStart = (index: number) => {
         setDraggedTabIndex(index)
     };
 
-    const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+    const handleDragTabOver = (event: React.DragEvent<HTMLLIElement>, index: number) => {
         event.preventDefault()
+        setDraggedOverTabIndex(index)
     };
 
-    const handleDrop = (index: number) => {
+    const handleDropTab = (index: number) => {
         if (draggedTabIndex === null || draggedTabIndex === index){
             return
         }
@@ -81,6 +85,40 @@ function QuestionnaireVersion() {
         processQuestionnaireVersion(version)
         setActiveTabIndex(index)
         setDraggedTabIndex(null)
+        setDraggedOverTabIndex(null)
+        setIsDirty(true)
+    };
+
+    // Questions drag and drop handlers
+    const handleDragQuestionStart = (index: number) => {
+        setDraggedQuestionIndex(index)
+    };
+
+    const handleDragQuestionOver = (event: React.DragEvent<HTMLTableRowElement>, index: number) => {
+        event.preventDefault()
+        setDraggedOverQuestionIndex(index)
+    };
+
+    const handleDropQuestion = (index: number) => {
+        if (draggedQuestionIndex === null || draggedQuestionIndex === index || !tabs[activeTabIndex]){
+            return
+        }
+
+        const updatedQuestions = [...tabs[activeTabIndex].questions]
+        const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
+        if(!movedQuestion){
+            return
+        }
+
+        // Insert at new position
+        updatedQuestions.splice(index, 0, movedQuestion)
+
+        // Set the tabs and version
+        tabs[activeTabIndex].questions = updatedQuestions
+        version.questions = tabs.flatMap(tab => tab.questions)
+        processQuestionnaireVersion(version)
+        setDraggedQuestionIndex(null)
+        setDraggedOverQuestionIndex(null)
         setIsDirty(true)
     };
 
@@ -377,21 +415,21 @@ function QuestionnaireVersion() {
             </div>
 
             <div className="flex flex-col mb-5">
-                <Table >
+                <Table>
                     <Table.Body className="divide-y">
-                        <Table.Row >
+                        <Table.Row key="questionnaireName">
                             <Table.HeadCell>Name</Table.HeadCell>
                             <Table.Cell>{questionnaire.name}</Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="creationDate">
                             <Table.HeadCell>Date created</Table.HeadCell>
                             <Table.Cell><TimeAgo date={questionnaire.createdAt || ''} /></Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="modificationDate">
                             <Table.HeadCell>Last modified</Table.HeadCell>
                             <Table.Cell><TimeAgo date={questionnaire.updatedAt || ''} /></Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="questionnaireVersion">
                             <Table.HeadCell>Version</Table.HeadCell>
                             <Table.Cell>{version.version || ''}</Table.Cell>
                         </Table.Row>
@@ -400,21 +438,26 @@ function QuestionnaireVersion() {
             </div>
 
             <div className="flex flex-col w-full">
-                <div className="overflow-auto border rounded-t-lg scroll-mt-2 shadow">
+                <div className="overflow-auto border rounded-t-lg shadow">
                     <ul className="flex flex-row justify-between h-full">
                         {tabs.map((tab, n) => (
                             <li
                                 key={`tab${n}`}
                                 draggable={true}
-                                onDragStart={() => handleDragStart(n)}
-                                onDragOver={handleDragOver}
-                                onDrop={() => handleDrop(n)}
-                                className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-grab text-md text-gray-600 
+                                onDragStart={() => handleDragTabStart(n)}
+                                onDragOver={(e) => handleDragTabOver(e, n)}
+                                onDrop={() => handleDropTab(n)}
+                                className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-pointer text-md text-gray-600 
                                     ${activeTabIndex === n && ' border-t-2 border-gray-400 bg-gray-50'}
+                                    ${draggedOverTabIndex === n && draggedTabIndex !== n && 'bg-blue-50'}
                                 `}
                                 onClick={() => setActiveTabIndex(n)}
                             >
                                 <div className="flex items-center px-2 justify-between h-full">
+                                    <div className="pr-3">
+                                        <MdDragIndicator className="cursor-grab" />
+                                    </div>
+
                                     <div className="flex items-center">
                                         <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
                                             {n + 1}
@@ -439,54 +482,65 @@ function QuestionnaireVersion() {
                         </button>
                     </ul>
                 </div>
+                
+                <div className="overflow-auto border rounded-t-none rounded-b-lg shadow">
+                    {tabs.length > 0 && (
+                        <Table className="" hoverable>
+                            <Table.Head className='rounded-t-none'>
+                                <Table.HeadCell className="w-0 p-0"/>
+                                <Table.HeadCell>Question</Table.HeadCell>
+                                <Table.HeadCell>Risk weight</Table.HeadCell>
+                                <Table.HeadCell>Answer Type</Table.HeadCell>
+                                <Table.HeadCell>Answers</Table.HeadCell>
+                                {/* <Table.HeadCell>Flag</Table.HeadCell> */}
+                                <Table.HeadCell>Tooltip</Table.HeadCell>
+                                <Table.HeadCell/>
+                            </Table.Head>
+                            <Table.Body className="divide-y">
+                                {((tabs[activeTabIndex] || {}).questions || []).map((question, i) => (
+                                    <Table.Row 
+                                        onClick={() => editQuestion(question)} 
+                                        key={`question-${i}`} 
+                                        className={`bg-white hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 cursor-pointer ${draggedOverQuestionIndex === i && draggedQuestionIndex !== i && 'bg-blue-50'}`}
+                                        draggable={true}
+                                        onDragStart={() => handleDragQuestionStart(i)}
+                                        onDragOver={(e) => handleDragQuestionOver(e, i)}
+                                        onDrop={() => handleDropQuestion(i)}
+                                    >
+                                        <Table.Cell className="w-1 p-2"><MdDragIndicator className="cursor-grab" size={16}/></Table.Cell>
+                                        <Table.Cell>{question.question}</Table.Cell>
+                                        <Table.Cell>{question.riskWeight}</Table.Cell>
+                                        <Table.Cell>{question.answerType}</Table.Cell>
+                                        <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
+                                        {/* <Table.Cell>{question.flag}</Table.Cell> */}
+                                        <Table.Cell>{question.tooltip}</Table.Cell>
+                                        <Table.Cell className="w-1 p-2">
+                                            <div className="flex flex-row">
+                                                <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => editQuestion(question)}>
+                                                    <HiPencilAlt size={16}/>
+                                                </span>
+                                                <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
+                                                    <HiTrash size={16}/>
+                                                </span>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                )).concat(
+                                    <Table.Row key="newQuestion" className="">
+                                        <Table.Cell colSpan={8} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
+                                            <div className="flex justify-center items-center text-sm gap-2">
+                                                <MdOutlineAdd size={20}/>
+                                                <span>New question</span>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                )}
 
-                {tabs.length > 0 && (
-                    <Table className="border rounded-t-none" hoverable>
-                        <Table.Head className='rounded-t-none'>
-                            <Table.HeadCell>Question</Table.HeadCell>
-                            <Table.HeadCell>Risk weight</Table.HeadCell>
-                            <Table.HeadCell>Answer Type</Table.HeadCell>
-                            <Table.HeadCell>Answers</Table.HeadCell>
-                            <Table.HeadCell>Flag</Table.HeadCell>
-                            <Table.HeadCell>Tooltip</Table.HeadCell>
-                            <Table.HeadCell>
-                                <span className="sr-only">Action</span>
-                            </Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                            {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
-                                <Table.Row onClick={() => editQuestion(question)} key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer">
-                                    <Table.Cell>{question.question}</Table.Cell>
-                                    <Table.Cell>{question.riskWeight}</Table.Cell>
-                                    <Table.Cell>{question.answerType}</Table.Cell>
-                                    <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
-                                    <Table.Cell>{question.flag}</Table.Cell>
-                                    <Table.Cell>{question.tooltip}</Table.Cell>
-                                    <Table.Cell>
-                                        <div className="flex flex-row">
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
-                                                <HiPencilAlt size={20} />
-                                            </span>
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
-                                                <HiTrash size={20} />
-                                            </span>
-                                        </div>
-                                    </Table.Cell>
-                                </Table.Row>
-                            )).concat(
-                                <Table.Row key="newQuestion" className="">
-                                    <Table.Cell colSpan={7} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
-                                        <div className="flex justify-center items-center text-sm gap-2">
-                                            <MdOutlineAdd size={20}/>
-                                            <span>New question</span>
-                                        </div>
-                                    </Table.Cell>
-                                </Table.Row>
-                            )}
-
-                        </Table.Body>
-                    </Table>
-                )}
+                            </Table.Body>
+                        </Table>
+                    )}
+                </div>
+                
                 
             </div>
 
@@ -508,7 +562,7 @@ function QuestionnaireVersion() {
                 </Modal.Body>
                 <Modal.Footer className="p-2 flex justify-center gap-4">
                     <Button onClick={() => createTab()}>
-                        Save
+                        Create
                     </Button>
                     <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
                         Cancel
@@ -531,7 +585,7 @@ function QuestionnaireVersion() {
                 </Modal.Body>
                 <Modal.Footer className="p-2 flex justify-center gap-4">
                     <Button onClick={() => editTabName()}>
-                        Save
+                        Edit
                     </Button>
                     <Button color="gray" onClick={() => setOpenEditTabModal(false)}>
                         Cancel
@@ -799,17 +853,17 @@ function QuestionnaireVersion() {
                                     onChange={(event) => { setRulePrefillFilter(event.target.value) }}
                                 />
                                 <Table hoverable>
+                                    <Table.Head className="border">
+                                        <Table.HeadCell>Tab</Table.HeadCell>
+                                        <Table.HeadCell>Question</Table.HeadCell>
+                                    </Table.Head>
                                     <Table.Body className="divide-y border">
-                                        <Table.Row >
-                                            <Table.Cell>Tab</Table.Cell>
-                                            <Table.Cell>Question</Table.Cell>
-                                        </Table.Row>
                                         {(version.questions || [])
                                             .filter(question =>
                                                 JSON.stringify(question).toLowerCase().includes(rulePrefillFilter)
                                             )
                                             .map((question, n) => (
-                                                <Table.Row className="cursor-pointer" onClick={() => { 
+                                                <Table.Row key={`resultQuestion${n}`} className="cursor-pointer" onClick={() => { 
                                                     setRulePrefillModalQuestion(question);
                                                     // get title and click
                                                     document.getElementById("accordion-title")?.click();
@@ -832,13 +886,12 @@ function QuestionnaireVersion() {
                                     <div className="flex flex-col">
                                         <div className='flex justify-left'>
                                             <Table >
+                                                <Table.Head className="border">
+                                                    <Table.HeadCell colSpan={2}>Answer</Table.HeadCell>
+                                                </Table.Head>
                                                 <Table.Body className="divide-y">
-                                                    <Table.Row >
-                                                        <Table.Cell>Answer</Table.Cell>
-                                                        <Table.Cell></Table.Cell>
-                                                    </Table.Row>
-                                                    {(rulePrefillModalQuestion?.answers || []).map((answer) => (
-                                                        <Table.Row >
+                                                    {(rulePrefillModalQuestion?.answers || []).map((answer, n) => (
+                                                        <Table.Row key={`resultAnswer${n}`}>
                                                             <Table.Cell>{answer.text}</Table.Cell>
                                                             <Table.Cell>
                                                                 <Button color="gray" onClick={() => {
