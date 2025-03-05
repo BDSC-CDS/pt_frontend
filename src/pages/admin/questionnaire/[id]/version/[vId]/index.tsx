@@ -100,26 +100,25 @@ function QuestionnaireVersion() {
     };
 
     const handleDropQuestion = (index: number) => {
-        if (draggedQuestionIndex === null || draggedQuestionIndex === index || !tabs[activeTabIndex]){
+        if (draggedQuestionIndex === null || draggedQuestionIndex === index){
             return
         }
 
-        const updatedQuestions = [...tabs[activeTabIndex].questions]
-        const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
-        if(!movedQuestion){
-            return
+        if(activeTabIndex && tabs && tabs[activeTabIndex]){
+            const updatedQuestions = [...tabs?.[activeTabIndex]?.questions ?? []]
+            const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
+            if(!movedQuestion){
+                return
+            }
+
+            // Insert at new position
+            updatedQuestions.splice(index, 0, movedQuestion)
+            version.questions = tabs.flatMap(tab => tab.questions)
+            processQuestionnaireVersion(version)
+            setDraggedQuestionIndex(null)
+            setDraggedOverQuestionIndex(null)
+            setIsDirty(true)
         }
-
-        // Insert at new position
-        updatedQuestions.splice(index, 0, movedQuestion)
-
-        // Set the tabs and version
-        tabs[activeTabIndex].questions = updatedQuestions
-        version.questions = tabs.flatMap(tab => tab.questions)
-        processQuestionnaireVersion(version)
-        setDraggedQuestionIndex(null)
-        setDraggedOverQuestionIndex(null)
-        setIsDirty(true)
     };
 
     // Load questionnaire and all its versions
@@ -229,10 +228,10 @@ function QuestionnaireVersion() {
     const [tabToEdit, setTabToEdit] = useState<Tab>();
     const [editedTabName, setEditedTabName] = useState<string>('');
     const handleEditTab = (n: number) => {
-        if(tabs[n]){
+        if(tabs && tabs[n]){
             setOpenEditTabModal(true);
             setTabToEdit(tabs[n]);
-            setEditedTabName(tabs[n].tabName);
+            setEditedTabName(tabs[n]?.tabName || "");
         }
     };
     const editTabName = () => {
