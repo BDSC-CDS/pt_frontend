@@ -107,7 +107,7 @@ const DataTable = <T extends {}>({
                         {columns.map((col, colIndex) => (
                             <Table.HeadCell key={col.name}>
                                 {col.tooltip && (
-                                    <Tooltip content={col.tooltip}>
+                                    <Tooltip style="light" arrow={false} content={col.tooltip}>
                                         <span className="cursor-pointer">{col.header}</span>
                                     </Tooltip>
                                 )}
@@ -134,7 +134,7 @@ const DataTable = <T extends {}>({
                                                 <div>
                                                     {leftIconActions.map((iconAction, actionIndex) => (
                                                         <div key={`iconAction${actionIndex}`} className="p-1 rounded-md hover:bg-gray-200" onClick={() => iconAction.callback(row)}>
-                                                            <Tooltip content={iconAction.tooltip} className="text-sm p-2">
+                                                            <Tooltip style="light" arrow={false} content={iconAction.tooltip} className="text-sm p-2">
                                                                 <iconAction.Icon className="text-base"/>
                                                             </Tooltip>
                                                         </div>
