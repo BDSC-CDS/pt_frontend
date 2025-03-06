@@ -111,21 +111,25 @@ function QuestionnaireVersion() {
             return
         }
 
-        if(activeTabIndex && tabs && tabs[activeTabIndex]){
-            const updatedQuestions = [...tabs?.[activeTabIndex]?.questions ?? []]
-            const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
-            if(!movedQuestion){
-                return
-            }
-
-            // Insert at new position
-            updatedQuestions.splice(index, 0, movedQuestion)
-            version.questions = tabs.flatMap(tab => tab.questions)
-            processQuestionnaireVersion(version)
-            setDraggedQuestionIndex(null)
-            setDraggedOverQuestionIndex(null)
-            setIsDirty(true)
+        const updatedQuestions = [...tabs?.[activeTabIndex]?.questions ?? []]
+        const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
+        if(!movedQuestion){
+            return
         }
+
+        updatedQuestions.splice(index, 0, movedQuestion)
+
+        // Create a new array for the updated tabs
+        const updatedTabs = tabs.map((tab, i) => i === activeTabIndex ? { ...tab, questions: updatedQuestions } : tab);
+
+        // Update the state with the new tabs array
+        setTabs(updatedTabs);
+
+        version.questions = updatedTabs.flatMap(tab => tab.questions || [])
+        processQuestionnaireVersion(version)
+        setDraggedQuestionIndex(null)
+        setDraggedOverQuestionIndex(null)
+        setIsDirty(true)
     };
 
     // Load questionnaire and all its versions
