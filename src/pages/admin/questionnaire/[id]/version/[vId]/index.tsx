@@ -1,12 +1,12 @@
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Table, Button, Modal, TextInput, Accordion, ToggleSwitch, Textarea } from 'flowbite-react';
 import TimeAgo from 'react-timeago'
 import { getQuestionnaire } from "../../../../../../utils/questionnaire"
 import CounterInput from "../../../../../../components/CounterInput"
-import { MdSave, MdOutlineAdd } from "react-icons/md";
+import { MdSave, MdOutlineAdd, MdDragIndicator } from "react-icons/md";
 import { HiPencilAlt, HiTrash, HiOutlineExclamationCircle } from "react-icons/hi";
 import { TemplatebackendQuestionnaire, TemplatebackendQuestionnaireVersion, TemplatebackendQuestionnaireQuestion, TemplatebackendQuestionnaireQuestionAnswer } from '~/internal/client';
 import cloneDeep from "lodash/cloneDeep";
@@ -50,17 +50,25 @@ function QuestionnaireVersion() {
     const [tabs, setTabs] = useState<Tabs>([]);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null)
+    const [draggedOverTabIndex, setDraggedOverTabIndex] = useState<number | null>(null)
+    const [draggedQuestionIndex, setDraggedQuestionIndex] = useState<number | null>(null)
+    const [draggedOverQuestionIndex, setDraggedOverQuestionIndex] = useState<number | null>(null)
 
     // Tabs drag and drop handlers
-    const handleDragStart = (index: number) => {
+    const handleDragTabStart = (index: number) => {
         setDraggedTabIndex(index)
     };
 
-    const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+    const handleDragTabOver = (event: React.DragEvent<HTMLLIElement>, index: number) => {
         event.preventDefault()
+        if(draggedTabIndex === null){
+            return
+        }
+
+        setDraggedOverTabIndex(index)
     };
 
-    const handleDrop = (index: number) => {
+    const handleDropTab = (index: number) => {
         if (draggedTabIndex === null || draggedTabIndex === index){
             return
         }
@@ -81,6 +89,46 @@ function QuestionnaireVersion() {
         processQuestionnaireVersion(version)
         setActiveTabIndex(index)
         setDraggedTabIndex(null)
+        setDraggedOverTabIndex(null)
+        setIsDirty(true)
+    };
+
+    // Questions drag and drop handlers
+    const handleDragQuestionStart = (index: number) => {
+        setDraggedQuestionIndex(index)
+    };
+
+    const handleDragQuestionOver = (event: React.DragEvent<HTMLTableRowElement>, index: number) => {
+        event.preventDefault()
+        if(draggedQuestionIndex === null ){
+            return
+        }
+        setDraggedOverQuestionIndex(index)
+    };
+
+    const handleDropQuestion = (index: number) => {
+        if (draggedQuestionIndex === null || draggedQuestionIndex === index){
+            return
+        }
+
+        const updatedQuestions = [...tabs?.[activeTabIndex]?.questions ?? []]
+        const movedQuestion = updatedQuestions.splice(draggedQuestionIndex, 1)[0]
+        if(!movedQuestion){
+            return
+        }
+
+        updatedQuestions.splice(index, 0, movedQuestion)
+
+        // Create a new array for the updated tabs
+        const updatedTabs = tabs.map((tab, i) => i === activeTabIndex ? { ...tab, questions: updatedQuestions } : tab);
+
+        // Update the state with the new tabs array
+        setTabs(updatedTabs);
+
+        version.questions = updatedTabs.flatMap(tab => tab.questions || [])
+        processQuestionnaireVersion(version)
+        setDraggedQuestionIndex(null)
+        setDraggedOverQuestionIndex(null)
         setIsDirty(true)
     };
 
@@ -169,28 +217,9 @@ function QuestionnaireVersion() {
     // Save questionnaire version modal
     const [openSaveModal, setOpenSaveModal] = useState(false);
 
-    // Everything to remove a tab and it's questions
-    const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
-    const [tabToRemove, setTabToRemove] = useState<Tab>();
-    const removeTabConfirmation = (n: number) => {
-        setOpenRemoveTabModal(true);
-        setTabToRemove(tabs[n])
-    };
-    const removeTab = () => {
-        setOpenRemoveTabModal(false);
-
-        version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
-        version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
-        processQuestionnaireVersion(version);
-        setIsDirty(true)
-    }
-
     // Everything to add a tab
     const [openCreateTabModal, setOpenCreateTabModal] = useState(false);
     const [createTabName, setCreateTabName] = useState('');
-    const handleCreateTabNameChange = (name: string) => {
-        setCreateTabName(name);
-    };
     const createTab = () => {
         if (!version.tabs) {
             version.tabs = []
@@ -204,6 +233,46 @@ function QuestionnaireVersion() {
         processQuestionnaireVersion(version);
         setIsDirty(true)
     }
+
+    // Everything to edit a tab name
+    const [openEditTabModal, setOpenEditTabModal] = useState(false);
+    const [tabToEdit, setTabToEdit] = useState<Tab>();
+    const [editedTabName, setEditedTabName] = useState<string>('');
+    const handleEditTab = (n: number) => {
+        if(tabs && tabs[n]){
+            setOpenEditTabModal(true);
+            setTabToEdit(tabs[n]);
+            setEditedTabName(tabs[n]?.tabName || "");
+        }
+    };
+    const editTabName = () => {
+        setOpenEditTabModal(false);
+        version.questions = version.questions?.map(q => {
+            if(q.tab == tabToEdit?.tabName){
+                q.tab = editedTabName;
+            }
+            return q;
+        });
+        version.tabs = (version.tabs || []).map(t => t == tabToEdit?.tabName ? editedTabName : t)
+        processQuestionnaireVersion(version);
+        setIsDirty(true)
+    };
+
+    // Everything to remove a tab and it's questions
+    const [openRemoveTabModal, setOpenRemoveTabModal] = useState(false);
+    const [tabToRemove, setTabToRemove] = useState<Tab>();
+    const handleRemoveTab = (n: number) => {
+        setOpenRemoveTabModal(true);
+        setTabToRemove(tabs[n])
+    };
+    const removeTab = () => {
+        setOpenRemoveTabModal(false);
+
+        version.questions = version.questions?.filter(q => q.tab != tabToRemove?.tabName);
+        version.tabs = (version.tabs || []).filter(t => t != tabToRemove?.tabName)
+        processQuestionnaireVersion(version);
+        setIsDirty(true)
+    };
 
     // Everything to remove a question
     const [openRemoveQuestionModal, setOpenRemoveQuestionModal] = useState(false);
@@ -312,7 +381,6 @@ function QuestionnaireVersion() {
     const [rulePrefillFilter, setRulePrefillFilter] = useState("");
 
     const addRulePrefil = (answer: TemplatebackendQuestionnaireQuestionAnswer, n: number) => {
-        // console.log("rule prefill answerId", answerID);
         setRulePrefillModalAnswer(answer);
         setRulePrefillModalAnswerIndex(n);
         setAddRulePrefillModal(true);
@@ -356,21 +424,21 @@ function QuestionnaireVersion() {
             </div>
 
             <div className="flex flex-col mb-5">
-                <Table >
+                <Table>
                     <Table.Body className="divide-y">
-                        <Table.Row >
+                        <Table.Row key="questionnaireName">
                             <Table.HeadCell>Name</Table.HeadCell>
                             <Table.Cell>{questionnaire.name}</Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="creationDate">
                             <Table.HeadCell>Date created</Table.HeadCell>
                             <Table.Cell><TimeAgo date={questionnaire.createdAt || ''} /></Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="modificationDate">
                             <Table.HeadCell>Last modified</Table.HeadCell>
                             <Table.Cell><TimeAgo date={questionnaire.updatedAt || ''} /></Table.Cell>
                         </Table.Row>
-                        <Table.Row >
+                        <Table.Row key="questionnaireVersion">
                             <Table.HeadCell>Version</Table.HeadCell>
                             <Table.Cell>{version.version || ''}</Table.Cell>
                         </Table.Row>
@@ -379,94 +447,160 @@ function QuestionnaireVersion() {
             </div>
 
             <div className="flex flex-col w-full">
-                <div className="overflow-auto border rounded-t-lg scroll-mt-2 shadow">
-                    <ul className="flex flex-row">
+                <div className="overflow-auto border rounded-t-lg shadow">
+                    <ul className="flex flex-row justify-between h-full">
                         {tabs.map((tab, n) => (
                             <li
                                 key={`tab${n}`}
                                 draggable={true}
-                                onDragStart={() => handleDragStart(n)}
-                                onDragOver={handleDragOver}
-                                onDrop={() => handleDrop(n)}
-                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-grab text-md text-gray-600 
-                                    ${activeTabIndex === n && 'border-t-2 border-gray-400 bg-gray-50'}
+                                onDragStart={() => handleDragTabStart(n)}
+                                onDragOver={(e) => handleDragTabOver(e, n)}
+                                onDrop={() => handleDropTab(n)}
+                                className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-pointer text-md text-gray-600 
+                                    ${draggedOverTabIndex === n && draggedTabIndex !== n ? 'bg-blue-50' : ''}
+                                    ${activeTabIndex === n ? 'border-t-2 border-gray-400 bg-gray-50' : ''}
                                 `}
                                 onClick={() => setActiveTabIndex(n)}
                             >
-                                <div className="flex items-center px-2 justify-between">
+                                <div className="flex items-center px-2 justify-between h-full">
+                                    <div className="pr-3">
+                                        <MdDragIndicator className="cursor-grab" />
+                                    </div>
+
                                     <div className="flex items-center">
                                         <span className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
                                             {n + 1}
                                         </span>
                                         <h3 className="font-medium leading-tight pl-2 pr-2">{tab.tabName}</h3>
                                     </div>
-                                    
-                                    <span className="p-2 hover:cursor-pointer hover:bg-gray-200 rounded-lg" onClick={() => removeTabConfirmation(n)}>
-                                        <HiTrash />
-                                    </span>
+
+                                    <div className="flex flex-row">
+                                        <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => handleEditTab(n)}>
+                                            <HiPencilAlt />
+                                        </span>
+                                        <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => handleRemoveTab(n)}>
+                                            <HiTrash />
+                                        </span>
+                                    </div>
                                 </div>
                             </li>
                         ))}
-                        <button className="p-4 hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={() => setOpenCreateTabModal(true)}>
-                            <MdOutlineAdd size={20} />
-                            <span>New tab</span>
+                        <button className="px-2 pt-3 pb-4 hover:bg-gray-100 cursor-pointer flex items-center gap-1" onClick={() => setOpenCreateTabModal(true)}>
+                            <MdOutlineAdd size={25}/>
+                            <span className="text-left">New tab</span>
                         </button>
                     </ul>
                 </div>
+                
+                <div className="overflow-auto border rounded-t-none rounded-b-lg shadow">
+                    {tabs.length > 0 && (
+                        <Table className="" hoverable>
+                            <Table.Head className='rounded-t-none'>
+                                <Table.HeadCell className="w-0 p-0"/>
+                                <Table.HeadCell>Question</Table.HeadCell>
+                                <Table.HeadCell>Risk weight</Table.HeadCell>
+                                <Table.HeadCell>Answer Type</Table.HeadCell>
+                                <Table.HeadCell>Answers</Table.HeadCell>
+                                {/* <Table.HeadCell>Flag</Table.HeadCell> */}
+                                <Table.HeadCell>Tooltip</Table.HeadCell>
+                                <Table.HeadCell/>
+                            </Table.Head>
+                            <Table.Body className="divide-y">
+                                {((tabs[activeTabIndex] || {}).questions || []).map((question, i) => (
+                                    <Table.Row 
+                                        onClick={() => editQuestion(question)} 
+                                        key={`question-${i}`} 
+                                        className={`bg-white hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 cursor-pointer ${draggedOverQuestionIndex === i && draggedQuestionIndex !== i && 'bg-blue-50'}`}
+                                        draggable={true}
+                                        onDragStart={() => handleDragQuestionStart(i)}
+                                        onDragOver={(e) => handleDragQuestionOver(e, i)}
+                                        onDrop={() => handleDropQuestion(i)}
+                                    >
+                                        <Table.Cell className="w-1 p-2"><MdDragIndicator className="cursor-grab" size={16}/></Table.Cell>
+                                        <Table.Cell>{question.question}</Table.Cell>
+                                        <Table.Cell>{question.riskWeight}</Table.Cell>
+                                        <Table.Cell>{question.answerType}</Table.Cell>
+                                        <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
+                                        {/* <Table.Cell>{question.flag}</Table.Cell> */}
+                                        <Table.Cell>{question.tooltip}</Table.Cell>
+                                        <Table.Cell className="w-1 p-2">
+                                            <div className="flex flex-row">
+                                                <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={() => editQuestion(question)}>
+                                                    <HiPencilAlt size={16}/>
+                                                </span>
+                                                <span className="p-1 hover:cursor-pointer hover:bg-gray-200 rounded-lg cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
+                                                    <HiTrash size={16}/>
+                                                </span>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                )).concat(
+                                    <Table.Row key="newQuestion" className="">
+                                        <Table.Cell colSpan={8} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
+                                            <div className="flex justify-center items-center text-sm gap-2">
+                                                <MdOutlineAdd size={20}/>
+                                                <span>New question</span>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                )}
 
-                {tabs.length > 0 && (
-                    <Table className="border rounded-t-none" hoverable>
-                        <Table.Head className='rounded-t-none'>
-                            <Table.HeadCell>Question</Table.HeadCell>
-                            <Table.HeadCell>Risk weight</Table.HeadCell>
-                            <Table.HeadCell>Answer Type</Table.HeadCell>
-                            <Table.HeadCell>Answers</Table.HeadCell>
-                            <Table.HeadCell>Flag</Table.HeadCell>
-                            <Table.HeadCell>Tooltip</Table.HeadCell>
-                            <Table.HeadCell>
-                                <span className="sr-only">Action</span>
-                            </Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body className="divide-y">
-                            {((tabs[activeTabIndex] || {}).questions || []).map((question) => (
-                                <Table.Row onClick={() => editQuestion(question)} key={question.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer">
-                                    <Table.Cell>{question.question}</Table.Cell>
-                                    <Table.Cell>{question.riskWeight}</Table.Cell>
-                                    <Table.Cell>{question.answerType}</Table.Cell>
-                                    <Table.Cell className="whitespace-pre-line">{question.answers?.map(a => "• " + a.text).join('\n')}</Table.Cell>
-                                    <Table.Cell>{question.flag}</Table.Cell>
-                                    <Table.Cell>{question.tooltip}</Table.Cell>
-                                    <Table.Cell>
-                                        <div className="flex flex-row">
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={() => editQuestion(question)}>
-                                                <HiPencilAlt size={20} />
-                                            </span>
-                                            <span className="hover:bg-gray-500  hover:bg-opacity-20 cursor-pointer" onClick={(e) => {e.stopPropagation(); removeQuestionConfirmation(question)}}>
-                                                <HiTrash size={20} />
-                                            </span>
-                                        </div>
-                                    </Table.Cell>
-                                </Table.Row>
-                            )).concat(
-                                <Table.Row key="newQuestion" className="">
-                                    <Table.Cell colSpan={7} className="hover:bg-gray-50 cursor-pointer" onClick={() => createNewQuestion()}>
-                                        <div className="flex justify-center items-center text-sm gap-2">
-                                            <MdOutlineAdd size={20}/>
-                                            <span>New question</span>
-                                        </div>
-                                    </Table.Cell>
-                                </Table.Row>
-                            )}
-
-                        </Table.Body>
-                    </Table>
-                )}
+                            </Table.Body>
+                        </Table>
+                    )}
+                </div>
+                
                 
             </div>
 
 
             {/* SAVE NEW VERSION MODAL */}
             <NewQuestionnaireVersionModal show={openSaveModal}  questionnaireId={questionnaireId} questionnaireVersion={version} onSave={() => setIsDirty(false)} onClose={() => setOpenSaveModal(false)}/>
+
+            {/* CREATE TAB MODAL */}
+            <Modal show={openCreateTabModal} size="xl" onClose={() => setOpenCreateTabModal(false)} popup>
+                <Modal.Header>
+                    <p>Create new tab</p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col py-5 px-10">
+                    <TextInput
+                        placeholder="Name"
+                        required
+                        onChange={(event) => setCreateTabName(event.target.value)}
+                    />
+                </Modal.Body>
+                <Modal.Footer className="p-2 flex justify-center gap-4">
+                    <Button onClick={() => createTab()}>
+                        Create
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* EDIT TAB MODAL */}
+            <Modal show={openEditTabModal} size="xl" onClose={() => setOpenEditTabModal(false)} popup>
+                <Modal.Header>
+                    <p>Rename tab</p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col py-5 px-10">
+                    <TextInput
+                        value={editedTabName}
+                        placeholder="Name"
+                        required
+                        onChange={(event) => setEditedTabName(event.target.value)}
+                    />
+                </Modal.Body>
+                <Modal.Footer className="p-2 flex justify-center gap-4">
+                    <Button onClick={() => editTabName()}>
+                        Edit
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenEditTabModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* REMOVE TAB MODAL */}
             <Modal show={openRemoveTabModal} size="md" onClose={() => setOpenRemoveTabModal(false)} popup>
@@ -480,36 +614,14 @@ function QuestionnaireVersion() {
                         </h3>
                         <div className="flex justify-center gap-4">
                             <Button color="failure" onClick={() => removeTab()}>
-                                Yes, I'm sure
+                                Yes
                             </Button>
                             <Button color="gray" onClick={() => setOpenRemoveTabModal(false)}>
-                                No, cancel
+                                Cancel
                             </Button>
                         </div>
                     </div>
                 </Modal.Body>
-            </Modal>
-
-            {/* CREATE TAB MODAL */}
-            <Modal show={openCreateTabModal} size="xl" onClose={() => setOpenCreateTabModal(false)} popup>
-                <Modal.Header>
-                    <p>Create new tab</p>
-                </Modal.Header>
-                <Modal.Body className="flex flex-col py-5 px-10">
-                    <TextInput
-                        placeholder="Name"
-                        required
-                        onChange={(event) => handleCreateTabNameChange(event.target.value)}
-                    />
-                </Modal.Body>
-                <Modal.Footer className="p-2 flex justify-center gap-4">
-                    <Button onClick={() => createTab()}>
-                        Save
-                    </Button>
-                    <Button color="gray" onClick={() => setOpenCreateTabModal(false)}>
-                        Cancel
-                    </Button>
-                </Modal.Footer>
             </Modal>
 
             {/* REMOVE QUESTION MODAL */}
@@ -523,10 +635,10 @@ function QuestionnaireVersion() {
                         </h3>
                         <div className="flex justify-center gap-4">
                             <Button color="failure" onClick={() => removeQuestion()}>
-                                Yes, I'm sure
+                                Yes
                             </Button>
                             <Button color="gray" onClick={() => setOpenRemoveQuestionModal(false)}>
-                                No, cancel
+                                Cancel
                             </Button>
                         </div>
                     </div>
@@ -750,17 +862,17 @@ function QuestionnaireVersion() {
                                     onChange={(event) => { setRulePrefillFilter(event.target.value) }}
                                 />
                                 <Table hoverable>
+                                    <Table.Head className="border">
+                                        <Table.HeadCell>Tab</Table.HeadCell>
+                                        <Table.HeadCell>Question</Table.HeadCell>
+                                    </Table.Head>
                                     <Table.Body className="divide-y border">
-                                        <Table.Row >
-                                            <Table.Cell>Tab</Table.Cell>
-                                            <Table.Cell>Question</Table.Cell>
-                                        </Table.Row>
                                         {(version.questions || [])
                                             .filter(question =>
                                                 JSON.stringify(question).toLowerCase().includes(rulePrefillFilter)
                                             )
                                             .map((question, n) => (
-                                                <Table.Row className="cursor-pointer" onClick={() => { 
+                                                <Table.Row key={`resultQuestion${n}`} className="cursor-pointer" onClick={() => { 
                                                     setRulePrefillModalQuestion(question);
                                                     // get title and click
                                                     document.getElementById("accordion-title")?.click();
@@ -783,13 +895,12 @@ function QuestionnaireVersion() {
                                     <div className="flex flex-col">
                                         <div className='flex justify-left'>
                                             <Table >
+                                                <Table.Head className="border">
+                                                    <Table.HeadCell colSpan={2}>Answer</Table.HeadCell>
+                                                </Table.Head>
                                                 <Table.Body className="divide-y">
-                                                    <Table.Row >
-                                                        <Table.Cell>Answer</Table.Cell>
-                                                        <Table.Cell></Table.Cell>
-                                                    </Table.Row>
-                                                    {(rulePrefillModalQuestion?.answers || []).map((answer) => (
-                                                        <Table.Row >
+                                                    {(rulePrefillModalQuestion?.answers || []).map((answer, n) => (
+                                                        <Table.Row key={`resultAnswer${n}`}>
                                                             <Table.Cell>{answer.text}</Table.Cell>
                                                             <Table.Cell>
                                                                 <Button color="gray" onClick={() => {
