@@ -54,6 +54,7 @@ function RiskAssessmentArx() {
                 <DatasetSelector
                     onRowClick={handleRowClick}
                     preview
+                    download
                 />
             </div>
         </>
