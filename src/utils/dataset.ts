@@ -1,13 +1,14 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, TemplatebackendChangeTypesDatasetRequest, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetJupyterhubRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetIdentifierRequest } from '../internal/client/index';
 import { DatasetServiceRevertDatasetRequest } from '../internal/client/index';
+import { apiURL } from './apiURL';
 
 /**
  * Function to store a new dataset.
@@ -176,5 +177,20 @@ export const changeTypesDataset = async (dataset_id: number, metadata: Array<Tem
         return response;
     } catch (error) {
         console.log("Error changing the types of the dataset:" + error);
+    }
+}
+
+export const getDatasetCsvFile = async (dataset_id: number) => {
+    const initOverrides = await getAuthInitOverrides()({ 
+        init: {} as HTTPRequestInit, 
+        context: {} as any 
+    });
+
+    const url = apiURL() + `api/v1/dataset/csv/${dataset_id}`;
+    try {
+        const response = await fetch(url, initOverrides);
+        return response;
+    } catch (error) {
+        console.log("Error getting the dataset CSV file:" + error);
     }
 }
