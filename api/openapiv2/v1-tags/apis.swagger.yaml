@@ -449,6 +449,39 @@ paths:
       tags:
         - DatasetService
       x-openapi-router-controller: dataset_controller
+  /api/v1/dataset/csv/{id}:
+    get:
+      summary: Get Dataset CSVFile
+      description: This endpoint allow getting a specific user's Dataset file in CSV format.
+      operationId: DatasetService_GetDatasetCSV
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+      tags:
+        - DatasetService
+      x-openapi-router-controller: dataset_controller
   /api/v1/dataset/dataframe/{id}:
     get:
       summary: Get Dataset Dataframe

@@ -75,6 +75,12 @@ export interface DatasetServiceDeleteDatasetRequest {
     id: number;
 }
 
+export interface DatasetServiceGetDatasetCSVRequest {
+    id: number;
+    offset?: number;
+    limit?: number;
+}
+
 export interface DatasetServiceGetDatasetContentRequest {
     id: number;
     offset?: number;
@@ -199,6 +205,50 @@ export class DatasetServiceApi extends runtime.BaseAPI {
      */
     async datasetServiceDeleteDataset(requestParameters: DatasetServiceDeleteDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendDeleteDatasetReply> {
         const response = await this.datasetServiceDeleteDatasetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset file in CSV format.
+     * Get Dataset CSVFile
+     */
+    async datasetServiceGetDatasetCSVRaw(requestParameters: DatasetServiceGetDatasetCSVRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiHttpBody>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceGetDatasetCSV.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/csv/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiHttpBodyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allow getting a specific user\'s Dataset file in CSV format.
+     * Get Dataset CSVFile
+     */
+    async datasetServiceGetDatasetCSV(requestParameters: DatasetServiceGetDatasetCSVRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiHttpBody> {
+        const response = await this.datasetServiceGetDatasetCSVRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
