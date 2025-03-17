@@ -15,6 +15,10 @@ import { apiURL } from './apiURL';
  *
  * @param dataset_name The new dataset name.
  * @param datasetContent The content of the dataset.
+ * @param types The types of the columns in the dataset.
+ * @param identifiers The identifier types of the columns in the dataset.
+ * @param id_col The column that contains the unique identifier.
+ * @param original_filename The original filename of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
 export const storeDataset = async (dataset_name: string, datasetContent: string, types: string, identifiers: string, id_col: string, original_filename: string) => {
