@@ -201,7 +201,7 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
 
     const handleUpload = async () => {
         if (!idCol) {
-            showToast("error", "Please select an identifier column.");
+            showToast("error", "Please select an unique ID column.");
             return;
         }
 
