@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { getMetadata, getDatasetContent, revertDataset, getInfo, getDatasetCsv, deleteDataset, getDatasetDataframe } from "../../../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
-import { useAuth } from '~/utils/authContext';
 import {
     BiCalculator,
     BiSolidReport,
