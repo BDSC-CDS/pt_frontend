@@ -1408,6 +1408,8 @@ definitions:
         format: int64
       datasetName:
         type: string
+      originalFilename:
+        type: string
       createdAt:
         type: string
         format: date-time
@@ -1889,6 +1891,8 @@ definitions:
       identifiers:
         type: string
       isId:
+        type: string
+      originalFilename:
         type: string
     title: Create a Dataset
   templatebackendStoreDatasetResult:
