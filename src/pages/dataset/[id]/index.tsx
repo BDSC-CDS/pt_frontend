@@ -18,9 +18,6 @@ import { downloadBytesFile } from '~/utils/download';
 import { MdDelete, MdDownload } from 'react-icons/md';
 
 const DatasetPage = () => {
-    // Athentication
-    const { isLoggedIn } = useAuth();
-
     // Routing
     const router = useRouter();
     const { id } = router.query; // Get the dynamic part of the URL
@@ -36,6 +33,7 @@ const DatasetPage = () => {
     const [currentRows, setCurrentRows] = useState<number>(0); // Number of rows in the current page
     const [datasetName, setDatasetName] = useState<string>();
     const [createdAt, setCreatedAt] = useState<Date>();
+    const [datasetOriginalFilename, setDatasetOriginalFilename] = useState<string>();
     // const [pageInput, setPageInput] = useState<number>(page + 1);
 
 
@@ -68,6 +66,7 @@ const DatasetPage = () => {
         if (response?.dataset) {
             setDatasetName(response.dataset.datasetName);
             setCreatedAt(response.dataset.createdAt);
+            setDatasetOriginalFilename(response.dataset.originalFilename);
         }
     }
 
@@ -181,124 +180,118 @@ const DatasetPage = () => {
 
     return (
         <>
-            {!isLoggedIn &&
-                <p className='m-8'>Please log in to consult your datasets.</p>
-            }
-            {isLoggedIn &&
-                <>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
-                            <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
-                            <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
-                            <p><strong>Number of Rows:</strong> {nRows}</p>
-                            <p><strong>Number of Columns:</strong> {nColumns} </p>
-                        </div>
+            <div className="flex justify-between items-start mb-4">
+                <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
+                    <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
+                    <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
+                    <p><strong>Number of Rows:</strong> {nRows}</p>
+                    <p><strong>Number of Columns:</strong> {nColumns} </p>
+                    <p><strong>Original Filename:</strong> {datasetOriginalFilename} </p>
+                </div>
 
-                        <div className="flex flex-col gap-2">
-                            <button
-                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
-                                onClick={handleDownloadCSV}
-                            >
-                                <MdDownload />
-                                Download CSV
-                            </button>
-                            <button
-                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
-                                onClick={handleDownloadDataframe}
-                            >
-                                <MdDownload />
-                                Download Dataframe
-                            </button>
-                            {/* <button
-                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-red-200"
-                                onClick={handleDelete}
-                            >
-                                <MdDelete/>
-                                Delete
-                            </button> */}
-                        </div>
-                    </div>
-                    
-                    <br />
+                <div className="flex flex-col gap-2">
+                    <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                        onClick={handleDownloadCSV}
+                    >
+                        <MdDownload />
+                        Download CSV
+                    </button>
+                    <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                        onClick={handleDownloadDataframe}
+                    >
+                        <MdDownload />
+                        Download Dataframe
+                    </button>
+                    {/* <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-red-200"
+                        onClick={handleDelete}
+                    >
+                        <MdDelete/>
+                        Delete
+                    </button> */}
+                </div>
+            </div>
+            
+            <br />
 
 
-                    Actions you can perform with this dataset:
+            Actions you can perform with this dataset:
 
-                    <div className="inline-flex rounded-md shadow-sm pl-8 pb-8" role="group">
-                        <button onClick={handleTransform} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                            <BiSolidRuler className="w-3 h-3 me-2" />
-                            Rule based-deidentification
-                        </button>
-                        <button onClick={handleReverse} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                            <BiUndo className="w-3 h-3 me-2" />
-                            Reverse transformation
-                        </button>
-                        <button onClick={handleRiskAssess} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                            <BiCalculator className="w-3 h-3 me-2" />
-                            Assess risk of reidentification
-                        </button>
-                        <button onClick={handleDeidentify} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                            <BiSolidReport className="w-3 h-3 me-2" />
-                            Deidentify in a notebook using ARX
-                        </button>
-                    </div>
+            <div className="inline-flex rounded-md shadow-sm pl-8 pb-8" role="group">
+                <button onClick={handleTransform} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                    <BiSolidRuler className="w-3 h-3 me-2" />
+                    Rule based-deidentification
+                </button>
+                <button onClick={handleReverse} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                    <BiUndo className="w-3 h-3 me-2" />
+                    Reverse transformation
+                </button>
+                <button onClick={handleRiskAssess} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                    <BiCalculator className="w-3 h-3 me-2" />
+                    Assess risk of reidentification
+                </button>
+                <button onClick={handleDeidentify} type="button" className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                    <BiSolidReport className="w-3 h-3 me-2" />
+                    Deidentify in a notebook using ARX
+                </button>
+            </div>
 
-                    {/* Dataset table view */}
-                    {metadata && columns && columns[0] ? (
-                        <DataTable
-                            data={columns[0].map((_, rowIndex) => {
-                                let row: Record<string, any> = {}
-                                metadata.forEach((meta, colIndex) => {
-                                    row[`column${meta.columnId}`] = columns[colIndex]?.[rowIndex]
-                                })
-                                return row
-                            })}
-                            columns={metadata?.map((meta, index) => ({
-                                name: `column${meta.columnId}`,
-                                header: meta.columnName ? meta.columnName : `column${index}`,
-                                tooltip: (
-                                    <div className="text-sm" style={{ textTransform: 'none' }}>
-                                        <p><strong>Type:</strong> {meta.type}</p>
-                                        <p><strong>Identifier:</strong> {meta.identifier}</p>
-                                        <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
-                                    </div>
-                                )
-                            }))}
-                        />
-                    ) : (
-                        <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
-                    )}
+            {/* Dataset table view */}
+            {metadata && columns && columns[0] ? (
+                <DataTable
+                    data={columns[0].map((_, rowIndex) => {
+                        let row: Record<string, any> = {}
+                        metadata.forEach((meta, colIndex) => {
+                            row[`column${meta.columnId}`] = columns[colIndex]?.[rowIndex]
+                        })
+                        return row
+                    })}
+                    columns={metadata?.map((meta, index) => ({
+                        name: `column${meta.columnId}`,
+                        header: meta.columnName ? meta.columnName : `column${index}`,
+                        tooltip: (
+                            <div className="text-sm" style={{ textTransform: 'none' }}>
+                                <p><strong>Type:</strong> {meta.type}</p>
+                                <p><strong>Identifier:</strong> {meta.identifier}</p>
+                                <p><strong>Is the ID Column:</strong> {meta.isId ? 'Yes' : 'No'}</p>
+                            </div>
+                        )
+                    }))}
+                />
+            ) : (
+                <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
+            )}
 
-                    {/* Pagination Controls */}
-                    <div className='flex justify-center items-center  space-x-2 mt-4 '>
-                        <span className='flex justify-center '>Page </span>
-                        <input
-                            type="number"
-                            min="1"
-                            max={Math.ceil(nRows / limit)}
-                            value={page + 1}
-                            onChange={handlePageInputChange}
-                            className="border rounded w-16 p-1 text-center"
-                        />
-                    </div>
-                    <div className="flex justify-end items-center  space-x-2 mt-2">
-                        <button
-                            className={`p-2 w-24 rounded ${page === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-200'}`}
-                            onClick={handlePrevPage}
-                            disabled={page === 0}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            className={`p-2 w-24 rounded ${((page + 1) * limit >= nRows) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-200'}`}
-                            onClick={handleNextPage}
-                            disabled={(page + 1) * limit >= nRows}
-                        >
-                            Next
-                        </button>
-                    </div>
-                </>
-            }
+            {/* Pagination Controls */}
+            <div className='flex justify-center items-center  space-x-2 mt-4 '>
+                <span className='flex justify-center '>Page </span>
+                <input
+                    type="number"
+                    min="1"
+                    max={Math.ceil(nRows / limit)}
+                    value={page + 1}
+                    onChange={handlePageInputChange}
+                    className="border rounded w-16 p-1 text-center"
+                />
+            </div>
+            <div className="flex justify-end items-center  space-x-2 mt-2">
+                <button
+                    className={`p-2 w-24 rounded ${page === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-200'}`}
+                    onClick={handlePrevPage}
+                    disabled={page === 0}
+                >
+                    Previous
+                </button>
+                <button
+                    className={`p-2 w-24 rounded ${((page + 1) * limit >= nRows) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-200'}`}
+                    onClick={handleNextPage}
+                    disabled={(page + 1) * limit >= nRows}
+                >
+                    Next
+                </button>
+            </div>
         </>
     );
 };
