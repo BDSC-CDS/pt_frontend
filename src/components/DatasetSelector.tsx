@@ -1,6 +1,6 @@
 
 import { useRouter } from 'next/router';
-import { getDatasetCsvFile, listDatasets } from "../utils/dataset"
+import { getDatasetCsv, listDatasets } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import DataTable from '~/components/DataTable';
@@ -104,7 +104,7 @@ const DatasetSelector = ({
     const handleDownload = async (id: number | undefined) => {
         if (id) {
             try {
-                const response = await getDatasetCsvFile(id);
+                const response = await getDatasetCsv(id);
                 if (!response) {
                     throw new Error('No response from the server');
                 }

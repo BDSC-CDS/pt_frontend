@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { deleteDataset, getDatasetCsvFile } from "../utils/dataset"
+import { deleteDataset, getDatasetCsv } from "../utils/dataset"
 import DatasetSelector from '~/components/DatasetSelector';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
@@ -52,7 +52,7 @@ function Dataset() {
     const handleDownload = async (id: number | undefined) => {
         if (id) {
             try {
-                const response = await getDatasetCsvFile(id);
+                const response = await getDatasetCsv(id);
                 if (!response) {
                     throw new Error('No response from the server');
                 }

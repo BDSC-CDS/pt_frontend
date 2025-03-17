@@ -180,13 +180,28 @@ export const changeTypesDataset = async (dataset_id: number, metadata: Array<Tem
     }
 }
 
-export const getDatasetCsvFile = async (dataset_id: number) => {
+export const getDatasetCsv = async (dataset_id: number) => {
     const initOverrides = await getAuthInitOverrides()({ 
         init: {} as HTTPRequestInit, 
         context: {} as any 
     });
 
     const url = apiURL() + `api/v1/dataset/csv/${dataset_id}`;
+    try {
+        const response = await fetch(url, initOverrides);
+        return response;
+    } catch (error) {
+        console.log("Error getting the dataset CSV file:" + error);
+    }
+}
+
+export const getDatasetDataframe = async (dataset_id: number) => {
+    const initOverrides = await getAuthInitOverrides()({ 
+        init: {} as HTTPRequestInit, 
+        context: {} as any 
+    });
+
+    const url = apiURL() + `api/v1/dataset/dataframe/${dataset_id}`;
     try {
         const response = await fetch(url, initOverrides);
         return response;
