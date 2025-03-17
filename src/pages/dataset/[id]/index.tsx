@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { getMetadata, getDatasetContent, revertDataset, getInfo, getDatasetCsvFile, deleteDataset } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent, revertDataset, getInfo, getDatasetCsv, deleteDataset, getDatasetDataframe } from "../../../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
@@ -103,16 +103,34 @@ const DatasetPage = () => {
         }
     }
 
-    const handleDownload = async () => {
+    const handleDownloadCSV = async () => {
         if (datasetId) {
             try {
-                const response = await getDatasetCsvFile(datasetId);
+                const response = await getDatasetCsv(datasetId);
                 if (!response) {
                     throw new Error('No response from the server');
                 }
 
                 const data = await response.blob();
                 downloadBytesFile(`dataset_${datasetId}.csv`, data);
+            } catch (error) {
+                showToast("error", "Error while trying to download the dataset: " + error)
+            } finally {
+                showToast("success", "Dataset successfully downloaded.")
+            }
+        }
+    }
+
+    const handleDownloadDataframe = async () => {
+        if (datasetId) {
+            try {
+                const response = await getDatasetDataframe(datasetId);
+                if (!response) {
+                    throw new Error('No response from the server');
+                }
+
+                const data = await response.blob();
+                downloadBytesFile(`dataset_${datasetId}.parquet`, data);
             } catch (error) {
                 showToast("error", "Error while trying to download the dataset: " + error)
             } finally {
@@ -179,10 +197,17 @@ const DatasetPage = () => {
                         <div className="flex flex-col gap-2">
                             <button
                                 className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
-                                onClick={handleDownload}
+                                onClick={handleDownloadCSV}
                             >
                                 <MdDownload />
-                                Download
+                                Download CSV
+                            </button>
+                            <button
+                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                                onClick={handleDownloadDataframe}
+                            >
+                                <MdDownload />
+                                Download Dataframe
                             </button>
                             {/* <button
                                 className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-red-200"
