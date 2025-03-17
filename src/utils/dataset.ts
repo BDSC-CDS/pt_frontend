@@ -14,17 +14,18 @@ import { apiURL } from './apiURL';
  * Function to store a new dataset.
  *
  * @param dataset_name The new dataset name.
- * @param dataset The content of the dataset.
+ * @param datasetContent The content of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
-export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string, id_col: string) => {
+export const storeDataset = async (dataset_name: string, datasetContent: string, types: string, identifiers: string, id_col: string, original_filename: string) => {
     const d: DatasetServiceStoreDatasetRequest = {
         body: {
             datasetName: dataset_name,
-            dataset: dataset,
+            dataset: datasetContent,
             types: types,
             identifiers: identifiers,
             isId: id_col,
+            originalFilename: original_filename
         }
     };
 
