@@ -37,6 +37,7 @@ function DeidentificationNotebook() {
                 <DatasetSelector
                     onRowClick={handleRowClick}
                     preview
+                    download
                 />
             </div>
         </>

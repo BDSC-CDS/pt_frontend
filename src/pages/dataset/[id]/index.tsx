@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/router';
-import { getMetadata, getDatasetContent, revertDataset, getInfo } from "../../../utils/dataset"
+import { getMetadata, getDatasetContent, revertDataset, getInfo, getDatasetCsv, deleteDataset, getDatasetDataframe } from "../../../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendMetadata } from '~/internal/client';
 import { useAuth } from '~/utils/authContext';
@@ -14,6 +14,8 @@ import {
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
+import { downloadBytesFile } from '~/utils/download';
+import { MdDelete, MdDownload } from 'react-icons/md';
 
 const DatasetPage = () => {
     // Athentication
@@ -101,6 +103,56 @@ const DatasetPage = () => {
         }
     }
 
+    const handleDownloadCSV = async () => {
+        if (datasetId) {
+            try {
+                const response = await getDatasetCsv(datasetId);
+                if (!response) {
+                    throw new Error('No response from the server');
+                }
+
+                const data = await response.blob();
+                downloadBytesFile(`dataset_${datasetId}.csv`, data);
+            } catch (error) {
+                showToast("error", "Error while trying to download the dataset: " + error)
+            } finally {
+                showToast("success", "Dataset successfully downloaded.")
+            }
+        }
+    }
+
+    const handleDownloadDataframe = async () => {
+        if (datasetId) {
+            try {
+                const response = await getDatasetDataframe(datasetId);
+                if (!response) {
+                    throw new Error('No response from the server');
+                }
+
+                const data = await response.blob();
+                downloadBytesFile(`dataset_${datasetId}.parquet`, data);
+            } catch (error) {
+                showToast("error", "Error while trying to download the dataset: " + error)
+            } finally {
+                showToast("success", "Dataset successfully downloaded.")
+            }
+        }
+    }
+
+    const handleDelete = async () => {
+        if (datasetId) {
+            try {
+                const response = await deleteDataset(datasetId);
+                console.log("Dataset successfully deleted.")
+                router.push("/dataset")
+            } catch (error) {
+                console.error("Error while trying to delete a dataset: ", error)
+            } finally {
+                showToast("success", "Dataset successfully deleted.")
+            }
+        }
+    }
+
     const handleTransform = async () => {
         if (datasetId) {
             router.push(`/rule-based-deid/${datasetId}`);
@@ -134,12 +186,39 @@ const DatasetPage = () => {
             }
             {isLoggedIn &&
                 <>
-                    <div className="bg-gray-100 p-5 rounded-lg shadow text-md ">
-                        <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
-                        <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
-                        <p><strong>Number of Rows:</strong> {nRows}</p>
-                        <p><strong>Number of Columns:</strong> {nColumns} </p>
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
+                            <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
+                            <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
+                            <p><strong>Number of Rows:</strong> {nRows}</p>
+                            <p><strong>Number of Columns:</strong> {nColumns} </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <button
+                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                                onClick={handleDownloadCSV}
+                            >
+                                <MdDownload />
+                                Download CSV
+                            </button>
+                            <button
+                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                                onClick={handleDownloadDataframe}
+                            >
+                                <MdDownload />
+                                Download Dataframe
+                            </button>
+                            {/* <button
+                                className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-red-200"
+                                onClick={handleDelete}
+                            >
+                                <MdDelete/>
+                                Delete
+                            </button> */}
+                        </div>
                     </div>
+                    
                     <br />
 
 

@@ -1,14 +1,15 @@
 
 import { useRouter } from 'next/router';
-import { listDatasets } from "../utils/dataset"
+import { getDatasetCsv, listDatasets } from "../utils/dataset"
 import { useEffect, useState } from 'react';
 import { TemplatebackendDataset } from '~/internal/client';
 import DataTable from '~/components/DataTable';
 import DatasetPreviewModal from './modals/DatasetPreviewModal';
-import { MdSearch } from 'react-icons/md';
+import { MdDownload, MdSearch } from 'react-icons/md';
 import { showToast } from '~/utils/showToast';
 import Spinner from './ui/Spinner';
 import DatasetUploadModal from './modals/DatasetUploadModal';
+import { downloadBytesFile } from '~/utils/download';
 
 
 interface DatasetSelectorProps {
@@ -18,12 +19,14 @@ interface DatasetSelectorProps {
         callback: (row: number | undefined) => void;
     }[];
     preview?: boolean;
+    download?: boolean;
 };
 
 const DatasetSelector = ({
     actions,
     onRowClick,
     preview,
+    download
 }: DatasetSelectorProps): JSX.Element => {
     const router = useRouter();
 
@@ -98,6 +101,25 @@ const DatasetSelector = ({
         }
     }
 
+    const handleDownload = async (id: number | undefined) => {
+        if (id) {
+            try {
+                const response = await getDatasetCsv(id);
+                if (!response) {
+                    throw new Error('No response from the server');
+                }
+
+                const data = await response.blob();
+                downloadBytesFile(`dataset_${id}.csv`, data);
+            } catch (error) {
+                showToast("error", "Error while trying to download the dataset: " + error)
+            } finally {
+                showToast("success", "Dataset successfully downloaded.")
+            }
+        }
+    };
+
+
     return (
         <>
             {isLoading ? (
@@ -117,6 +139,7 @@ const DatasetSelector = ({
                         ]}
                         onRowClick={(row) => handleRowClick(row.id)}
                         leftIconActions={preview ? [{Icon: MdSearch, tooltip: "Preview", callback: (row:any) => handlePreview(row.id)}] : undefined}
+                        rightIconActions={download ? [{Icon: MdDownload, tooltip: "Download", callback: (row:any) => handleDownload(row.id)}] : undefined}
                         actions={mappedActions}
                         addRow={{
                             label: "New dataset",

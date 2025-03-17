@@ -1,9 +1,10 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { deleteDataset } from "../utils/dataset"
+import { deleteDataset, getDatasetCsv } from "../utils/dataset"
 import DatasetSelector from '~/components/DatasetSelector';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
+import { downloadBytesFile } from '~/utils/download';
 
 function Dataset() {
     // Routing
@@ -48,6 +49,24 @@ function Dataset() {
         }
     };
 
+    const handleDownload = async (id: number | undefined) => {
+        if (id) {
+            try {
+                const response = await getDatasetCsv(id);
+                if (!response) {
+                    throw new Error('No response from the server');
+                }
+                
+                const data = await response.blob();
+                downloadBytesFile(`dataset_${id}.csv`, data);
+            } catch (error) {
+                showToast("error", "Error while trying to download the dataset: " + error)
+            } finally {
+                showToast("success", "Dataset successfully downloaded.")
+            }
+        }
+    };
+
     return (
         <>
             <Head>
@@ -64,6 +83,7 @@ function Dataset() {
                         { name: "Rule-based DeID", callback: (id) => handleTransform(id) },
                         { name: "Formal DeID", callback: (id) => handleOpenDeidentificationNotebook(id) },
                         { name: "Assess risk", callback: (id) => handleAssessRisk(id) },
+                        { name: "Download", callback: (id) => handleDownload(id) },
                         { name: "Delete", callback: (id) => handleDelete(id) },
                     ]}
                     preview

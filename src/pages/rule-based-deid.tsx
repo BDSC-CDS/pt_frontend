@@ -37,6 +37,7 @@ function RuleBasedDeid() {
                 <DatasetSelector
                     onRowClick={handleRowClick}
                     preview
+                    download
                 />
             </div>
         </>
