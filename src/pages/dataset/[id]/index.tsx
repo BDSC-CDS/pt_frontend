@@ -14,7 +14,10 @@ import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
 import { downloadBytesFile } from '~/utils/download';
-import { MdDelete, MdDownload } from 'react-icons/md';
+import { MdDelete, MdDownload, MdEdit } from 'react-icons/md';
+import { HiPencilAlt } from 'react-icons/hi';
+import DatasetEditMetadataModal from '~/components/modals/DatasetEditMetadataModal';
+import DatasetRenameModal from '~/components/modals/DatasetRenameModal';
 
 const DatasetPage = () => {
     // Routing
@@ -33,6 +36,8 @@ const DatasetPage = () => {
     const [datasetName, setDatasetName] = useState<string>();
     const [createdAt, setCreatedAt] = useState<Date>();
     const [datasetOriginalFilename, setDatasetOriginalFilename] = useState<string>();
+    const [showRenameModal, setShowRenameModal] = useState(false);
+    const [showEditMetadataModal, setShowEditMetadataModal] = useState(false);
     // const [pageInput, setPageInput] = useState<number>(page + 1);
 
 
@@ -70,16 +75,26 @@ const DatasetPage = () => {
     }
 
     useEffect(() => {
-        if (id) {
+        const handleRouteChange = () => {
             try {
                 getDatasetMetadata();
                 getDatasetInfo();
                 getAndProcessDatasetContent();
             } catch (error) {
-                showToast("error", "Error retrieving dataset data.")
-            }
-        }
-    }, [id, page, limit]);
+                showToast("error", "Error retrieving dataset data.")}
+        };
+
+        // Attach event listener
+        router.events.on('routeChangeComplete', handleRouteChange);
+
+        // Initial load
+        handleRouteChange();
+
+        // Clean up event listener on unmount
+        return () => {
+            router.events.off('routeChangeComplete', handleRouteChange);
+        };
+    }, [id, page, limit, router.events]);
 
     // Event handlers
     const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,7 +194,7 @@ const DatasetPage = () => {
 
     return (
         <>
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-center mb-4">
                 <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
                     <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
                     <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
@@ -188,7 +203,21 @@ const DatasetPage = () => {
                     <p><strong>Original Filename:</strong> {datasetOriginalFilename} </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
+                    <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                        onClick={() => setShowRenameModal(true)}
+                    >
+                        <HiPencilAlt />
+                        Rename Dataset
+                    </button>
+                    <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                        onClick={() => setShowEditMetadataModal(true)}
+                    >
+                        <MdEdit />
+                        Edit Metadata
+                    </button>
                     <button
                         className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
                         onClick={handleDownloadCSV}
@@ -212,6 +241,12 @@ const DatasetPage = () => {
                     </button> */}
                 </div>
             </div>
+
+            {/* DatasetRenameModal modal */}
+            <DatasetRenameModal show={showRenameModal} onClose={() => setShowRenameModal(false)} datasetId={datasetId} datasetName={datasetName || ""} />
+
+            {/* DatasetEditMetadata modal */}
+            <DatasetEditMetadataModal show={showEditMetadataModal} onClose={() => setShowEditMetadataModal(false)} datasetId={datasetId} />
             
             <br />
 

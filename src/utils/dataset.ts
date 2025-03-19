@@ -1,7 +1,7 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit, DatasetServiceUpdateDatasetNameOperationRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
@@ -172,6 +172,7 @@ export const revertDataset = async (dataset_id: number) => {
 
 export const changeTypesDataset = async (dataset_id: number, metadata: Array<TemplatebackendMetadata>) => {
     const request: DatasetServiceChangeTypesDatasetRequest = {
+
         body: {
             datasetId: dataset_id,
             metadata: metadata
@@ -212,5 +213,21 @@ export const getDatasetDataframe = async (dataset_id: number) => {
         return response;
     } catch (error) {
         console.log("Error getting the dataset CSV file:" + error);
+    }
+}
+
+export const updateDatasetName = async (dataset_id: number, dataset_name: string) => {
+    const request: DatasetServiceUpdateDatasetNameOperationRequest = {
+        id: dataset_id,
+        body: {
+            name: dataset_name
+        }
+    }
+
+    try {
+        const response = await apiClientDataset.datasetServiceUpdateDatasetName(request, getAuthInitOverrides());
+        return response;
+    } catch (error) {
+        console.log("Error updating the dataset name:" + error);
     }
 }
