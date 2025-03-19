@@ -99,7 +99,7 @@ export default function DatasetEditMetadataModal({ show, datasetId, onClose }: D
     }
 
     const setColumnType = (columnId: number, type: string) => {
-        if (sampleData[columnId] && !validateColumnType(type, sampleData[columnId])) {
+        if (sampleData[columnId] && !validateColumnType(type, sampleData[columnId] || [])) {
             showToast("error", `Invalid type selected. Please choose a compatible type.`);
             return;
         }
