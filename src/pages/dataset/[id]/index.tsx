@@ -81,7 +81,8 @@ const DatasetPage = () => {
                 getDatasetInfo();
                 getAndProcessDatasetContent();
             } catch (error) {
-                showToast("error", "Error retrieving dataset data.")}
+                showToast("error", "Error retrieving dataset data.")
+            }
         };
 
         // Attach event listener
@@ -187,13 +188,13 @@ const DatasetPage = () => {
             if (response && response?.id) {
                 router.push(`/dataset/${response.id}`);
             } else {
-                alert("The dataset has not been transformed and therefore cannot be reversed.");
+                showToast("error", "The dataset has not been transformed yet.");
             }
         }
     };
 
     return (
-        <>
+        <> 
             <div className="flex justify-between items-center mb-4">
                 <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
                     <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
