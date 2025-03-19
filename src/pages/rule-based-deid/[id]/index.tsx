@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
 import { showToast } from '~/utils/showToast';
+import DatasetEditMetadataModal from '~/components/modals/DatasetEditMetadataModal';
 
 const TransformPage = () => {
 
@@ -291,37 +292,6 @@ const TransformPage = () => {
         setShowColTypeModal(true);
     };
 
-    const setColumnType = (column: string | undefined, type: string) => {
-        if (column && newMetadata) {
-            // Update the newMetadata array
-            const updatedMetadata = newMetadata.map(meta => {
-                if (meta.columnName === column) {
-                    return { ...meta, type: type };
-                }
-                return meta;
-            });
-            setNewMetadata(updatedMetadata); // Update the newMetadata state
-        };
-    };
-    const setColumnIdentifying_ = (column: string | undefined, newIdentifier: string) => {
-        if (column && newMetadata) {
-            const updatedMetadata = newMetadata.map(meta => {
-                if (meta.columnName === column) {
-                    return { ...meta, identifier: newIdentifier };
-                }
-                return meta;
-            });
-            setNewMetadata(updatedMetadata); // Update the newMetadata state
-        }
-    };
-
-    useEffect(() => {
-        setConfig(prev => ({
-            ...prev,
-            scrambleFieldFields: selectedScrambleFields
-        }));
-    }, [selectedScrambleFields]);
-
     useEffect(() => {
         if (id) {
             try {
@@ -405,36 +375,6 @@ const TransformPage = () => {
         }
         setShowColTypeModal(false);
     };
-
-    const handleChangeTypes = async () => {
-        // if the types have not changed from the original types
-        if (!newMetadata || JSON.stringify(newMetadata) === JSON.stringify(metadata)) {
-            closeColumnTypeModal();
-            return;
-        }
-        try {
-
-            const updatedMetadata = newMetadata.map(meta => ({
-                ...meta,
-                isId: meta.columnName === idCol // Ensure that isId is correct before sending
-            }));
-
-            const response = await changeTypesDataset(datasetId, updatedMetadata);
-            // Implement the transformation logic for selected configurations
-            if (response?.id) {
-                router.push("/dataset/" + response.id);
-                closeColumnTypeModal();
-            }
-        } catch (error) {
-            // Safely check if error is an instance of Error
-            if (error instanceof Error) {
-                setErrorMessage(error.message);
-            } else {
-                setErrorMessage('An unexpected error occurred');
-            }
-            setShowErrorModal(true);
-        }
-    }
 
     const nonIdentifyingColumns = useMemo(() => {
         return metadata?.filter((meta) => meta.identifier === 'non-identifying');
@@ -583,65 +523,7 @@ const TransformPage = () => {
                 </Modal>
 
                 {/* Modal to change the column types */}
-                <Modal
-                    show={showColTypeModal}
-                    onClose={() => closeColumnTypeModal()}
-                >
-                    <Modal.Header>
-                        Change Column Types
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between font-bold">
-                                <span className="w-1/2">Column Name</span>
-                                <div className="flex space-x-4 w-1/2">
-                                    <span className="w-1/2">Type</span>
-                                    <span className="w-1/2">Identifier</span>
-                                    <span className="w-1/3">Is Identifier?</span>
-                                </div>
-                            </div>
-                            {newMetadata?.map(meta => (
-                                <>
-                                    <div key={meta.columnId} className="flex items-center justify-between">
-                                        <span className="w-1/2">{meta.columnName}:</span>
-                                        <div className="flex space-x-4 w-1/2">
-                                            <select
-                                                value={meta.type}
-                                                onChange={(e) => setColumnType(meta.columnName, e.target.value)}
-                                                className="select select-bordered w-1/2"
-                                            >
-                                                <option value="string">String</option>
-                                                <option value="int">Integer</option>
-                                                <option value="float">Float</option>
-                                                <option value="date">Date</option>
-                                            </select>
-                                            <select
-                                                value={meta.identifier}
-                                                onChange={(e) => setColumnIdentifying_(meta.columnName, e.target.value)}
-                                                className="select select-bordered w-1/2"
-                                            >
-                                                <option value="identifier">Identifier</option>
-                                                <option value="quasi-identifier">Quasi-identifier</option>
-                                                <option value="non-identifying">Non-identifying</option>
-                                            </select>
-                                            <input
-                                                type="radio"
-                                                name="identifier-column"  // Radio group name should be the same for all
-                                                checked={idCol === meta.columnName}
-                                                onChange={() => setIdCol(meta.columnName)}
-                                                className="radio radio-bordered"
-                                            />
-                                        </div>
-                                    </div>
-                                </>))
-                            }
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer className='flex justify-between'>
-                        <Button className='bg-gray-400' onClick={() => closeColumnTypeModal()}>Close</Button>
-                        <Button onClick={() => handleChangeTypes()}>Save</Button>
-                    </Modal.Footer>
-                </Modal>
+                <DatasetEditMetadataModal show={showColTypeModal} datasetId={datasetId} onClose={() => setShowColTypeModal(false)} />
 
                 {/* Dataset preview*/}
                 <div className='flex flex-col w-full'>
