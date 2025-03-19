@@ -3,8 +3,8 @@ import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../u
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
 import { MdOutlineAdd, MdMoreHoriz, MdFileUpload } from "react-icons/md";
-import { Button, Modal, Alert, Tooltip } from 'flowbite-react';
-import { transformDataset, getMetadata, getDatasetIdentifier, changeTypesDataset, getInfo } from "../../../utils/dataset";
+import { Button, Modal, Alert } from 'flowbite-react';
+import { transformDataset, getMetadata, getDatasetIdentifier, getInfo } from "../../../utils/dataset";
 import { saveAs } from 'file-saver';
 import DataTable from '~/components/DataTable';
 import withAuth from '~/components/withAuth';
@@ -53,9 +53,7 @@ const TransformPage = () => {
     const [hassubFieldRegex, setHassubFieldRegex] = useState(false);
     const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
     const [metadata, setMetadata] = useState<Array<TemplatebackendMetadata>>();
-    const [idMetadata, setIDMetadata] = useState<Array<TemplatebackendMetadata>>();
     const [filteredMetadata, setFilteredMetadata] = useState<Array<TemplatebackendMetadata>>();
-    const [newMetadata, setNewMetadata] = useState<Array<TemplatebackendMetadata>>([]);
     const [selectedScrambleFields, setSelectedScrambleFields] = useState<Array<string>>([]);
     const [selectedSubListField, setSelectedSubListField] = useState("");
     const [selectedSubRegexField, setSelectedSubRegexField] = useState("");
@@ -67,7 +65,6 @@ const TransformPage = () => {
     const [showColTypeModal, setShowColTypeModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-    const [idCol, setIdCol] = useState<string>();
     const [datasetName, setDatasetName] = useState<string>();
     const [createdAt, setCreatedAt] = useState<Date>();
     const [showImportModal, setShowImportModal] = useState(false);
@@ -211,9 +208,6 @@ const TransformPage = () => {
         const response = await getMetadata(datasetId);
         if (response?.metadata?.metadata) {
             setMetadata(response.metadata.metadata);
-            setNewMetadata(JSON.parse(JSON.stringify(response.metadata.metadata)));
-            const identifierMetadata = response.metadata.metadata.filter(item => (item.identifier === "identifier" || item.identifier === "quasi-identifier"));
-            setIDMetadata(identifierMetadata);
             const filteredMetadata = response.metadata.metadata.filter(item => ((item.type === "int" || item.type === "float" || item.type === "string") && (item.identifier === "identifier" || item.identifier === "quasi-identifier")));
             setFilteredMetadata(filteredMetadata);
             if (filteredMetadata.length > 0 && filteredMetadata[0] && filteredMetadata[0].columnName) {
@@ -227,11 +221,6 @@ const TransformPage = () => {
                     ...prev,
                     ['subFieldRegexField']: filteredMetadata[0]?.columnName
                 }));
-            }
-            // set the original id column
-            const originalIdCol = response.metadata.metadata.find((meta) => meta.isId)?.columnName;
-            if (originalIdCol) {
-                setIdCol(originalIdCol); // Reset idCol to original identifier column
             }
 
             //set the number of columns
@@ -362,19 +351,7 @@ const TransformPage = () => {
 
             setFilteredConfigs(filtered);  // Set the filtered configurations
         }
-    }, [configs, metadata]);
-
-
-
-    const closeColumnTypeModal = () => {
-        // Close the modal and reset newMetadata back to the original metadata
-        setNewMetadata(JSON.parse(JSON.stringify(metadata))); // Reset to original values
-        const originalIdCol = metadata?.find((meta) => meta.isId)?.columnName;
-        if (originalIdCol) {
-            setIdCol(originalIdCol); // Reset idCol to original identifier column
-        }
-        setShowColTypeModal(false);
-    };
+    }, [configs, metadata]);  
 
     const nonIdentifyingColumns = useMemo(() => {
         return metadata?.filter((meta) => meta.identifier === 'non-identifying');
