@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   ApiHttpBody,
+  DatasetServiceUpdateDatasetNameRequest,
   RpcStatus,
   TemplatebackendChangeTypesDatasetReply,
   TemplatebackendChangeTypesDatasetRequest,
@@ -31,10 +32,13 @@ import type {
   TemplatebackendStoreDatasetRequest,
   TemplatebackendTransformDatasetReply,
   TemplatebackendTransformDatasetRequest,
+  TemplatebackendUpdateDatasetNameReply,
 } from '../models/index';
 import {
     ApiHttpBodyFromJSON,
     ApiHttpBodyToJSON,
+    DatasetServiceUpdateDatasetNameRequestFromJSON,
+    DatasetServiceUpdateDatasetNameRequestToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
     TemplatebackendChangeTypesDatasetReplyFromJSON,
@@ -65,6 +69,8 @@ import {
     TemplatebackendTransformDatasetReplyToJSON,
     TemplatebackendTransformDatasetRequestFromJSON,
     TemplatebackendTransformDatasetRequestToJSON,
+    TemplatebackendUpdateDatasetNameReplyFromJSON,
+    TemplatebackendUpdateDatasetNameReplyToJSON,
 } from '../models/index';
 
 export interface DatasetServiceChangeTypesDatasetRequest {
@@ -126,6 +132,11 @@ export interface DatasetServiceStoreDatasetRequest {
 
 export interface DatasetServiceTransformDatasetRequest {
     body: TemplatebackendTransformDatasetRequest;
+}
+
+export interface DatasetServiceUpdateDatasetNameOperationRequest {
+    id: number;
+    body: DatasetServiceUpdateDatasetNameRequest;
 }
 
 /**
@@ -646,6 +657,49 @@ export class DatasetServiceApi extends runtime.BaseAPI {
      */
     async datasetServiceTransformDataset(requestParameters: DatasetServiceTransformDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendTransformDatasetReply> {
         const response = await this.datasetServiceTransformDatasetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint renames a dataset
+     * Rename a dataset
+     */
+    async datasetServiceUpdateDatasetNameRaw(requestParameters: DatasetServiceUpdateDatasetNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdateDatasetNameReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceUpdateDatasetName.');
+        }
+
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceUpdateDatasetName.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DatasetServiceUpdateDatasetNameRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendUpdateDatasetNameReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint renames a dataset
+     * Rename a dataset
+     */
+    async datasetServiceUpdateDatasetName(requestParameters: DatasetServiceUpdateDatasetNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdateDatasetNameReply> {
+        const response = await this.datasetServiceUpdateDatasetNameRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

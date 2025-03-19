@@ -709,6 +709,36 @@ paths:
       tags:
         - DatasetService
       x-openapi-router-controller: dataset_controller
+    put:
+      summary: Rename a dataset
+      description: This endpoint renames a dataset
+      operationId: DatasetService_UpdateDatasetName
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendUpdateDatasetNameReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+      tags:
+        - DatasetService
+      x-openapi-router-controller: dataset_controller
   /api/v1/hello:
     get:
       summary: Get a hello
@@ -1921,6 +1951,16 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendUpdateDatasetNameReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendUpdateDatasetNameResult'
+  templatebackendUpdateDatasetNameResult:
+    type: object
+    properties:
+      success:
+        type: boolean
   templatebackendUpdatePasswordReply:
     type: object
     properties:
