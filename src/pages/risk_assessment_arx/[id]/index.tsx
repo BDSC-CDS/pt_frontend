@@ -33,17 +33,17 @@ const RiskAssessmentPage = () => {
             </div>
         );
     }
-    const riskAssessment = data?.result?.riskAssessment;
+    // explicitly typing the riskAssessment object
+    const riskAssessment = data?.result?.riskAssessment as {
+        quasi_identifiers?: string[];
+        [key: string]: any;
+    } | undefined;
 
-    const quasiIdentifiers =
-        riskAssessment && !Array.isArray(riskAssessment)
-            ? riskAssessment.quasi_identifiers
-            : [];
+    const quasiIdentifiers = riskAssessment?.quasi_identifiers ?? [];
 
-    if (!quasiIdentifiers || quasiIdentifiers.length === 0) {
+    if (quasiIdentifiers.length === 0) {
         return <div>No quasi-identifiers have been defined for this risk assessment.</div>;
     }
-
 
     const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata || {};
     const sensitiveAttributes: string[] = [];
