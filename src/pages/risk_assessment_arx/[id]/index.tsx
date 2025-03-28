@@ -29,11 +29,11 @@ const RiskAssessmentPage = () => {
             <div>
                 <div>Loading...</div>
                 <br />
-                <p>We're fetching the data. If this takes too long, it may be that no quasi-identifiers have been defined.</p>
+                <p>If loading persists, please ensure at least one quasi-identifier is defined to generate a risk assessment.</p>
             </div>
         );
     }
-    // explicitly typing the riskAssessment object
+
     const riskAssessment = data?.result?.riskAssessment as {
         quasi_identifiers?: string[];
         [key: string]: any;
