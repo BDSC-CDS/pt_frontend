@@ -7,25 +7,6 @@ import withAuth from '~/components/withAuth';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
-// Fully typed shape of the riskAssessment object
-type RiskAssessmentType = {
-  quasi_identifiers: string[];
-  risk_assessment?: {
-    resultsMetadata?: Record<
-      string,
-      {
-        attributeTypes?: {
-          sensitive?: string[];
-        };
-        risks?: {
-          initialAverageProsecutor?: number | null;
-          initialHighestProsecutor?: number | null;
-        };
-      }
-    >;
-  };
-};
-
 const RiskAssessmentPage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -35,61 +16,45 @@ const RiskAssessmentPage = () => {
   useEffect(() => {
     if (id) {
       getRiskAssessment(Number(id))
-        .then((response) => setData(response))
+        .then(response => setData(response))
         .catch(console.error);
     }
   }, [id]);
 
-  // Initial loading state
   if (data === undefined) {
     return (
-      <div className="container">
+      <div>
         <div>Loading...</div>
       </div>
     );
   }
 
-  // No data case
-  if (data === null || !data.result?.riskAssessment) {
-    return (
-      <div className="container">
-        <h2 className="text-xl font-bold mb-4">Risk assessment not available</h2>
-        <p>Unable to retrieve risk assessment data for ID: {id}</p>
-      </div>
-    );
-  }
-
-  const riskAssessment = data.result.riskAssessment as RiskAssessmentType;
-
-  const quasiIdentifiers = riskAssessment.quasi_identifiers;
+  const quasiIdentifiers = data.result?.riskAssessment;
 
   if (!Array.isArray(quasiIdentifiers) || quasiIdentifiers.length === 0) {
     return (
-      <div className="container">
+      <div>
         <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
         <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
       </div>
     );
   }
 
-  // Extract sensitive attributes and prosecutor risks
-  const resultsMetadata = riskAssessment.risk_assessment?.resultsMetadata;
+  const resultsMetadata = data.result?.resultsMetadata;
   const sensitiveAttributes: string[] = [];
   let initialAverageProsecutor: number | null = null;
   let initialHighestProsecutor: number | null = null;
 
   if (resultsMetadata && typeof resultsMetadata === 'object') {
-    Object.values(resultsMetadata).forEach((metadata) => {
+    Object.values(resultsMetadata).forEach((metadata: any) => {
       if (metadata.attributeTypes?.sensitive) {
         sensitiveAttributes.push(...metadata.attributeTypes.sensitive);
       }
-
       if (metadata.risks?.initialAverageProsecutor !== null) {
-        initialAverageProsecutor = metadata.risks.initialAverageProsecutor ?? initialAverageProsecutor;
+        initialAverageProsecutor = metadata.risks.initialAverageProsecutor;
       }
-
       if (metadata.risks?.initialHighestProsecutor !== null) {
-        initialHighestProsecutor = metadata.risks.initialHighestProsecutor ?? initialHighestProsecutor;
+        initialHighestProsecutor = metadata.risks.initialHighestProsecutor;
       }
     });
   }
@@ -100,13 +65,17 @@ const RiskAssessmentPage = () => {
 
       {/* Quasi Identifiers */}
       <div className="card">
-        <h2 className="font-semibold">Quasi Identifiers</h2>
-        <p>{quasiIdentifiers.join(', ')}</p>
+        <h2>Quasi Identifiers</h2>
+        <ul>
+          {quasiIdentifiers.map((identifier, index) => (
+            <li key={index}>{identifier}</li>
+          ))}
+        </ul>
       </div>
 
       {/* Sensitive Attributes */}
-      <div className="card mt-4">
-        <h2 className="font-semibold">Sensitive Attributes</h2>
+      <div className="card">
+        <h2>Sensitive Attributes</h2>
         <ul>
           {sensitiveAttributes.length > 0 ? (
             sensitiveAttributes.map((attr, index) => <li key={index}>{attr}</li>)
@@ -117,11 +86,11 @@ const RiskAssessmentPage = () => {
       </div>
 
       {/* Risk Gauge */}
-      <div className="card mt-4">
-        <h2 className="font-semibold mb-2">Risk Assessment</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="card">
+        <h2>Risk Assessment</h2>
+        <div className="gauge-section flex gap-8">
           <div>
-            <h3 className="mb-2">Average Prosecutor Risk</h3>
+            <h3>Average Prosecutor Risk</h3>
             <GaugeChart
               animate={false}
               arcsLength={[0.1, 0.8]}
@@ -132,7 +101,7 @@ const RiskAssessmentPage = () => {
             />
           </div>
           <div>
-            <h3 className="mb-2">Highest Prosecutor Risk</h3>
+            <h3>Highest Prosecutor Risk</h3>
             <GaugeChart
               animate={false}
               arcsLength={[0.1, 0.8]}
@@ -148,7 +117,7 @@ const RiskAssessmentPage = () => {
       {/* Benchmark Thresholds Table */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Benchmark Thresholds for Identifiable Groups</h2>
-        <table className="table-auto border-collapse border border-gray-400 w-full text-sm">
+        <table className="table-auto border-collapse border border-gray-400 w-full">
           <thead>
             <tr>
               <th className="border border-gray-400 px-4 py-2">Scenario Context (Matrix)</th>
