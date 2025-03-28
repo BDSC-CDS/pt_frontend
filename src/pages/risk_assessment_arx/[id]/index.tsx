@@ -21,26 +21,31 @@ const RiskAssessmentPage = () => {
         }
     }, [id]);
 
-    if (data === undefined) {
-        return <div><div>Loading...</div></div>;
-      }
-    
-      const riskAssessment = data.result?.riskAssessment;
-      const quasiIdentifiers = riskAssessment?.quasi_identifiers;
-    
-      if (!quasiIdentifiers || quasiIdentifiers.length === 0) {
+    if (!data) {
         return (
-          <div>
-            <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
-            <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
-          </div>
+            <div>
+                <div>Loading...</div>
+            </div>
         );
-      }
-    
-      const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata;
-      const sensitiveAttributes: string[] = [];
-      let initialAverageProsecutor: number | null = null;
-      let initialHighestProsecutor: number | null = null;
+    }
+
+    const riskAssessment = data.result?.riskAssessment;
+    const quasiIdentifiers = riskAssessment?.quasi_identifiers;
+
+    if (!Array.isArray(quasiIdentifiers) || quasiIdentifiers.length === 0) {
+        return (
+            <div>
+                <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
+                <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
+            </div>
+        );
+    }
+
+
+    const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata;
+    const sensitiveAttributes: string[] = [];
+    let initialAverageProsecutor: number | null = null;
+    let initialHighestProsecutor: number | null = null;
 
     // Check if resultsMetadata is an object and iterate through its values
     if (resultsMetadata && typeof resultsMetadata === 'object') {
