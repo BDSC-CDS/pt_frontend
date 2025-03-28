@@ -21,26 +21,30 @@ const RiskAssessmentPage = () => {
         }
     }, [id]);
 
-    if (!data) {
+    type RiskAssessmentType = {
+        quasi_identifiers: string[];
+      };
+      
+      if (!data) {
         return (
-            <div>
-                <div>Loading...</div>
-            </div>
+          <div>
+            <div>Loading...</div>
+          </div>
         );
-    }
-
-    const riskAssessment = data.result?.riskAssessment;
-    const quasiIdentifiers = riskAssessment?.quasi_identifiers;
-
-    if (!Array.isArray(quasiIdentifiers) || quasiIdentifiers.length === 0) {
+      }
+      
+      const riskAssessment = data.result?.riskAssessment as RiskAssessmentType | undefined;
+      
+      const quasiIdentifiers = riskAssessment?.quasi_identifiers;
+      
+      if (!Array.isArray(quasiIdentifiers) || quasiIdentifiers.length === 0) {
         return (
-            <div>
-                <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
-                <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
-            </div>
+          <div>
+            <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
+            <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
+          </div>
         );
-    }
-
+      }
 
     const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata;
     const sensitiveAttributes: string[] = [];
