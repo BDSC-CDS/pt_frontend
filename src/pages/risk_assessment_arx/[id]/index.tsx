@@ -21,7 +21,7 @@ const RiskAssessmentPage = () => {
         }
     }, [id]);
 
-    if (data === undefined) {
+    if (!data || !data.result?.riskAssessment) {
         return (
             <div>
                 <div>Loading...</div>
@@ -29,10 +29,9 @@ const RiskAssessmentPage = () => {
         );
     }
 
-    const riskAssessment: any = data.result?.riskAssessment!;
-    const quasiIdentifiers = riskAssessment?.quasi_identifiers;
+    const riskAssessment = data.result.riskAssessment;
+    const quasiIdentifiers = riskAssessment.quasi_identifiers;
 
-    // Show message if no quasi-identifiers
     if (!quasiIdentifiers || quasiIdentifiers.length === 0) {
         return (
             <div>
@@ -41,6 +40,7 @@ const RiskAssessmentPage = () => {
             </div>
         );
     }
+
 
 
     const riskAssessment: any = data.result?.riskAssessment!;
