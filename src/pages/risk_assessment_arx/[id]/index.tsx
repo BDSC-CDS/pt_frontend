@@ -21,16 +21,27 @@ const RiskAssessmentPage = () => {
         }
     }, [id]);
 
-    if (!data) {
+    if (data === undefined) {
         return (
             <div>
                 <div>Loading...</div>
-                <br />
-                <p>We're fetching the data. If this takes too long, it may be that no quasi-identifiers have been defined.</p>
-                <p>Please check that you specified some quasi-identifiers.</p>
             </div>
         );
     }
+
+    const riskAssessment: any = data.result?.riskAssessment!;
+    const quasiIdentifiers = riskAssessment?.quasi_identifiers;
+
+    // Show message if no quasi-identifiers
+    if (!quasiIdentifiers || quasiIdentifiers.length === 0) {
+        return (
+            <div>
+                <h2 className="text-xl font-bold mb-4">No quasi-identifiers defined</h2>
+                <p>Please define at least one quasi-identifier to generate a risk assessment.</p>
+            </div>
+        );
+    }
+
 
     const riskAssessment: any = data.result?.riskAssessment!;
     const resultsMetadata = riskAssessment?.risk_assessment?.resultsMetadata;
@@ -87,11 +98,11 @@ const RiskAssessmentPage = () => {
                 <div className="gauge-section">
                     <div>
                         <h3>Average Prosecutor Risk</h3>
-                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2}  percent={initialAverageProsecutor || 0} textColor='black' />
+                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2} percent={initialAverageProsecutor || 0} textColor='black' />
                     </div>
                     <div>
                         <h3>Highest Prosecutor Risk</h3>
-                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2}  percent={initialHighestProsecutor || 0} textColor='black' />
+                        <GaugeChart animate={false} arcsLength={[0.1, 0.8]} colors={['#2a9d8f', '#e76f51']} nrOfLevels={2} percent={initialHighestProsecutor || 0} textColor='black' />
                     </div>
                 </div>
             </div>
