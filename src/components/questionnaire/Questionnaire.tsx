@@ -360,18 +360,18 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
             <ReplySaveModal show={openSaveModal} onSave={saveReply} onClose={() => setOpenSaveModal(false)}/>
                   
             {/* All Questionnaire Tabs */}
-            <div id="all-tabs" className="flex flex-col flex-grow">
-                <div className="overflow-auto border rounded-t-lg scroll-mt-2">
-                    <ul className="flex w-full">
+            <div id="all-tabs" className="flex flex-col w-full">
+                <div className="overflow-auto border rounded-t-lg shadow">
+                    <ul className="flex flex-row justify-between h-full">
                         {tabs.map((tab, n) => (
                             <li
                                 key={`tab${n}`}
-                                className={`flex-grow text-center hover:bg-gray-100 pt-3 pb-2 cursor-pointer text-md text-gray-600 
+                                className={`flex-grow text-left hover:bg-gray-100 pt-3 pb-4 cursor-pointer text-md text-gray-600 
                                     ${activeTab === tab.id && 'border-t-2 border-gray-400 bg-gray-50'}
                                 `}
                                 onClick={() => setActiveTab(tab.id)}
                             >
-                                <div className="flex items-center px-2 justify-between">
+                                <div className="flex items-center px-2 justify-between h-full">
                                     <div className="flex items-center">
                                         <a className="flex items-center justify-center w-6 h-6 border border-gray-300 rounded-full shrink-0 ">
                                             {n + 1}
