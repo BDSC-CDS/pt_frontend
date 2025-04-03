@@ -24,7 +24,7 @@ function QuestionnaireSelectInput({question, onSelect}: QuestionnaireSelectInput
 
     return (
         <div className="relative">
-            <div className={`px-2 py-2 border rounded-lg bg-gray-50
+            <div className={`border rounded-lg bg-gray-50
                 ${question.prefilledBy
                     ? "border-blue-400"
                     : selected
@@ -36,7 +36,7 @@ function QuestionnaireSelectInput({question, onSelect}: QuestionnaireSelectInput
                     label={selected || 'Select an option'}
                     className="w-full rounded-lg"
                     renderTrigger={() => (
-                        <div className="flex items-center justify-between cursor-pointer text-sm">
+                        <div className="flex px-2 py-2 items-center justify-between cursor-pointer text-sm">
                             <span className="select-none w-11/12">
                                 {selected || 'Select an option'}
                             </span>
