@@ -289,8 +289,6 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
         content: <QuestionnaireTab
                     tabQuestions={questions[tab]}
                     setSelectedAnswer={setSelectedAnswer}
-                    getSelectedAnswer={getSelectedAnswer}
-                    isQuestionAnswered={isQuestionAnswered} 
                 />
     })).concat([{
         id: String(Object.keys(questions).length + 1),
