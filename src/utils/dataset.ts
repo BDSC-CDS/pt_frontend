@@ -225,7 +225,7 @@ export const updateDatasetName = async (dataset_id: number, dataset_name: string
     }
 
     try {
-        const response = await apiClientDataset.datasetServiceUpdateDatasetName(request, getAuthInitOverrides());
+        const response = await apiClientDataset.datasetServiceUpdateDataset(request, getAuthInitOverrides());
         return response;
     } catch (error) {
         console.log("Error updating the dataset name:" + error);
