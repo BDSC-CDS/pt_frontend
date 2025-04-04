@@ -1,7 +1,7 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit, DatasetServiceUpdateDatasetNameOperationRequest } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit, DatasetServiceUpdateDatasetOperationRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
@@ -217,7 +217,7 @@ export const getDatasetDataframe = async (dataset_id: number) => {
 }
 
 export const updateDatasetName = async (dataset_id: number, dataset_name: string) => {
-    const request: DatasetServiceUpdateDatasetNameOperationRequest = {
+    const request: DatasetServiceUpdateDatasetOperationRequest = {
         id: dataset_id,
         body: {
             name: dataset_name
