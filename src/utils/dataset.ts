@@ -1,7 +1,7 @@
 import apiClientDataset from './apiClientDataset';
 import { getAuthInitOverrides } from './authContext'
 
-import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit } from '../internal/client/index';
+import { DatasetServiceStoreDatasetRequest, DatasetServiceTransformDatasetRequest, DatasetServiceDeleteDatasetRequest, TemplatebackendMetadata, DatasetServiceChangeTypesDatasetRequest, DatasetServiceGetDatasetInfoRequest, HTTPRequestInit, DatasetServiceUpdateDatasetOperationRequest } from '../internal/client/index';
 import { DatasetServiceListDatasetsRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetMetadataRequest } from '../internal/client/index';
 import { DatasetServiceGetDatasetContentRequest } from '../internal/client/index';
@@ -14,17 +14,22 @@ import { apiURL } from './apiURL';
  * Function to store a new dataset.
  *
  * @param dataset_name The new dataset name.
- * @param dataset The content of the dataset.
+ * @param datasetContent The content of the dataset.
+ * @param types The types of the columns in the dataset.
+ * @param identifiers The identifier types of the columns in the dataset.
+ * @param id_col The column that contains the unique identifier.
+ * @param original_filename The original filename of the dataset.
  * @returns The response from the API or undefined in case of an error.
  */
-export const storeDataset = async (dataset_name: string, dataset: string, types: string, identifiers: string, id_col: string) => {
+export const storeDataset = async (dataset_name: string, datasetContent: string, types: string, identifiers: string, id_col: string, original_filename: string) => {
     const d: DatasetServiceStoreDatasetRequest = {
         body: {
             datasetName: dataset_name,
-            dataset: dataset,
+            dataset: datasetContent,
             types: types,
             identifiers: identifiers,
             isId: id_col,
+            originalFilename: original_filename
         }
     };
 
@@ -167,6 +172,7 @@ export const revertDataset = async (dataset_id: number) => {
 
 export const changeTypesDataset = async (dataset_id: number, metadata: Array<TemplatebackendMetadata>) => {
     const request: DatasetServiceChangeTypesDatasetRequest = {
+
         body: {
             datasetId: dataset_id,
             metadata: metadata
@@ -207,5 +213,21 @@ export const getDatasetDataframe = async (dataset_id: number) => {
         return response;
     } catch (error) {
         console.log("Error getting the dataset CSV file:" + error);
+    }
+}
+
+export const updateDatasetName = async (dataset_id: number, dataset_name: string) => {
+    const request: DatasetServiceUpdateDatasetOperationRequest = {
+        id: dataset_id,
+        body: {
+            name: dataset_name
+        }
+    }
+
+    try {
+        const response = await apiClientDataset.datasetServiceUpdateDataset(request, getAuthInitOverrides());
+        return response;
+    } catch (error) {
+        console.log("Error updating the dataset name:" + error);
     }
 }
