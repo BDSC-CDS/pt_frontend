@@ -16,7 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   ApiHttpBody,
-  DatasetServiceUpdateDatasetNameRequest,
+  DatasetServiceUpdateDatasetRequest,
   RpcStatus,
   TemplatebackendChangeTypesDatasetReply,
   TemplatebackendChangeTypesDatasetRequest,
@@ -32,13 +32,13 @@ import type {
   TemplatebackendStoreDatasetRequest,
   TemplatebackendTransformDatasetReply,
   TemplatebackendTransformDatasetRequest,
-  TemplatebackendUpdateDatasetNameReply,
+  TemplatebackendUpdateDatasetReply,
 } from '../models/index';
 import {
     ApiHttpBodyFromJSON,
     ApiHttpBodyToJSON,
-    DatasetServiceUpdateDatasetNameRequestFromJSON,
-    DatasetServiceUpdateDatasetNameRequestToJSON,
+    DatasetServiceUpdateDatasetRequestFromJSON,
+    DatasetServiceUpdateDatasetRequestToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
     TemplatebackendChangeTypesDatasetReplyFromJSON,
@@ -69,8 +69,8 @@ import {
     TemplatebackendTransformDatasetReplyToJSON,
     TemplatebackendTransformDatasetRequestFromJSON,
     TemplatebackendTransformDatasetRequestToJSON,
-    TemplatebackendUpdateDatasetNameReplyFromJSON,
-    TemplatebackendUpdateDatasetNameReplyToJSON,
+    TemplatebackendUpdateDatasetReplyFromJSON,
+    TemplatebackendUpdateDatasetReplyToJSON,
 } from '../models/index';
 
 export interface DatasetServiceChangeTypesDatasetRequest {
@@ -134,9 +134,9 @@ export interface DatasetServiceTransformDatasetRequest {
     body: TemplatebackendTransformDatasetRequest;
 }
 
-export interface DatasetServiceUpdateDatasetNameOperationRequest {
+export interface DatasetServiceUpdateDatasetOperationRequest {
     id: number;
-    body: DatasetServiceUpdateDatasetNameRequest;
+    body: DatasetServiceUpdateDatasetRequest;
 }
 
 /**
@@ -661,16 +661,16 @@ export class DatasetServiceApi extends runtime.BaseAPI {
     }
 
     /**
-     * This endpoint renames a dataset
-     * Rename a dataset
+     * This endpoint allows to update a dataset (accepts only the name field)
+     * Update Dataset
      */
-    async datasetServiceUpdateDatasetNameRaw(requestParameters: DatasetServiceUpdateDatasetNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdateDatasetNameReply>> {
+    async datasetServiceUpdateDatasetRaw(requestParameters: DatasetServiceUpdateDatasetOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdateDatasetReply>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceUpdateDatasetName.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceUpdateDataset.');
         }
 
         if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceUpdateDatasetName.');
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceUpdateDataset.');
         }
 
         const queryParameters: any = {};
@@ -688,18 +688,18 @@ export class DatasetServiceApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: DatasetServiceUpdateDatasetNameRequestToJSON(requestParameters.body),
+            body: DatasetServiceUpdateDatasetRequestToJSON(requestParameters.body),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendUpdateDatasetNameReplyFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendUpdateDatasetReplyFromJSON(jsonValue));
     }
 
     /**
-     * This endpoint renames a dataset
-     * Rename a dataset
+     * This endpoint allows to update a dataset (accepts only the name field)
+     * Update Dataset
      */
-    async datasetServiceUpdateDatasetName(requestParameters: DatasetServiceUpdateDatasetNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdateDatasetNameReply> {
-        const response = await this.datasetServiceUpdateDatasetNameRaw(requestParameters, initOverrides);
+    async datasetServiceUpdateDataset(requestParameters: DatasetServiceUpdateDatasetOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdateDatasetReply> {
+        const response = await this.datasetServiceUpdateDatasetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

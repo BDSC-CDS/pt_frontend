@@ -9,7 +9,7 @@ apis/UsersServiceApi.ts
 apis/index.ts
 index.ts
 models/ApiHttpBody.ts
-models/DatasetServiceUpdateDatasetNameRequest.ts
+models/DatasetServiceUpdateDatasetRequest.ts
 models/IndexServiceCreateHelloRequest.ts
 models/ProtobufAny.ts
 models/QuestionnaireServiceShareReplyRequest.ts
@@ -93,8 +93,8 @@ models/TemplatebackendStoreDatasetResult.ts
 models/TemplatebackendTransformDatasetReply.ts
 models/TemplatebackendTransformDatasetRequest.ts
 models/TemplatebackendTransformDatasetResult.ts
-models/TemplatebackendUpdateDatasetNameReply.ts
-models/TemplatebackendUpdateDatasetNameResult.ts
+models/TemplatebackendUpdateDatasetReply.ts
+models/TemplatebackendUpdateDatasetResult.ts
 models/TemplatebackendUpdatePasswordReply.ts
 models/TemplatebackendUpdatePasswordRequest.ts
 models/TemplatebackendUser.ts
