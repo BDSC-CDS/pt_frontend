@@ -29,7 +29,6 @@ const RiskAssessmentPage = () => {
             <div>
                 <div>Loading...</div>
                 <br />
-                <p>If loading persists, please ensure at least one quasi-identifier is defined to generate a risk assessment.</p>
             </div>
         );
     }
