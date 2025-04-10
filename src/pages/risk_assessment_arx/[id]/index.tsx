@@ -112,7 +112,40 @@ const RiskAssessmentPage = () => {
 
             <div className="mt-8">
                 <h2 className="text-xl font-bold mb-4">Benchmark Thresholds for Identifiable Groups</h2>
-                {/* Your table here */}
+                <table className="table-auto border-collapse border border-gray-400 w-full">
+                    <thead>
+                        <tr>
+                            <th className="border border-gray-400 px-4 py-2">Scenario Context (Matrix)</th>
+                            <th className="border border-gray-400 px-4 py-2">Threshold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Public - High possibility of attack, low impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Max &lt; 0.1</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Public - High possibility of attack, medium impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Max &lt; 0.075</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Public - High possibility of attack, high impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Max &lt; 0.05</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Non-public - Low-med possibility of attack, low-medium impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Avg &lt; 0.1</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Non-public - Medium possibility of attack, medium impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Avg &lt; 0.075</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-gray-400 px-4 py-2">Non-public - Medium-high possibility of attack, medium-high impact</td>
+                            <td className="border border-gray-400 px-4 py-2">Avg &lt; 0.05</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     );
