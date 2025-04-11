@@ -45,6 +45,12 @@ export interface TemplatebackendDataset {
     datasetName?: string;
     /**
      * 
+     * @type {string}
+     * @memberof TemplatebackendDataset
+     */
+    originalFilename?: string;
+    /**
+     * 
      * @type {Date}
      * @memberof TemplatebackendDataset
      */
@@ -80,6 +86,7 @@ export function TemplatebackendDatasetFromJSONTyped(json: any, ignoreDiscriminat
         'userid': !exists(json, 'userid') ? undefined : json['userid'],
         'tenantid': !exists(json, 'tenantid') ? undefined : json['tenantid'],
         'datasetName': !exists(json, 'datasetName') ? undefined : json['datasetName'],
+        'originalFilename': !exists(json, 'originalFilename') ? undefined : json['originalFilename'],
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'deletedAt': !exists(json, 'deletedAt') ? undefined : (new Date(json['deletedAt'])),
     };
@@ -98,6 +105,7 @@ export function TemplatebackendDatasetToJSON(value?: TemplatebackendDataset | nu
         'userid': value.userid,
         'tenantid': value.tenantid,
         'datasetName': value.datasetName,
+        'originalFilename': value.originalFilename,
         'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
         'deletedAt': value.deletedAt === undefined ? undefined : (value.deletedAt.toISOString()),
     };

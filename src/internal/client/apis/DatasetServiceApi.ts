@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   ApiHttpBody,
+  DatasetServiceUpdateDatasetRequest,
   RpcStatus,
   TemplatebackendChangeTypesDatasetReply,
   TemplatebackendChangeTypesDatasetRequest,
@@ -31,10 +32,13 @@ import type {
   TemplatebackendStoreDatasetRequest,
   TemplatebackendTransformDatasetReply,
   TemplatebackendTransformDatasetRequest,
+  TemplatebackendUpdateDatasetReply,
 } from '../models/index';
 import {
     ApiHttpBodyFromJSON,
     ApiHttpBodyToJSON,
+    DatasetServiceUpdateDatasetRequestFromJSON,
+    DatasetServiceUpdateDatasetRequestToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
     TemplatebackendChangeTypesDatasetReplyFromJSON,
@@ -65,6 +69,8 @@ import {
     TemplatebackendTransformDatasetReplyToJSON,
     TemplatebackendTransformDatasetRequestFromJSON,
     TemplatebackendTransformDatasetRequestToJSON,
+    TemplatebackendUpdateDatasetReplyFromJSON,
+    TemplatebackendUpdateDatasetReplyToJSON,
 } from '../models/index';
 
 export interface DatasetServiceChangeTypesDatasetRequest {
@@ -126,6 +132,11 @@ export interface DatasetServiceStoreDatasetRequest {
 
 export interface DatasetServiceTransformDatasetRequest {
     body: TemplatebackendTransformDatasetRequest;
+}
+
+export interface DatasetServiceUpdateDatasetOperationRequest {
+    id: number;
+    body: DatasetServiceUpdateDatasetRequest;
 }
 
 /**
@@ -646,6 +657,49 @@ export class DatasetServiceApi extends runtime.BaseAPI {
      */
     async datasetServiceTransformDataset(requestParameters: DatasetServiceTransformDatasetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendTransformDatasetReply> {
         const response = await this.datasetServiceTransformDatasetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * This endpoint allows to update a dataset (accepts only the name field)
+     * Update Dataset
+     */
+    async datasetServiceUpdateDatasetRaw(requestParameters: DatasetServiceUpdateDatasetOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TemplatebackendUpdateDatasetReply>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling datasetServiceUpdateDataset.');
+        }
+
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling datasetServiceUpdateDataset.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
+        const response = await this.request({
+            path: `/api/v1/dataset/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DatasetServiceUpdateDatasetRequestToJSON(requestParameters.body),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TemplatebackendUpdateDatasetReplyFromJSON(jsonValue));
+    }
+
+    /**
+     * This endpoint allows to update a dataset (accepts only the name field)
+     * Update Dataset
+     */
+    async datasetServiceUpdateDataset(requestParameters: DatasetServiceUpdateDatasetOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TemplatebackendUpdateDatasetReply> {
+        const response = await this.datasetServiceUpdateDatasetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

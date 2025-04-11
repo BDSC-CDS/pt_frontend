@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ApiHttpBody';
+export * from './DatasetServiceUpdateDatasetRequest';
 export * from './IndexServiceCreateHelloRequest';
 export * from './ProtobufAny';
 export * from './QuestionnaireServiceShareReplyRequest';
@@ -84,6 +85,8 @@ export * from './TemplatebackendStoreDatasetResult';
 export * from './TemplatebackendTransformDatasetReply';
 export * from './TemplatebackendTransformDatasetRequest';
 export * from './TemplatebackendTransformDatasetResult';
+export * from './TemplatebackendUpdateDatasetReply';
+export * from './TemplatebackendUpdateDatasetResult';
 export * from './TemplatebackendUpdatePasswordReply';
 export * from './TemplatebackendUpdatePasswordRequest';
 export * from './TemplatebackendUser';

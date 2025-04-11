@@ -11,7 +11,7 @@ interface InputFieldProps {
 
 export default function InputField({ label, name, value, onChange, error, type = "text" }:  InputFieldProps){
     return (
-        <div className="mb-3 w-full">
+        <div className="my-3 w-full">
             <input
                 id={name}
                 name={name}
@@ -20,7 +20,7 @@ export default function InputField({ label, name, value, onChange, error, type =
                 value={value}
                 onChange={onChange}
                 autoComplete={name}
-                className={`border rounded px-2 py-1 w-full text-black ${error ? "border-red-500" : ""}`}
+                className={`border rounded px-2 py-2 w-full text-black ${error ? "border-red-500" : ""}`}
             />
             {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>

@@ -1,12 +1,12 @@
-import { Button, Modal } from "flowbite-react"
-import { useRouter } from "next/router"
+import { Button, Modal, Table } from "flowbite-react"
 import Papa from "papaparse"
 import { useState } from "react"
-import { TemplatebackendDataset } from "~/internal/client"
 import DataTable from "../DataTable"
 import { DateTime } from "luxon"
 import { storeDataset } from "~/utils/dataset"
 import { showToast } from "~/utils/showToast"
+import InputField from "../ui/InputField"
+import Spinner from "../ui/Spinner"
 
 interface DatasetUploadModalProps {
     show: boolean
@@ -33,28 +33,28 @@ const acceptedDateFormats = [
  * A modal to upload a dataset.
  */
 export default function DatasetUploadModal({ show, datasetNames, onSuccess, onClose }: DatasetUploadModalProps) {
-    const router = useRouter()
-    const [fileName, setFileName] = useState('');
+    const [originalFileName, setOriginalFileName] = useState('')
+    const [datasetName, setDatasetName] = useState('');
     const [columnTypes, setColumnTypes] = useState<ColumnTypes>({});
     const [columnIdentifying, setColumnIdentifying] = useState<ColumnTypes>({});
-    const [csvString, setCsvString] = useState('');
-    const [csvPreview, setCsvPreview] = useState<string[][]>([]); // New state for CSV preview
-    const [hasSelectedDataset, setHasSelectedDataset] = useState(false);
     const [idCol, setIdCol] = useState<string>();
+    const [csvString, setCsvString] = useState('');
+    const [csvPreview, setCsvPreview] = useState<string[][]>([]);
+    const [hasSelectedDataset, setHasSelectedDataset] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     
-    const getUniqueFileName = (baseFileName: string, datasetNames: string[]): string => {
-        console.log(datasetNames)
-        let uniqueFileName = baseFileName;
+    const getUniqueDatasetName = (baseFileName: string, datasetNames: string[]): string => {
+        let uniqueDatasetName = baseFileName;
         let counter = 1;
 
         // Loop to find a unique name
-        while (datasetNames.includes(uniqueFileName)) {
-            uniqueFileName = `${baseFileName} (${counter})`;
+        while (datasetNames.includes(uniqueDatasetName)) {
+            uniqueDatasetName = `${baseFileName} (${counter})`;
             counter++;
         }
 
-        return uniqueFileName;
+        return uniqueDatasetName;
     };
 
     const detectColumnTypes = (data: Record<string, any>[]): ColumnTypes => {
@@ -144,11 +144,13 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
             return;
         }
 
+        // Set the file name
+        setOriginalFileName(file.name);
         // Use the file name as the dataset name (remove extension)
         const baseFileName = file.name.replace(/\.[^/.]+$/, "");
         // Get a unique file name
-        const uniqueFileName = getUniqueFileName(baseFileName, datasetNames);
-        setFileName(uniqueFileName);
+        const uniqueFileName = getUniqueDatasetName(baseFileName, datasetNames);
+        setDatasetName(uniqueFileName);
 
         Papa.parse(file, {
             complete: (result) => {
@@ -199,14 +201,15 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
 
     const handleUpload = async () => {
         if (!idCol) {
-            showToast("error", "Please select an identifier column.");
+            showToast("error", "Please select an unique ID column.");
             return;
         }
 
         try {
+            setIsLoading(true);
             const types = JSON.stringify(columnTypes);
             const identifiers = JSON.stringify(columnIdentifying);
-            const response = await storeDataset(fileName, csvString, types, identifiers, idCol);
+            const response = await storeDataset(datasetName, csvString, types, identifiers, idCol, originalFileName);
             if (!response || !response.result || !response.result.id) {
                 throw "No response received from the server."
             }
@@ -216,12 +219,15 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
             onSuccess(response.result.id);
         } catch (error) {
             showToast("error", "Error uploading the dataset:"+error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
     const handleClose = () => {
         setCsvString('');
-        setFileName('');
+        setDatasetName('');
+        setOriginalFileName('');
         setColumnTypes({});
         setColumnIdentifying({});
         setIdCol('');
@@ -236,8 +242,20 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
 
             <Modal.Body className="flex flex-col gap-5">
                 {/* File selector */}
-                <div className="flex justify-center">
-                    <input type="file" accept=".csv" onChange={handleOpenFile} className="p-2"/>
+                <div className="flex flex-row justify-center items-end gap-5">
+                    <input type="file" accept=".csv" onChange={handleOpenFile} className="mb-3 text-base border bg-gray-50 rounded cursor-pointer "/>
+
+                    {hasSelectedDataset && (
+                        <div className="w-2/3">
+                            <h2 className="font-bold">Dataset Name</h2>
+                            <InputField
+                                label="Dataset Name"
+                                name="dataset-name"
+                                value={datasetName}
+                                onChange={(e) => setDatasetName(e.target.value)}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {hasSelectedDataset && (
@@ -262,66 +280,59 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
                                 />
                             )}
                         </div>
+                        
 
                         <hr />
 
                         {/* Type selection */}
-                        <div className="flex justify-center ml-14">
-                            <div className="flex flex-col items-center gap-1 w-5/6 ">
-                                <div className="flex font-bold w-full mb-2">
-                                    <span className="w-1/4">Column Name</span>
-                                    <span className="w-1/4">Type</span>
-                                    <span className="w-1/4">Identifier</span>
-                                    <span className="w-1/6">Is Identifier?</span>
-                                </div>
-                                {Object.keys(columnTypes).map((column, index) => (
-                                    <div key={index} className="flex items-center w-full">
-                                        <span className="w-1/4">{column}</span>
-                                        <div className="w-1/4 flex">
-                                            <select
-                                                value={columnTypes[column]}
-                                                onChange={(e) => setColumnType(column, e.target.value)}
-                                                className="select select-bordered w-11/12"
-                                            >
-                                                <option value="string">String</option>
-                                                <option value="int">Integer</option>
-                                                <option value="float">Float</option>
-                                                <option value="date">Date</option>
-                                            </select>
-                                        </div>
-                        
-                                        <div className="w-1/4 flex">
-                                            <select
-                                                value={columnIdentifying[column]}
-                                                onChange={(e) => setColumnIdentifying_(column, e.target.value)}
-                                                className="select select-bordered w-11/12"
-                                            >
-                                                <option value="identifier">Identifier</option>
-                                                <option value="quasi-identifier">Quasi-identifier</option>
-                                                <option value="non-identifying">Non-identifying</option>
-                                            </select>
-                                        </div>
-                                        {/* <select
-                                            value={columnIdentifying[column]}
-                                            onChange={(e) => setColumnIdentifying_(column, e.target.value)}
-                                            className="select select-bordered w-1/4"
-                                        >
-                                            <option value="identifier">Identifier</option>
-                                            <option value="quasi-identifier">Quasi-identifier</option>
-                                            <option value="non-identifying">Non-identifying</option>
-                                        </select> */}
-                                        <div className="w-1/6 flex pl-10">
-                                            <input
-                                                type="radio"
-                                                name="identifier-column"
-                                                checked={idCol === column}
-                                                onChange={() => setIdCol(column)}
-                                                className="radio radio-bordered"
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="rounded-lg border">
+                            <Table>
+                                <Table.Head>
+                                    <Table.HeadCell className="w-1/12">Unique ID</Table.HeadCell>
+                                    <Table.HeadCell className="w-1/4">Column Name</Table.HeadCell>
+                                    <Table.HeadCell className="w-1/4">Type</Table.HeadCell>
+                                    <Table.HeadCell className="w-1/4">Identifier Type</Table.HeadCell>
+                                </Table.Head>
+                                <Table.Body className="divide-y">
+                                    {Object.keys(columnTypes).map((column, index) => (
+                                        <Table.Row key={index}>
+                                            <Table.Cell className="py-2">
+                                                <input
+                                                    type="radio"
+                                                    name="identifier-column"
+                                                    checked={idCol === column}
+                                                    onChange={() => setIdCol(column)}
+                                                    className="radio radio-bordered cursor-pointer"
+                                                />
+                                            </Table.Cell>
+                                            <Table.Cell className="text-sm py-2">{column}</Table.Cell>
+                                            <Table.Cell className="py-2">
+                                                <select
+                                                    value={columnTypes[column]}
+                                                    onChange={(e) => setColumnType(column, e.target.value)}
+                                                    className="rounded w-5/6 py-1 cursor-pointer"
+                                                >
+                                                    <option value="string">String</option>
+                                                    <option value="int">Integer</option>
+                                                    <option value="float">Float</option>
+                                                    <option value="date">Date</option>
+                                                </select>
+                                            </Table.Cell>
+                                            <Table.Cell className="py-2">
+                                                <select
+                                                    value={columnIdentifying[column]}
+                                                    onChange={(e) => setColumnIdentifying_(column, e.target.value)}
+                                                    className="w-5/6 rounded py-1 cursor-pointer"
+                                                >
+                                                    <option value="identifier">Identifier</option>
+                                                    <option value="quasi-identifier">Quasi-identifier</option>
+                                                    <option value="non-identifying">Non-identifying</option>
+                                                </select>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
                         </div>
                     </div>
                         
@@ -331,7 +342,7 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
             <Modal.Footer className="flex justify-center gap-3">
 
                 <Button onClick={handleUpload}>
-                    Upload
+                    {isLoading ? <Spinner/> : "Upload"}
                 </Button>
                 <Button color="gray" onClick={handleClose}>Cancel</Button>
             </Modal.Footer>
