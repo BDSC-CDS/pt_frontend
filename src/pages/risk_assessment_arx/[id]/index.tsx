@@ -4,6 +4,7 @@ import { getRiskAssessment } from '~/utils/RiskAssessmentArx';
 import { TemplatebackendGetRiskAssessmentReply } from '~/internal/client';
 import dynamic from 'next/dynamic';
 import withAuth from '~/components/withAuth';
+import Spinner from '~/components/ui/Spinner';
 
 const GaugeChart = dynamic(() => import('react-gauge-chart'), { ssr: false });
 
@@ -11,25 +12,34 @@ const RiskAssessmentPage = () => {
     const router = useRouter();
     const { id } = router.query;
 
-    const [data, setData] = useState<TemplatebackendGetRiskAssessmentReply | null>(null);
+    const [data, setData] = useState<TemplatebackendGetRiskAssessmentReply | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const getDatasetRiskAssessment = async (datasetId: number) => {
+        try {
+            setLoading(true);
+        
+            const response = await getRiskAssessment(datasetId);
+            if (response) {
+                setData(response)
+            }
+        } catch (error) {
+            console.error('Error fetching risk assessment:', error);
+            return undefined;
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         if (id) {
-            setLoading(true);
-            getRiskAssessment(Number(id))
-                .then((response) => setData(response ?? null))
-                .catch(console.error)
-                .finally(() => setLoading(false));
+            getDatasetRiskAssessment(Number(id));
         }
     }, [id]);
 
     if (loading) {
         return (
-            <div>
-                <div>Loading...</div>
-                <br />
-            </div>
+            <Spinner/>
         );
     }
 
@@ -39,7 +49,6 @@ const RiskAssessmentPage = () => {
     } | undefined;
 
     const quasiIdentifiers = riskAssessment?.quasi_identifiers ?? [];
-
     if (quasiIdentifiers.length === 0) {
         return <div>No quasi-identifiers have been defined for this risk assessment.</div>;
     }
@@ -67,7 +76,7 @@ const RiskAssessmentPage = () => {
 
             <div className="card">
                 <h2>Quasi Identifiers</h2>
-                <p>{quasiIdentifiers.join(', ')}</p>
+                <p>{quasiIdentifiers}</p>
             </div>
 
             <div className="card">
