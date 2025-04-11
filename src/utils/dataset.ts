@@ -192,7 +192,7 @@ export const getDatasetCsv = async (dataset_id: number) => {
         context: {} as any 
     });
 
-    const url = apiURL() + `api/v1/dataset/csv/${dataset_id}`;
+    const url = apiURL() + `/api/v1/dataset/csv/${dataset_id}`;
     try {
         const response = await fetch(url, initOverrides);
         return response;
@@ -207,12 +207,12 @@ export const getDatasetDataframe = async (dataset_id: number) => {
         context: {} as any 
     });
 
-    const url = apiURL() + `api/v1/dataset/dataframe/${dataset_id}`;
+    const url = apiURL() + `/api/v1/dataset/dataframe/${dataset_id}`;
     try {
         const response = await fetch(url, initOverrides);
         return response;
     } catch (error) {
-        console.log("Error getting the dataset CSV file:" + error);
+        console.log("Error getting the dataset Parquet file:" + error);
     }
 }
 
