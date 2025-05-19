@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { createConfig, getConfigs, deleteConfig, exportConfig } from "../../../utils/configuration"
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { TemplatebackendConfig, TemplatebackendMetadata } from '~/internal/client';
-import { MdOutlineAdd, MdMoreHoriz, MdFileUpload } from "react-icons/md";
+import { MdOutlineAdd, MdMoreHoriz, MdFileUpload, MdEdit } from "react-icons/md";
 import { Button, Modal, Alert } from 'flowbite-react';
 import { transformDataset, getMetadata, getDatasetIdentifier, getInfo } from "../../../utils/dataset";
 import { saveAs } from 'file-saver';
@@ -416,23 +416,26 @@ const TransformPage = () => {
         }
     };
 
-    const handleOpenFileDialog = () => {
-        fileInputRef.current?.click();
-    };
-
-    const closeImportModal = () => {
-        setShowImportModal(false);
-        setImportedConfig(null);
-    };
-    // ------------------------------- html -------------------------------------------- //
 
     return (
         <>
-            <div className="bg-gray-100 p-5 rounded-lg shadow text-md ">
-                <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
-                <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
-                <p><strong>Number of Rows:</strong> {totalRows}</p>
-                <p><strong>Number of Columns:</strong> {nColumns} </p>
+            <div className="flex justify-between items-center mb-4">
+                <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
+                    <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
+                    <p><strong>Created Date:</strong> {createdAt?.toLocaleString()} </p>
+                    <p><strong>Number of Rows:</strong> {nRows}</p>
+                    <p><strong>Number of Columns:</strong> {nColumns} </p>
+                </div>
+
+                <div className="flex flex-col gap-2 ">
+                    <button
+                        className="flex items-center gap-2 p-2 rounded bg-gray-300 hover:bg-gray-200"
+                        onClick={handleColumnTypeChange}
+                    >
+                        <MdEdit />
+                        Edit Metadata
+                    </button>
+                </div>
             </div>
 
             <div className="flex flex-col items-end pt-5 relative mb-1">
@@ -505,11 +508,11 @@ const TransformPage = () => {
                 {/* Dataset preview*/}
                 <div className='flex flex-col w-full'>
                     <div className="flex items-center w-full mb-3">
-                        {nonIdentifyingColumns && nonIdentifyingColumns?.length > 0 && (
+                        {/* {nonIdentifyingColumns && nonIdentifyingColumns?.length > 0 && (
                             <Alert className="mt-2 ml-3 w-1/2" color="info">
                                 These are only the identifying and quasi-identifying columns. To change the column types, click <button onClick={handleColumnTypeChange} className='underline'>here</button>.
                             </Alert>
-                        )}
+                        )} */}
                         {/* Create Configuration Button */}
                         <button
                             onClick={() => setShowCreateModal(true)}
@@ -556,7 +559,7 @@ const TransformPage = () => {
                                                             ▼
                                                         </span>
                                                     </button>
-                                                    <div className='flex justify-start items-center'>
+                                                    <div className='flex justify-start items-center relative'>
                                                         <a
                                                             onMouseEnter={() => handleMenuOpen(config.id)}
 
@@ -699,15 +702,6 @@ const TransformPage = () => {
                             ) : (
                                 <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
                             )}
-
-                            <div className='flex justify-start '>
-                                <button
-                                    onClick={handleColumnTypeChange}
-                                    className={buttonClass}
-                                >
-                                    <p className='ml-2 text-md'> Edit Metadata </p>
-                                </button>
-                            </div>
                         </div>
 
 
