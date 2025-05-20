@@ -1,7 +1,6 @@
-import { on } from "events"
 import { Button, Modal, TextInput } from "flowbite-react"
 import { useRouter } from "next/router"
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { updateDatasetName } from "~/utils/dataset"
 import { showToast } from "~/utils/showToast"
 
