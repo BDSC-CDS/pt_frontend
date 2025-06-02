@@ -105,7 +105,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 ? reportData.missingDataSections.join(", ")
                 : "None"}`,
             `Overall Completion Rate: ${reportData.overallCompletionRate}`,
-            `Current Risk Score: ${currentRisk}`,
+            `Risk Score: ${currentRisk}`,
             `Total High Risk Answers: ${reportData.totalHighRiskAnswers}`,
             `Risk Level: ${riskLabel.text}`, // Risk label
         ];
@@ -184,7 +184,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         });
 
 
-        pdf.save("questionnaire.pdf");
+        pdf.save("qualitative_risk_assessment.pdf");
     }
 
     const handleExportSPHNConfig = async () => {
@@ -218,7 +218,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
             </div>
             <div className="mb-2">
-                <strong>Current Risk (%):</strong> {currentRisk}
+                <strong>Risk Score:</strong> {currentRisk}
             </div>
             <div className="mb-2 text-red-500">
                 <strong>High-Risk Answers:</strong> {reportData.totalHighRiskAnswers}

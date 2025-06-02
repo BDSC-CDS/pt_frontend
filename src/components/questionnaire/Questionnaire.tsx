@@ -409,7 +409,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                                         <h3 className="font-semibold text-gray-900 dark:text-white">Risk details</h3>
                                                     </div>
                                                     <div className="px-3 py-2">
-                                                        Current risk: {currentRisk} <p className='text-xs text-gray-400 inline-block'>({(currentRiskPc * 100).toFixed(2) + "%"})</p><br />
+                                                        Risk Score: {currentRisk}<br />
                                                         Max. possible risk: {maxRisk}<br />
                                                         Min. possible risk: {minRisk} <br />
                                                         <p className='text-xs text-gray-400'>Note that some questions have negative risk so the minimum could be less but is clamped</p>

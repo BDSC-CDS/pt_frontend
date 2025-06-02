@@ -39,7 +39,7 @@ In the questionnaire, there are some answers marked as high-risk answers. When y
   - **Total Questions Answered**: Number of completed questions
   - **Sections Completed**: Overview of the completed and missing sections
   - **Overall Completion Rate**: Displays the percentage of completion
-  - **Current Risk (%)**: Shows the overall risk percentage
+  - **Current Risk**: Shows the overall risk
   - **High-Risk Answers**: Highlights the number of answers contributing to significant risks
 - **Export Options**:
   - Export the summary of the replied answers as **PDF**
