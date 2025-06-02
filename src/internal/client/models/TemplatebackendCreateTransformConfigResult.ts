@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendCreateConfigResult
+ * @interface TemplatebackendCreateTransformConfigResult
  */
-export interface TemplatebackendCreateConfigResult {
+export interface TemplatebackendCreateTransformConfigResult {
     /**
      * 
      * @type {number}
-     * @memberof TemplatebackendCreateConfigResult
+     * @memberof TemplatebackendCreateTransformConfigResult
      */
     id?: number;
 }
 
 /**
- * Check if a given object implements the TemplatebackendCreateConfigResult interface.
+ * Check if a given object implements the TemplatebackendCreateTransformConfigResult interface.
  */
-export function instanceOfTemplatebackendCreateConfigResult(value: object): boolean {
+export function instanceOfTemplatebackendCreateTransformConfigResult(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendCreateConfigResultFromJSON(json: any): TemplatebackendCreateConfigResult {
-    return TemplatebackendCreateConfigResultFromJSONTyped(json, false);
+export function TemplatebackendCreateTransformConfigResultFromJSON(json: any): TemplatebackendCreateTransformConfigResult {
+    return TemplatebackendCreateTransformConfigResultFromJSONTyped(json, false);
 }
 
-export function TemplatebackendCreateConfigResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendCreateConfigResult {
+export function TemplatebackendCreateTransformConfigResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendCreateTransformConfigResult {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendCreateConfigResultFromJSONTyped(json: any, ignore
     };
 }
 
-export function TemplatebackendCreateConfigResultToJSON(value?: TemplatebackendCreateConfigResult | null): any {
+export function TemplatebackendCreateTransformConfigResultToJSON(value?: TemplatebackendCreateTransformConfigResult | null): any {
     if (value === undefined) {
         return undefined;
     }

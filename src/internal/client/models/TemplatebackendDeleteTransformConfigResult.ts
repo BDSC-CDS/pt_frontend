@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendUpdateDatasetNameResult
+ * @interface TemplatebackendDeleteTransformConfigResult
  */
-export interface TemplatebackendUpdateDatasetNameResult {
+export interface TemplatebackendDeleteTransformConfigResult {
     /**
      * 
      * @type {boolean}
-     * @memberof TemplatebackendUpdateDatasetNameResult
+     * @memberof TemplatebackendDeleteTransformConfigResult
      */
     success?: boolean;
 }
 
 /**
- * Check if a given object implements the TemplatebackendUpdateDatasetNameResult interface.
+ * Check if a given object implements the TemplatebackendDeleteTransformConfigResult interface.
  */
-export function instanceOfTemplatebackendUpdateDatasetNameResult(value: object): boolean {
+export function instanceOfTemplatebackendDeleteTransformConfigResult(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendUpdateDatasetNameResultFromJSON(json: any): TemplatebackendUpdateDatasetNameResult {
-    return TemplatebackendUpdateDatasetNameResultFromJSONTyped(json, false);
+export function TemplatebackendDeleteTransformConfigResultFromJSON(json: any): TemplatebackendDeleteTransformConfigResult {
+    return TemplatebackendDeleteTransformConfigResultFromJSONTyped(json, false);
 }
 
-export function TemplatebackendUpdateDatasetNameResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendUpdateDatasetNameResult {
+export function TemplatebackendDeleteTransformConfigResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendDeleteTransformConfigResult {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendUpdateDatasetNameResultFromJSONTyped(json: any, i
     };
 }
 
-export function TemplatebackendUpdateDatasetNameResultToJSON(value?: TemplatebackendUpdateDatasetNameResult | null): any {
+export function TemplatebackendDeleteTransformConfigResultToJSON(value?: TemplatebackendDeleteTransformConfigResult | null): any {
     if (value === undefined) {
         return undefined;
     }
