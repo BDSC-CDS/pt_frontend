@@ -105,7 +105,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 ? reportData.missingDataSections.join(", ")
                 : "None"}`,
             `Overall Completion Rate: ${reportData.overallCompletionRate}`,
-            `Current Risk Score: ${currentRisk}`,
+            `Risk Score: ${currentRisk}`,
             `Total High Risk Answers: ${reportData.totalHighRiskAnswers}`,
             `Risk Level: ${riskLabel.text}`, // Risk label
         ];
@@ -144,7 +144,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 addFooter(pageNumber);
             }
 
-            // Tab Title: Bold, Size 14
+            // Tab Title
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(14);
             pdf.text(`Tab: ${tab}`, margin, cursorY);
@@ -161,7 +161,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                     addFooter(pageNumber);
                 }
 
-                // Question: Normal, Size 12
+                // Question
                 pdf.setFont("helvetica", "normal");
                 pdf.setFontSize(12);
                 const questionText = `${questionIndex + 1}. ${question.questionDescription}`;
@@ -169,7 +169,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 pdf.text(questionLines, margin, cursorY);
                 cursorY += questionLines.length * 6;
 
-                // Answer: Italic, Size 12
+                // Answer
                 pdf.setFont("helvetica", "italic");
                 const selectedAnswer = question.answers.find((a) => a.selected);
                 const answerText = selectedAnswer
@@ -180,13 +180,11 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 cursorY += answerLines.length * 6 + 5;
             });
 
-            // Add spacing between tabs
             cursorY += 5;
         });
 
 
-        // Save the PDF
-        pdf.save("questions-and-answers-with-summary-and-header.pdf");
+        pdf.save("qualitative_risk_assessment.pdf");
     }
 
     const handleExportSPHNConfig = async () => {
@@ -220,7 +218,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 <strong>Overall Completion Rate:</strong> {reportData.overallCompletionRate}
             </div>
             <div className="mb-2">
-                <strong>Current Risk (%):</strong> {currentRisk}
+                <strong>Risk Score:</strong> {currentRisk}
             </div>
             <div className="mb-2 text-red-500">
                 <strong>High-Risk Answers:</strong> {reportData.totalHighRiskAnswers}
@@ -265,11 +263,11 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             <div className="flex flex-row justify-center mt-4">
                 <span onClick={() => handleExportPDF()} className="flex items-center bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <FaFilePdf />
-                    <p className='ml-2 text-sm'>Export PDF</p>
+                    <p className='ml-2 text-sm'>Download PDF</p>
                 </span>
                 <span onClick={() => handleExportSPHNConfig()} className="flex items-center ml-2 bg-gray-200 hover:bg-gray-300 p-2 pr-3 rounded cursor-pointer">
                     <GrDocumentConfig />
-                    <p className='ml-2 text-sm'>Export connector configuration</p>
+                    <p className='ml-2 text-sm'>Download connector configuration</p>
                 </span>
             </div>
         </div>
