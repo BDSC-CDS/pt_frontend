@@ -37,7 +37,7 @@ const DEFAULT_CONFIG: TemplatebackendTransformConfig = {
     subFieldRegexList: [],
 };
 
-interface CreateTransformConfigModalProps {
+interface TransformConfigCreateModalProps {
     show: boolean
     metadata: TemplatebackendMetadata[]
     // onSubmit: (saveName: string) => void
@@ -66,7 +66,7 @@ enum FieldType {
 /**
  * Create rule-based De-Id config modal.
  */
-export default function CreateTransformConfigModal({ show, metadata, onClose }: CreateTransformConfigModalProps) {
+export default function TransformConfigCreateModal({ show, metadata, onClose }: TransformConfigCreateModalProps) {
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [scramblableFields, setScramblableFields] = useState<Field[]>()
@@ -118,13 +118,13 @@ export default function CreateTransformConfigModal({ show, metadata, onClose }: 
 
                 console.log("Creating transform config with:", newConfig)
 
-                // const response = await createTransformConfig(newConfig)
-                // if (response && response.result && response.result.id) {
-                //     showToast("success", `Configuration ${response.result.id} created successfully.`)
-                //     handleClose()
-                // } else {
-                //     throw new Error("Internal server error.")
-                // }
+                const response = await createTransformConfig(newConfig)
+                if (response && response.result && response.result.id) {
+                    showToast("success", `Configuration ${response.result.id} created successfully.`)
+                    handleClose()
+                } else {
+                    throw new Error("Internal server error.")
+                }
             }
         } catch (error) {
             showToast("error", "Error creating the configuration: " + error)
