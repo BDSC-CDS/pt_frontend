@@ -93,6 +93,8 @@ export default function TransformConfigCreateModal({ show, metadata, onClose }: 
                 showToast("error", "Some fields in the substitution list are empty.")
             } else if (applySubFieldRegex && (!config.subFieldRegexList || config.subFieldRegexList.some(item => !item.field || !item.regex || !item.replacement))) {
                 showToast("error", "Some fields in the regex substitution list are empty.")
+            } else if (!applyDateShift && !applyScrambleField && !applySubFieldList && !applySubFieldRegex) {
+                showToast("error", "At least one transformation must be selected.")  
             } else {
                 const newConfig: TemplatebackendTransformConfig = {name: config.name}
 
