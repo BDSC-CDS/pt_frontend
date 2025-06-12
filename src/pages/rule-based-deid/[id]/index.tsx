@@ -33,15 +33,14 @@ const TransformPage = () => {
     const [nColumns, setNColumns] = useState(0);
     const [nRows, setNRows] = useState<number>(0);
 
-    const [errorMessage, setErrorMessage] = useState("");
     const [datasetName, setDatasetName] = useState<string>();
     const [createdAt, setCreatedAt] = useState<Date>();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoadingApply, setIsLoadingApply] = useState<boolean>(false);
 
     const [showEditMetadataModal, setShowEditMetadataModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
-    const [showErrorModal, setShowErrorModal] = useState(false);
 
 
     // ----------------------------------- methods --------------------------------- //
@@ -49,29 +48,27 @@ const TransformPage = () => {
         if (id) {
             setOpenConfigId(openConfigId === id ? null : id);
         }
-    };
+    }
     const toggleDetail = (detailId: string) => {
         setOpenDetailId(openDetailId === detailId ? null : detailId);
-    };
+    }
 
     const applyTransformation = async (configId: number) => {
-        if (!configId) return;
         try {
+            setIsLoadingApply(true);
             const response = await transformDataset(datasetId, configId);
-            // Implement the transformation logic for selected configurations
-            if (response?.result) {
+            if (response?.result && response.result.id) {
                 router.push("/dataset/" + response.result.id);
+                showToast("success", `Transformed dataset ${response.result.id} sucessfully created.`);
+            } else {
+                showToast("error", "Error applying transformation.");
             }
         } catch (error) {
-            // Safely check if error is an instance of Error
-            if (error instanceof Error) {
-                setErrorMessage(error.message);
-            } else {
-                setErrorMessage("An unexpected error occurred");
-            }
-            setShowErrorModal(true);
+            showToast("error", "Error applying transformation: "+ error);
+        } finally {
+            setIsLoadingApply(false);
         }
-    };
+    }
 
     const getDatasetInfo = async () => {
         const response = await getInfo(datasetId);
@@ -112,7 +109,7 @@ const TransformPage = () => {
             if (response?.result?.configs) {
                 setConfigs(response.result.configs);
             } else {
-                showToast("error", "No configurations found.");
+                showToast("error", "Error retrieving configurations.");
             }
         } catch (error) {
             showToast("error", "Error retrieving configurations.");
@@ -127,19 +124,19 @@ const TransformPage = () => {
                 setIsLoading(true);
                 const response = await deleteTransformConfig(configId);
                 if( response?.result?.success) {
-                    showToast("success", "Configuration deleted successfully.");
+                    showToast("success", "Configuration successfully deleted.");
+                    setSelectedConfigId(undefined)
+                    getConfigs()
                 } else {
-                    throw new Error("Failed to delete configuration");
+                    showToast("error", "Failed to delete configuration.");
                 }
             } catch (error) {
                 showToast("error", "Error deleting the configuration.");
             } finally {
                 setIsLoading(false);
             }
-            setSelectedConfigId(undefined); // Reset selected config after deletion
-            getConfigs(); // Refresh the configs after deletion
         }
-    };
+    }
 
     // Handle the export logic
     const handleExportConfig = async (configId: number | undefined) => {
@@ -149,12 +146,15 @@ const TransformPage = () => {
                 if (response?.config) {
                     const blob = new Blob([response.config], { type: "application/json" });
                     saveAs(blob, `config_${configId}.json`); // Download the file with the configId as its name
+                    showToast("success", "Configuration exported successfully.");
+                } else {
+                    showToast("error", "Failed to export configuration.");
                 }
             } catch (error) {
-                console.error("Error exporting the configuration", error);
+                showToast("error", "Error exporting the configuration.");
             }
         }
-    };
+    }
 
     useEffect(() => {
         if (id) {
@@ -173,7 +173,7 @@ const TransformPage = () => {
         if (datasetId) {
             getConfigs();
         }
-    }, [id, showCreateModal, showImportModal]);
+    }, [id, showCreateModal, showImportModal])
 
     // Filter the configurations based on the metadata
     useEffect(() => {
@@ -257,28 +257,6 @@ const TransformPage = () => {
                 show={showImportModal}
                 onClose={() => setShowImportModal(false)}
             />
-
-            {/* Modal for showing error messages */}
-            <Modal
-                show={showErrorModal}
-                onClose={() => setShowErrorModal(false)}
-            >
-                <Modal.Body>
-                    <div className="text-center ">
-                        <div className="space-y-6">
-                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                Error
-                            </p>
-                            <div>{errorMessage}</div>
-                        </div>
-                        <div className="flex justify-center gap-4 mt-4 ">
-
-                            <Button color="failure" onClick={() => setShowErrorModal(false)}>Close</Button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
-
             
             <div className="flex justify-start items-start">
                 {/* Dataset table preview */}
@@ -305,7 +283,7 @@ const TransformPage = () => {
                             }))}
                         />
                     ) : (
-                        <div className="flex justify-center items-center h-96 w-full">
+                        <div className="flex justify-center items-center h-28 w-full">
                             <Spinner/>
                         </div>
                     )}
@@ -478,9 +456,8 @@ const TransformPage = () => {
                     </div>                    
 
                     <div className="flex justify-center">
-                        <Button onClick={() => applyTransformation(selectedConfigId!)} disabled={isLoading || !selectedConfigId} >
-                            Apply Transformation
-                            {/* {isLoading ? <Spinner /> : "Apply Transformation"} */}
+                        <Button onClick={() => applyTransformation(selectedConfigId!)} disabled={isLoadingApply || !selectedConfigId} >
+                            {isLoadingApply ? <Spinner/> : "Apply Transformation"}
                         </Button>
                     </div>
                 </div>
