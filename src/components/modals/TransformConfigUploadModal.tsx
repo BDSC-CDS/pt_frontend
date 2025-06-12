@@ -74,6 +74,7 @@ export default function TransformConfigUploadModal({ show, onClose }: TransformC
             setImportedConfig(newConfig)
         };
         reader.readAsText(file);
+        setIsLoading(false);
     };
 
     const handleImportSubmit = async () => {
