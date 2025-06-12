@@ -280,7 +280,7 @@ const TransformPage = () => {
             </Modal>
 
             
-            <div className="flex ">
+            <div className="flex justify-start items-start">
                 {/* Dataset table preview */}
                 <div className="flex justify-center items-center w-2/3">
                     {metadata && columns && columns[0] ? (
@@ -305,23 +305,32 @@ const TransformPage = () => {
                             }))}
                         />
                     ) : (
-                        <Spinner/>
+                        <div className="flex justify-center items-center h-96 w-full">
+                            <Spinner/>
+                        </div>
                     )}
                 </div>                
                 
                 {/* Configurations */}
                 <div className="flex flex-col w-1/3 gap-3 ml-5">
                     <div className="rounded-lg border border-gray-300">
-                        <div className="flex items-start font-semibold p-2 border-b bg-gray-50">
+                        <div className="flex items-start font-semibold px-5 py-2 border-b bg-gray-50">
                             Select a configuration
                         </div>
+                        
+                        {isLoading && (
+                            <div className="py-2 border-b">
+                                <Spinner/>
+                            </div>
+                        )}
 
-                        {filteredConfigs && filteredConfigs.length == 0 && (
-                            <p className="text-gray-500 p-2 border-b">No configurations yet.</p>
+
+                        {!isLoading && filteredConfigs && filteredConfigs.length == 0 && (
+                            <p className="text-gray-500 px-5 py-2 border-b">No configurations yet.</p>
                         )}
 
                         {filteredConfigs && filteredConfigs.length > 0 && filteredConfigs?.map((config) => (
-                            <div key={`config${config.id}`} className="flex p-2 gap-2 items-center border-b">
+                            <div key={`config${config.id}`} className="flex px-5 py-2 gap-2 items-center border-b">
                                 <Radio
                                     id={`checkbox-config-${config.id}`}
                                     checked={selectedConfigId === config.id}
@@ -377,7 +386,7 @@ const TransformPage = () => {
                                                     </button>
                                                     {openDetailId === `scramble-${config.id}` && (
                                                         <div className="p-2 text-sm">
-                                                            <p>Fields: {config.scrambleField.fields?.filter(field => !field.includes("sphn")).join(", ")}</p>
+                                                            <p><b>Fields:</b> {config.scrambleField.fields?.filter(field => !field.includes("sphn")).join(", ")}</p>
                                                         </div>
                                                     )}
                                                 </>
@@ -386,7 +395,7 @@ const TransformPage = () => {
                                                 <>
                                                     <button onClick={() => toggleDetail(`dateShift-${config.id}`)}
                                                         className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                        Date Shift
+                                                        Date shift
                                                         <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `dateShift-${config.id}` ? "rotate-0" : "rotate-180"}`}>
                                                             ▼
                                                         </span>
@@ -432,7 +441,7 @@ const TransformPage = () => {
                                                 <>
                                                     <button onClick={() => toggleDetail(`subfieldregex-${config.id}`)}
                                                         className="w-full text-left bg-gray-100 p-2 font-semibold text-md focus:outline-none">
-                                                        SubField Regex Replacement
+                                                        Substitute field regex
                                                         <span className={`ml-2 text-gray-400 inline-block transform transition-transform duration-100 ${openDetailId === `subfieldregex-${config.id}` ? "rotate-0" : "rotate-180"}`}>
                                                             ▼
                                                         </span>
