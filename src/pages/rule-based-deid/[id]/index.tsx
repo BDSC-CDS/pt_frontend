@@ -215,7 +215,7 @@ const TransformPage = () => {
 
 
     return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-10">
             <div className="flex justify-between items-center">
                 <div className="bg-gray-100 p-5 rounded-lg shadow text-md w-1/2">
                     <h2 className="text-lg font-bold mb-2"> {datasetName}</h2>
@@ -329,7 +329,7 @@ const TransformPage = () => {
                             <p className="text-gray-500 px-5 py-2 border-b">No configurations yet.</p>
                         )}
 
-                        {filteredConfigs && filteredConfigs.length > 0 && filteredConfigs?.map((config) => (
+                        {!isLoading && filteredConfigs && filteredConfigs.length > 0 && filteredConfigs?.map((config) => (
                             <div key={`config${config.id}`} className="flex px-5 py-2 gap-2 items-center border-b">
                                 <Radio
                                     id={`checkbox-config-${config.id}`}
