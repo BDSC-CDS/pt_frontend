@@ -71,34 +71,57 @@ const TransformPage = () => {
     }
 
     const getDatasetInfo = async () => {
-        const response = await getInfo(datasetId);
-        if (response?.dataset) {
-            setDatasetName(response.dataset.datasetName);
-            setCreatedAt(response.dataset.createdAt);
+        try {
+            setIsLoading(true);
+            
+            const response = await getInfo(datasetId);
+            if (response?.dataset) {
+                setDatasetName(response.dataset.datasetName);
+                setCreatedAt(response.dataset.createdAt);
+            }
+        } catch (error) {
+            showToast("error", "Error retrieving dataset information: " + error);
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
     const getDatasetMetadata = async () => {
-        const response = await getMetadata(datasetId);
-        if (response?.metadata?.metadata) {
-            setMetadata(response.metadata.metadata);
+        try {
+            setIsLoading(true);
+            const response = await getMetadata(datasetId);
+            if (response?.metadata?.metadata) {
+                setMetadata(response.metadata.metadata);
+            }
+        } catch (error) {
+            showToast("error", "Error retrieving dataset metadata: " + error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
     const getAndProcessDatasetContent = async () => {
-        //const response = await getDatasetContent(datasetId, 0, 5);
-        const response = await getDatasetIdentifier(datasetId, 0, 5);
-        if (response && response.result?.columns) {
-            const result = response.result?.columns.map((col) => {
-                return col.value;
-            })
-            if (result) {
-                setColumns(result)
-                setNColumns(result.length);
+        try {
+            setIsLoading(true);
+            const response = await getDatasetIdentifier(datasetId, 0, 5)
+
+            if (response && response.result?.columns) {
+                const result = response.result?.columns.map((col) => {
+                    return col.value;
+                })
+                if (result) {
+                    setColumns(result)
+                    setNColumns(result.length);
+                }
             }
-        }
-        if (response && response.result?.nRows) {
-            setNRows(response.result.nRows);
+            if (response && response.result?.nRows) {
+                setNRows(response.result.nRows);
+            }
+        } catch (error) {
+            showToast("error", "Error retrieving dataset content: " + error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
