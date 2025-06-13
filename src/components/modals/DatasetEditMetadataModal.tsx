@@ -141,7 +141,11 @@ export default function DatasetEditMetadataModal({ show, datasetId, onClose }: D
 
             showToast("success", "Metadata successfully updated.");
             handleClose();
-            router.push(`/dataset/${response.id}`);
+            //push to current url and change id
+            router.push({
+                pathname: router.pathname, 
+                query: { ...router.query, id: response.id }, 
+            });
         } catch (error) {
             showToast("error", "Error uploading the dataset:"+error);
         } finally {
