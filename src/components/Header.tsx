@@ -21,9 +21,9 @@ export default function Header() {
                         <Link href="/" passHref>
                             <span className="px-3 py-2 hover:underline rounded cursor-pointer">Home</span>
                         </Link>
-                        <Link href="/about" passHref>
+                        {/* <Link href="/about" passHref>
                             <span className="px-3 py-2 hover:underline rounded cursor-pointer">About</span>
-                        </Link>
+                        </Link> */}
                         <Link href="/contact" passHref>
                             <span className="px-3 py-2 hover:underline rounded cursor-pointer">Contact</span>
                         </Link>
