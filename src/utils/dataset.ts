@@ -129,6 +129,7 @@ export const getDatasetIdentifier = async (id: number, offset?: number, limit?: 
         return response;
     } catch (error) {
         console.log("Error getting the dataset identifying content:" + error);
+        throw error;
     }
 };
 

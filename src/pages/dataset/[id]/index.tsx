@@ -18,6 +18,7 @@ import { MdDelete, MdDownload, MdEdit } from 'react-icons/md';
 import { HiPencilAlt } from 'react-icons/hi';
 import DatasetEditMetadataModal from '~/components/modals/DatasetEditMetadataModal';
 import DatasetRenameModal from '~/components/modals/DatasetRenameModal';
+import Spinner from '~/components/ui/Spinner';
 
 const DatasetPage = () => {
     // Routing
@@ -296,7 +297,9 @@ const DatasetPage = () => {
                     }))}
                 />
             ) : (
-                <div className="text-center text-gray-500 mt-20">The dataset is empty.</div>
+                 <div className="flex justify-center items-center h-28 w-full">
+                    <Spinner/>
+                </div>
             )}
 
             {/* Pagination Controls */}
