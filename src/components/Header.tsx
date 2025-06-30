@@ -18,10 +18,6 @@ export default function Header() {
                                 height={44}
                                 className="h-11 w-auto min-w-8 max-w-28 my-auto ml-5 m-2"
                             />
-                            {/* <div 
-                                style={logoStyle} 
-                                className="h-14 w-auto min-w-8 max-w-32 my-auto ml-5 m-2 bg-no-repeat bg-contain bg-center"
-                            /> */}
                             <p className="font-bold text-lg w-40">Privacy Toolbox</p>
                         </div>
                     </Link>
