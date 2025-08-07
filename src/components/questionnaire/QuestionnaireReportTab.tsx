@@ -18,8 +18,7 @@ interface QuestionnaireReportTabProps {
 }
 
 export default function QuestionnaireReportTab({ replyName, questions, currentRisk, reportData}: QuestionnaireReportTabProps) {
-    const [exportInProgress, setExportInProgress] = useState(false);
-
+    // Handler for exporting PDF report
     const handleExportPDF = async () => {
         const pdf = new jsPDF('p', 'mm', 'a4'); // A4 page size
         const margin = 10; // Margin in mm
@@ -28,16 +27,18 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         const headerHeight = 20; // Header height in mm
         let cursorY = margin + headerHeight; // Starting Y position for text
 
+        const rootStyles = getComputedStyle(document.documentElement);
+        const headerBgColor = rootStyles.getPropertyValue('--header-bg-color').trim() || '#306278';
 
         // Function to add the header with logo on the left (only on the first page)
         const addHeader = async (firstPage = false) => {
             if (!firstPage) return;
 
-            pdf.setFillColor("#306278");
+            pdf.setFillColor(headerBgColor);
             pdf.rect(0, 0, pageWidth, headerHeight, "F");
 
             // Fetch the logo as Base64
-            const response = await fetch("/logo.png"); // Keep the existing path
+            const response = await fetch("/logo.png");
             const blob = await response.blob();
 
             const reader = new FileReader();
@@ -45,24 +46,64 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             return new Promise((resolve) => {
                 reader.onloadend = () => {
                     const base64Logo = reader.result as string;
-                    const logoWidth = 15;
-                    const logoHeight = 10;
-                    pdf.addImage(
-                        base64Logo,
-                        "PNG",
-                        margin, // Left align the logo
-                        (headerHeight - logoHeight) / 2, // Center vertically within the header
-                        logoWidth,
-                        logoHeight
-                    );
+                    
+                    // Create an Image object to get natural dimensions
+                    const img = new Image();
+                    img.onload = () => {
+                        // Get natural dimensions
+                        const naturalWidth = img.naturalWidth;
+                        const naturalHeight = img.naturalHeight;
+                        const aspectRatio = naturalWidth / naturalHeight;
+                        
+                        // Calculate dynamic size based on header constraints
+                        const maxLogoHeight = headerHeight * 0.7; // Use 70% of header height
+                        const maxLogoWidth = pageWidth * 0.3; // Use max 30% of page width
+                        
+                        let logoWidth, logoHeight;
+                        
+                        // Determine size based on aspect ratio and constraints
+                        if (aspectRatio > 1) {
+                            // Horizontal logo - width is the limiting factor
+                            logoWidth = Math.min(maxLogoWidth, maxLogoHeight * aspectRatio);
+                            logoHeight = logoWidth / aspectRatio;
+                        } else {
+                            // Vertical or square logo - height is the limiting factor
+                            logoHeight = Math.min(maxLogoHeight, maxLogoWidth / aspectRatio);
+                            logoWidth = logoHeight * aspectRatio;
+                        }
+                        
+                        // Ensure minimum size (optional)
+                        const minSize = 8; // minimum 8mm
+                        if (logoWidth < minSize || logoHeight < minSize) {
+                            if (aspectRatio > 1) {
+                                logoWidth = minSize * aspectRatio;
+                                logoHeight = minSize;
+                            } else {
+                                logoWidth = minSize;
+                                logoHeight = minSize / aspectRatio;
+                            }
+                        }
+                        
+                        pdf.addImage(
+                            base64Logo,
+                            "PNG",
+                            margin, // Left align the logo
+                            (headerHeight - logoHeight) / 2, // Center vertically within the header
+                            logoWidth,
+                            logoHeight
+                        );
 
-                    // Add the title "Privacy Toolbox" next to the logo
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setFontSize(14);
-                    pdf.setTextColor("#FFFFFF");
-                    pdf.text("Privacy Toolbox", margin + logoWidth + 5, headerHeight / 1.5);
+                        // Add the title "Privacy Toolbox" next to the logo with dynamic spacing
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setFontSize(14);
+                        pdf.setTextColor("#FFFFFF");
+                        pdf.text("Privacy Toolbox", margin + logoWidth + 5, headerHeight / 1.5);
 
-                    resolve(null);
+                        resolve(null);
+                    };
+                    
+                    // Set the source to trigger the onload event
+                    img.src = base64Logo;
                 };
             });
         };
@@ -85,7 +126,6 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         // Step 1: Add Summary
         pdf.setFontSize(12);
         pdf.setFont("helvetica", "normal");
-
 
         pdf.setFont("helvetica", "bold");
         pdf.text("Summary", margin, cursorY);
@@ -130,7 +170,6 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
 
         // reset color to black 
         pdf.setTextColor(0, 0, 0);
-
 
         cursorY += 10;
 
