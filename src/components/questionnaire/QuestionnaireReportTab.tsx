@@ -1,8 +1,11 @@
-import jsPDF from 'jspdf';
+import jsPDF, {
+  AcroFormTextField
+} from 'jspdf';
 import React, { useState } from 'react';
 import { FaFilePdf } from "react-icons/fa6";
 import { GrDocumentConfig } from 'react-icons/gr';
 import { Question, Questions } from '~/utils/questions';
+
 
 interface QuestionnaireReportTabProps {
     replyName: string | undefined;
@@ -19,9 +22,7 @@ interface QuestionnaireReportTabProps {
 
 export default function QuestionnaireReportTab({ replyName, questions, currentRisk, reportData}: QuestionnaireReportTabProps) {
     const [exportInProgress, setExportInProgress] = useState(false);
-    const riskLabel = reportData.totalHighRiskAnswers > 0
-    ? { text: "High Risk", color: "#e76f51" } // Red
-    : currentRisk > 45
+    const riskLabel = currentRisk > 45
         ? { text: "Medium Risk", color: "#e9c46a" } // Yellow
         : { text: "Low to Medium Risk", color: "#2a9d8f" }; // Green
     const handleExportPDF = async () => {
@@ -127,8 +128,34 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             cursorY += wrappedLines.length * 6;
         });
 
+
+
         // reset color to black 
         pdf.setTextColor(0, 0, 0);
+        if (reportData.totalHighRiskAnswers > 0) {
+            const fieldWidth = pageWidth - 2 * margin;
+            const fieldHeight = 50; // height of the blank space
+
+            // Label for the field
+            pdf.setFontSize(12);
+            pdf.text("Explanation of how high-risk answers are addressed:", margin, cursorY + 6);
+   
+  
+
+            // Create the fillable text field
+            const textField = new AcroFormTextField();
+            textField.fieldName = "HighRiskExplanation";
+            textField.multiline = true;
+            textField.x = margin;
+            textField.width = fieldWidth;
+            textField.y = cursorY + 10;
+            textField.height = fieldHeight;
+            textField.fontSize = 10;
+
+            pdf.addField(textField);
+
+            cursorY += textField.height + 16; // move cursor after the field
+        }
 
 
         cursorY += 10;
@@ -200,6 +227,9 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();        
     }
+
+    const [highRiskExplanation, setHighRiskExplanation] = React.useState("");
+
     
     return (
         <div key="report" className="p-4 rounded-lg">
@@ -225,6 +255,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             <div className="mb-2 text-red-500">
                 <strong>High-Risk Answers:</strong> {reportData.totalHighRiskAnswers}
             </div>
+
             <hr className="my-4" />
             <h3 className="text-lg font-semibold mb-2">High risk answers selected</h3>
             <div>
@@ -261,6 +292,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                     ));
                 })()}
             </div>
+            <hr className="my-4" />
             <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
             <div>
                 {(() => {

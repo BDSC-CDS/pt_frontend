@@ -425,9 +425,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                     
                                     <div className="mt-2 flex justify-center">
                                         {
-                                                reportData.totalHighRiskAnswers > 0
-                                                    ? <span style={{ color: '#e76f51' }}>High Risk</span> // Red
-                                                    : currentRisk > 45
+                                                currentRisk > 45
                                                     ? <span style={{ color: '#e9c46a' }}>Medium Risk</span> // Yellow
                                                     : <span style={{ color: '#2a9d8f' }}>Low to Medium Risk</span> // Green
                                         }
@@ -443,7 +441,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                     arcsLength={[0.43, 0.46, 0.1]}
                                     // cornerRadius={0}
                                     colors={['#2a9d8f', '#e9c46a', '#e76f51']}
-                                    percent={reportData.totalHighRiskAnswers > 0 ? 99 : currentDisplayRiskPc}
+                                    percent={currentDisplayRiskPc}
                                     formatTextValue={value=>""}
                                     /*textColor={
                                         reportData.totalHighRiskAnswers > 0
