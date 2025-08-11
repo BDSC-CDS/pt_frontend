@@ -19,7 +19,11 @@ interface QuestionnaireReportTabProps {
 
 export default function QuestionnaireReportTab({ replyName, questions, currentRisk, reportData}: QuestionnaireReportTabProps) {
     const [exportInProgress, setExportInProgress] = useState(false);
-
+    const riskLabel = reportData.totalHighRiskAnswers > 0
+    ? { text: "High Risk", color: "#e76f51" } // Red
+    : currentRisk > 45
+        ? { text: "Medium Risk", color: "#e9c46a" } // Yellow
+        : { text: "Low to Medium Risk", color: "#2a9d8f" }; // Green
     const handleExportPDF = async () => {
         const pdf = new jsPDF('p', 'mm', 'a4'); // A4 page size
         const margin = 10; // Margin in mm
@@ -65,7 +69,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                     resolve(null);
                 };
             });
-        };
+        };     
 
         // Function to add footer with title and page number
         const addFooter = (pageNumber: number) => {
@@ -91,11 +95,6 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         pdf.text("Summary", margin, cursorY);
         cursorY += 10;
         
-        const riskLabel = reportData.totalHighRiskAnswers > 0
-        ? { text: "High Risk", color: "#e76f51" } // Red
-        : currentRisk > 45
-            ? { text: "Medium Risk", color: "#e9c46a" } // Yellow
-            : { text: "Low to Medium Risk", color: "#2a9d8f" }; // Green
     
         const summaryContent = [
             `Project Title: ${replyName || ""}`,
@@ -199,7 +198,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
         element.href = URL.createObjectURL(file);
         element.download = "connector-config.json";
         document.body.appendChild(element); // Required for this to work in FireFox
-        element.click();
+        element.click();        
     }
     
     return (
@@ -219,6 +218,9 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             </div>
             <div className="mb-2">
                 <strong>Risk Score:</strong> {currentRisk}
+            </div>
+            <div className="mb-2">
+                <strong>Risk Level:</strong> {riskLabel.text}
             </div>
             <div className="mb-2 text-red-500">
                 <strong>High-Risk Answers:</strong> {reportData.totalHighRiskAnswers}
