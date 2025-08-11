@@ -226,6 +226,41 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
                 <strong>High-Risk Answers:</strong> {reportData.totalHighRiskAnswers}
             </div>
             <hr className="my-4" />
+            <h3 className="text-lg font-semibold mb-2">High risk answers selected</h3>
+            <div>
+                {(() => {
+                    // Gather all questions into a single array with their tab
+                    let allQuestions: { tab: string; question: Question; risk: number; }[] = [];
+                    Object.keys(questions).forEach((tab) => {
+                        questions[tab]?.forEach((question) => {
+                            const selectedAnswer = question.answers.find((answer) => answer.selected && answer.highRisk);
+                            if (selectedAnswer) {
+                                const risk = selectedAnswer.riskLevel * question.riskWeight;
+                                allQuestions.push({ tab, question, risk });
+                            }
+                        });
+                    });
+    
+                    // Sort questions by risk descending and take the top 5
+                    const topQuestions = allQuestions
+                        .sort((a, b) => b.risk - a.risk)
+                        .slice(0, 5);
+                    if (topQuestions.length === 0) {
+                        return <p>No high-risk questions found.</p>;
+                    }
+                    // Render top 5 high-risk questions with their tabs
+                    return topQuestions.map(({ tab, question, risk }, index) => (
+                        <div key={question.questionId} className="mb-4">
+                            <p className="text-sm">
+                                <strong>{index + 1}. {question.questionDescription}</strong> (Tab: {tab})
+                            </p>
+                            <p className="text-xs text-red-500">
+                                Selected Answer: {question.answers.find((a) => a.selected)?.answerDescription || 'Not Answered'}
+                            </p>
+                        </div>
+                    ));
+                })()}
+            </div>
             <h3 className="text-lg font-semibold mb-2">Top 5 questions significantly impacting the Risk Assessment</h3>
             <div>
                 {(() => {
