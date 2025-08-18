@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TemplatebackendExportConfigReply
+ * @interface TemplatebackendExportTransformConfigReply
  */
-export interface TemplatebackendExportConfigReply {
+export interface TemplatebackendExportTransformConfigReply {
     /**
      * 
      * @type {string}
-     * @memberof TemplatebackendExportConfigReply
+     * @memberof TemplatebackendExportTransformConfigReply
      */
     config?: string;
 }
 
 /**
- * Check if a given object implements the TemplatebackendExportConfigReply interface.
+ * Check if a given object implements the TemplatebackendExportTransformConfigReply interface.
  */
-export function instanceOfTemplatebackendExportConfigReply(value: object): boolean {
+export function instanceOfTemplatebackendExportTransformConfigReply(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TemplatebackendExportConfigReplyFromJSON(json: any): TemplatebackendExportConfigReply {
-    return TemplatebackendExportConfigReplyFromJSONTyped(json, false);
+export function TemplatebackendExportTransformConfigReplyFromJSON(json: any): TemplatebackendExportTransformConfigReply {
+    return TemplatebackendExportTransformConfigReplyFromJSONTyped(json, false);
 }
 
-export function TemplatebackendExportConfigReplyFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendExportConfigReply {
+export function TemplatebackendExportTransformConfigReplyFromJSONTyped(json: any, ignoreDiscriminator: boolean): TemplatebackendExportTransformConfigReply {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function TemplatebackendExportConfigReplyFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function TemplatebackendExportConfigReplyToJSON(value?: TemplatebackendExportConfigReply | null): any {
+export function TemplatebackendExportTransformConfigReplyToJSON(value?: TemplatebackendExportTransformConfigReply | null): any {
     if (value === undefined) {
         return undefined;
     }

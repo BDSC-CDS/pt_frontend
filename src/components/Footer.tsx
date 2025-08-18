@@ -18,7 +18,7 @@ export default function FooterMenu() {
 
                     <Footer.LinkGroup>
                         <Footer.Link href="/" className='text-white'>Home</Footer.Link>
-                        <Footer.Link href="/about" className='text-white'>About</Footer.Link>
+                        {/* <Footer.Link href="/about" className='text-white'>About</Footer.Link> */}
                         <Footer.Link href="/contact" className='text-white'>Contact</Footer.Link>
                     </Footer.LinkGroup>
                     <div className='flex'>
