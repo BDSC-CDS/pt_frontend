@@ -96,27 +96,40 @@ export default function DatasetUploadModal({ show, datasetNames, onSuccess, onCl
         const types: ColumnTypes = {}
         const sampleCount = Math.min(rows.length, MIN_SAMPLE_SIZE)
 
-        const counters: Record<string, Record<string, number>> = {}
+        const counters: Record<string, { int: number; float: number; date: number; string: number }> = {}
 
         rows.slice(0, sampleCount).forEach(row => {
             for (const key in row) {
-            const value = row[key]
-            const trimmed = value?.toString().trim()
-            if (!counters[key]) counters[key] = { int: 0, float: 0, date: 0, string: 0 }
+                const value = row[key]
+                const trimmed = value?.toString().trim()
+                
+                if (!(key in counters)) {
+                    counters[key] = { int: 0, float: 0, date: 0, string: 0 }
+                }
 
-            if (!trimmed) continue
+                if (!trimmed) continue
 
-            if (isDate(trimmed)) counters[key].date!++
-                else if (!isNaN(trimmed) && Number.isInteger(+trimmed)) counters[key].int!++
-                else if (!isNaN(+trimmed)) counters[key].float!++
-                else counters[key].string!++
+                const counter = counters[key]!
+                
+                if (isDate(trimmed)) {
+                    counter.date++
+                } else if (!isNaN(+trimmed) && Number.isInteger(+trimmed)) {
+                    counter.int++
+                } else if (!isNaN(+trimmed)) {
+                    counter.float++
+                } else {
+                    counter.string++
+                }
             }
         })
 
         for (const key in counters) {
-            const t = counters[key]
-            const bestType = Object.entries(t!).sort((a, b) => b[1] - a[1])[0]![0]
-            types[key] = bestType
+            const typeCounter = counters[key]
+            if (typeCounter) {
+                const bestType = Object.entries(typeCounter)
+                    .sort((a, b) => b[1] - a[1])[0]?.[0] || 'string'
+                types[key] = bestType
+            }
         }
 
         return types
