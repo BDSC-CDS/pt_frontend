@@ -25,6 +25,11 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
+            {/* Demo Banner */}
+            <div className="w-full bg-red-600 text-white text-center py-2 rounded-md mb-6">
+                ⚠️ This is a demo, please do not enter patient or sensitive data.
+            </div>
+
             {/* Title */}
             <div className="flex flex-col justify-center items-start mb-12">
                 <h1 className="text-4xl font-extrabold text-gray-800">Privacy Toolbox</h1>
