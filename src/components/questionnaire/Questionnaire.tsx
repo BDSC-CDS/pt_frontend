@@ -331,10 +331,12 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                     }
                 }
             });
+            // Force re-render by updating questions state
+            setQuestions({...questions});
         }
         computeCurrentRisk();
         computeCurrentReport();
-    }, []);
+    }, [questionnaireReply]);
 
     return (
         <div className="flex flex-col h-full gap-2">
