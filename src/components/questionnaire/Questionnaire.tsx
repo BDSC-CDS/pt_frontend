@@ -331,10 +331,12 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                     }
                 }
             });
+            // Force re-render by updating questions state
+            setQuestions({...questions});
         }
         computeCurrentRisk();
         computeCurrentReport();
-    }, []);
+    }, [questionnaireReply]);
 
     return (
         <div className="flex flex-col h-full gap-2">
@@ -456,8 +458,10 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                 {(reportData.totalHighRiskAnswers > 0) && (
                                     <div className="flex items-center">
                                         <MdOutlineWarningAmber size={50} color='#e76f51' className="inline-block" />
-                                        <div className="inline-block items-center text-red-700">You have selected a <br />high risk answer</div>
+                                        <div className="inline-block items-center text-red-700">
+                                            You have selected a <br />high risk answer
                                         </div>
+                                    </div>
                                     )}
                             </div>
                         )}
