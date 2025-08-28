@@ -1,5 +1,7 @@
 // utils/pdfService.ts
-import jsPDF from 'jspdf';
+import jsPDF, {
+  AcroFormTextField
+} from 'jspdf';
 import { Questions } from '~/utils/questions';
 
 interface PDFConfig {
@@ -39,15 +41,21 @@ export class PDFReportService {
         replyName: string | undefined,
         questions: Questions,
         currentRisk: number,
-        reportData: ReportData
+        reportData: ReportData,
+        riskLabel: { text: string; color: string }
     ): Promise<void> {
         // Add header to first page
         await this.addHeader(true);
         this.addFooter(replyName);
 
         // Add content sections
-        this.addSummarySection(replyName, currentRisk, reportData);
+        this.addSummarySection(replyName, currentRisk, reportData, riskLabel);
         this.addQuestionsSection(questions);
+
+        // Add high-risk explanation section
+        if (reportData.totalHighRiskAnswers > 0) {
+            this.addHighRiskExplanation(questions);
+        }
 
         // Save the PDF
         const filename = this.generateFilename(replyName);
@@ -170,29 +178,20 @@ export class PDFReportService {
     private addSummarySection(
         replyName: string | undefined,
         currentRisk: number,
-        reportData: ReportData
+        reportData: ReportData,
+        riskLabel: { text: string; color: string }
     ): void {
         this.pdf.setFont("helvetica", "bold");
         this.pdf.setFontSize(12);
         this.pdf.text("Summary", this.config.margin, this.cursorY);
         this.cursorY += 10;
 
-        const riskLabel = this.calculateRiskLabel(currentRisk, reportData.totalHighRiskAnswers);
         const summaryContent = this.buildSummaryContent(replyName, currentRisk, reportData, riskLabel);
 
         this.addTextContent(summaryContent, riskLabel);
         this.cursorY += 10;
     }
 
-    private calculateRiskLabel(currentRisk: number, totalHighRiskAnswers: number): { text: string; color: string } {
-        if (totalHighRiskAnswers > 0) {
-            return { text: "High Risk", color: "#e76f51" };
-        } else if (currentRisk > 45) {
-            return { text: "Medium Risk", color: "#e9c46a" };
-        } else {
-            return { text: "Low to Medium Risk", color: "#2a9d8f" };
-        }
-    }
 
     private buildSummaryContent(
         replyName: string | undefined,
@@ -230,6 +229,29 @@ export class PDFReportService {
         });
         
         this.pdf.setTextColor(0, 0, 0);
+    }
+
+    private addHighRiskExplanation(questions: Questions): void {
+        const fieldWidth = this.config.pageWidth - 2 * this.config.margin;
+        const fieldHeight = 50; // height of the blank space
+
+        // Label for the field
+        this.pdf.setFontSize(12);
+        this.pdf.text("Explanation of how high-risk answers are addressed:", this.config.margin, this.cursorY + 6);
+
+        // Create the fillable text field
+        const textField = new AcroFormTextField();
+        textField.fieldName = "HighRiskExplanation";
+        textField.multiline = true;
+        textField.x = this.config.margin;
+        textField.width = fieldWidth;
+        textField.y = this.cursorY + 10;
+        textField.height = fieldHeight;
+        textField.fontSize = 10;
+
+        this.pdf.addField(textField);
+
+        this.cursorY += textField.height + 16; // move cursor after the field
     }
 
     private setRiskColor(color: string): void {

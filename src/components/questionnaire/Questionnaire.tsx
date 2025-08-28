@@ -233,7 +233,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
         //     setCurrentDisplayRiskPc(1);
         // } 
     };
-
+    
     const computeCurrentReport = () => {
         const sectionsCompleted: string[] = [];
         const sectionsMissing: string[] = [];
@@ -397,7 +397,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                         {activeTab !== String(tabs.length) && (
                             <div className='w-1/4 text-black flex flex-col items-center justify-start'>
                                 <h1 className='text-md font-semibold'>
-                                    <div className="flex items-center">
+                                    <div className="flex mt-2 justify-center items-center">
                                         Current score
 
                                         <Tooltip 
@@ -425,11 +425,9 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                         </Tooltip>
                                     </div>
                                     
-                                    <div className="mt-2">
+                                    <div className="mt-2 flex justify-center">
                                         {
-                                            reportData.totalHighRiskAnswers > 0
-                                                ? <span style={{ color: '#e76f51' }}>High Risk</span> // Red
-                                                : currentRisk > 45
+                                                currentRisk > 45
                                                     ? <span style={{ color: '#e9c46a' }}>Medium Risk</span> // Yellow
                                                     : <span style={{ color: '#2a9d8f' }}>Low to Medium Risk</span> // Green
                                         }
@@ -445,7 +443,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                     arcsLength={[0.43, 0.46, 0.1]}
                                     // cornerRadius={0}
                                     colors={['#2a9d8f', '#e9c46a', '#e76f51']}
-                                    percent={reportData.totalHighRiskAnswers > 0 ? 99 : currentDisplayRiskPc}
+                                    percent={currentDisplayRiskPc}
                                     formatTextValue={value=>""}
                                     /*textColor={
                                         reportData.totalHighRiskAnswers > 0
@@ -459,10 +457,12 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
 
                                 {(reportData.totalHighRiskAnswers > 0) && (
                                     <div className="flex items-center">
-                                        <MdOutlineWarningAmber size={70} color='#e76f51' className="inline-block" />
-                                        <div className="inline-block items-center text-red-700">You've selected a <br />high-risk answer</div>
+                                        <MdOutlineWarningAmber size={50} color='#e76f51' className="inline-block" />
+                                        <div className="inline-block items-center text-red-700">
+                                            You have selected a <br />high risk answer
+                                        </div>
                                     </div>
-                                )}
+                                    )}
                             </div>
                         )}
                     </div>
