@@ -82,7 +82,7 @@ export default function QuestionnaireReportTab({ replyName, questions, currentRi
             </div>
 
             <hr className="my-4" />
-            <h3 className="text-lg font-semibold mb-2">High risk answers selected</h3>
+            <h3 className="text-lg font-semibold mb-2">High-risk answers selected</h3>
             <div>
                 {(() => {
                     // Gather all questions into a single array with their tab

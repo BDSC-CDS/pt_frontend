@@ -212,7 +212,7 @@ export class PDFReportService {
                 : "None"}`,
             `Overall Completion Rate: ${reportData.overallCompletionRate}`,
             `Risk Score: ${currentRisk}`,
-            `Total High Risk Answers: ${reportData.totalHighRiskAnswers}`,
+            `Total High-Risk Answers: ${reportData.totalHighRiskAnswers}`,
             `Risk Level: ${riskLabel.text}`
         ];
     }

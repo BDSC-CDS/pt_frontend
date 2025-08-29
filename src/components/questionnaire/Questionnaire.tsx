@@ -459,7 +459,7 @@ export default function Questionnaire({ questionnaireVersion, questionnaireReply
                                     <div className="flex items-center">
                                         <MdOutlineWarningAmber size={50} color='#e76f51' className="inline-block" />
                                         <div className="inline-block items-center text-red-700">
-                                            You have selected a <br />high risk answer
+                                            You have selected a <br />high-risk answer
                                         </div>
                                     </div>
                                     )}
