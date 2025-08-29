@@ -725,7 +725,7 @@ function QuestionnaireVersion() {
                                                                         </Table.Cell>
                                                                     </Table.Row>
                                                                     <Table.Row >
-                                                                        <Table.HeadCell>High risk</Table.HeadCell>
+                                                                        <Table.HeadCell>High-risk</Table.HeadCell>
                                                                         <Table.Cell>
                                                                             <ToggleSwitch
                                                                                 checked={questionToEdit?.answers?.[n]?.highRisk || false}
@@ -808,7 +808,7 @@ function QuestionnaireVersion() {
                                                                         </Table.Cell>
                                                                     </Table.Row>
                                                                     <Table.Row >
-                                                                        <Table.HeadCell>High risk</Table.HeadCell>
+                                                                        <Table.HeadCell>High-risk</Table.HeadCell>
                                                                         <Table.Cell>
                                                                             <ToggleSwitch
                                                                                 checked={addAnswerHighRisk}

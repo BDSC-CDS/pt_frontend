@@ -9,11 +9,11 @@ info:
 tags:
   - name: AuditLogService
   - name: AuthenticationService
-  - name: ConfigurationService
   - name: DatasetService
   - name: IndexService
   - name: QuestionnaireService
   - name: RiskAssessmentService
+  - name: TransformConfigService
   - name: UsersService
 schemes:
   - http
@@ -45,68 +45,6 @@ paths:
       tags:
         - AuthenticationService
       x-openapi-router-controller: authentication_controller
-  /api/rest/v1/config/export/{id}:
-    get:
-      summary: Export a configuration as json (SPHN Connector format)
-      description: This endpoint returns the JSON of a configuration
-      operationId: ConfigurationService_ExportConfig
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendExportConfigReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-          format: int64
-      tags:
-        - ConfigurationService
-      x-openapi-router-controller: config_generator_controller
-  /api/rest/v1/configs:
-    get:
-      summary: Get configuration files
-      description: This endpoint returns the configuration files for a given user
-      operationId: ConfigurationService_GetConfigs
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendGetConfigsReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      tags:
-        - ConfigurationService
-      x-openapi-router-controller: config_generator_controller
-    post:
-      summary: Create a configuration
-      description: This endpoint creates a usconfigurationer
-      operationId: ConfigurationService_CreateConfig
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendCreateConfigReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/templatebackendConfig'
-      tags:
-        - ConfigurationService
-      x-openapi-router-controller: config_generator_controller
   /api/rest/v1/users:
     post:
       summary: Create a user
@@ -343,29 +281,6 @@ paths:
       tags:
         - AuditLogService
       x-openapi-router-controller: audit_log_controller
-  /api/v1/config/{id}:
-    delete:
-      summary: Deletes a config
-      description: This endpoint deletes a config
-      operationId: ConfigurationService_DeleteConfig
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/templatebackendDeleteConfigReply'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/rpcStatus'
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-          format: int64
-      tags:
-        - ConfigurationService
-      x-openapi-router-controller: config_generator_controller
   /api/v1/dataset:
     get:
       summary: List datasets
@@ -1036,6 +951,125 @@ paths:
       tags:
         - RiskAssessmentService
       x-openapi-router-controller: risk_assessment_controller
+  /api/v1/transform-config:
+    get:
+      summary: List transform configurations
+      description: This endpoint allows listing a user's dataset transform configurations
+      operationId: TransformConfigService_ListTransformConfigs
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendListTransformConfigsReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          format: int64
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int64
+      tags:
+        - TransformConfigService
+      x-openapi-router-controller: transform_config_controller
+    post:
+      summary: Create a transform configuration
+      description: This endpoint creates a dataset transform configuration
+      operationId: TransformConfigService_CreateTransformConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendCreateTransformConfigReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/templatebackendCreateTransformConfigRequest'
+      tags:
+        - TransformConfigService
+      x-openapi-router-controller: transform_config_controller
+  /api/v1/transform-config/export/json/{id}:
+    get:
+      summary: 'Export transform configuration as a JSON file '
+      description: This endpoint returns a JSON file of a transform configuration (SPHN Connector format)
+      operationId: TransformConfigService_ExportTransformConfigJSON
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - TransformConfigService
+      x-openapi-router-controller: transform_config_controller
+  /api/v1/transform-config/export/{id}:
+    get:
+      summary: Export transform configuration as a string
+      description: This endpoint returns a JSON string of a transform configuration (SPHN Connector format)
+      operationId: TransformConfigService_ExportTransformConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendExportTransformConfigReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - TransformConfigService
+      x-openapi-router-controller: transform_config_controller
+  /api/v1/transform-config/{id}:
+    delete:
+      summary: Delete transform configuration
+      description: This endpoint deletes a dataset transform configuration
+      operationId: TransformConfigService_DeleteTransformConfig
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/templatebackendDeleteTransformConfigReply'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - TransformConfigService
+      x-openapi-router-controller: transform_config_controller
 definitions:
   apiHttpBody:
     type: object
@@ -1274,72 +1308,6 @@ definitions:
         type: array
         items:
           type: string
-  templatebackendConfig:
-    type: object
-    properties:
-      id:
-        type: integer
-        format: int64
-      userid:
-        type: integer
-        format: int64
-      tenantid:
-        type: integer
-        format: int64
-      configName:
-        type: string
-      questionnaireid:
-        type: integer
-        format: int64
-      hasScrambleField:
-        type: boolean
-      hasDateShift:
-        type: boolean
-      hassubFieldList:
-        type: boolean
-      hassubFieldRegex:
-        type: boolean
-      scrambleFieldFields:
-        type: array
-        items:
-          type: string
-      dateShiftLowrange:
-        type: integer
-        format: int32
-      dateShiftHighrange:
-        type: integer
-        format: int32
-      subFieldListField:
-        type: string
-      subFieldListSubstitute:
-        type: array
-        items:
-          type: string
-      subFieldListReplacement:
-        type: string
-      subFieldRegexField:
-        type: string
-      subFieldRegexRegex:
-        type: string
-      subFieldRegexReplacement:
-        type: string
-      createdAt:
-        type: string
-        format: date-time
-      deletedAt:
-        type: string
-        format: date-time
-  templatebackendCreateConfigReply:
-    type: object
-    properties:
-      result:
-        $ref: '#/definitions/templatebackendCreateConfigResult'
-  templatebackendCreateConfigResult:
-    type: object
-    properties:
-      id:
-        type: integer
-        format: int64
   templatebackendCreateHelloReply:
     type: object
     properties:
@@ -1403,6 +1371,23 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendCreateTransformConfigReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendCreateTransformConfigResult'
+  templatebackendCreateTransformConfigRequest:
+    type: object
+    properties:
+      config:
+        $ref: '#/definitions/templatebackendTransformConfig'
+    title: Create a new transform config
+  templatebackendCreateTransformConfigResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
   templatebackendCreateUserReply:
     type: object
     properties:
@@ -1446,16 +1431,15 @@ definitions:
       deletedAt:
         type: string
         format: date-time
-  templatebackendDeleteConfigReply:
+  templatebackendDateShiftConfig:
     type: object
     properties:
-      result:
-        $ref: '#/definitions/templatebackendDeleteConfigResult'
-  templatebackendDeleteConfigResult:
-    type: object
-    properties:
-      success:
-        type: boolean
+      lowrange:
+        type: integer
+        format: int32
+      highrange:
+        type: integer
+        format: int32
   templatebackendDeleteDatasetReply:
     type: object
     properties:
@@ -1476,6 +1460,16 @@ definitions:
     properties:
       success:
         type: boolean
+  templatebackendDeleteTransformConfigReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendDeleteTransformConfigResult'
+  templatebackendDeleteTransformConfigResult:
+    type: object
+    properties:
+      success:
+        type: boolean
   templatebackendDeleteUserReply:
     type: object
     properties:
@@ -1483,24 +1477,11 @@ definitions:
         $ref: '#/definitions/templatebackendDeleteUserResult'
   templatebackendDeleteUserResult:
     type: object
-  templatebackendExportConfigReply:
+  templatebackendExportTransformConfigReply:
     type: object
     properties:
       config:
         type: string
-  templatebackendGetConfigsReply:
-    type: object
-    properties:
-      result:
-        $ref: '#/definitions/templatebackendGetConfigsResult'
-  templatebackendGetConfigsResult:
-    type: object
-    properties:
-      config:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/templatebackendConfig'
   templatebackendGetDatasetContentReply:
     type: object
     properties:
@@ -1650,6 +1631,19 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/templatebackendQuestionnaireReply'
+  templatebackendListTransformConfigsReply:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/templatebackendListTransformConfigsResult'
+  templatebackendListTransformConfigsResult:
+    type: object
+    properties:
+      configs:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/templatebackendTransformConfig'
   templatebackendMetadata:
     type: object
     properties:
@@ -1881,6 +1875,13 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendScrambleFieldConfig:
+    type: object
+    properties:
+      fields:
+        type: array
+        items:
+          type: string
   templatebackendSearchUsersReply:
     type: object
     properties:
@@ -1931,6 +1932,67 @@ definitions:
       id:
         type: integer
         format: int64
+  templatebackendSubstituteFieldListConfig:
+    type: object
+    properties:
+      name:
+        type: string
+      field:
+        type: string
+      substitutionList:
+        type: array
+        items:
+          type: string
+      replacement:
+        type: string
+  templatebackendSubstituteFieldRegexConfig:
+    type: object
+    properties:
+      name:
+        type: string
+      field:
+        type: string
+      regex:
+        type: string
+      replacement:
+        type: string
+  templatebackendTransformConfig:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      userid:
+        type: integer
+        format: int64
+      tenantid:
+        type: integer
+        format: int64
+      questionnaireid:
+        type: integer
+        format: int64
+      dateShift:
+        $ref: '#/definitions/templatebackendDateShiftConfig'
+      scrambleField:
+        $ref: '#/definitions/templatebackendScrambleFieldConfig'
+      subFieldListList:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/templatebackendSubstituteFieldListConfig'
+      subFieldRegexList:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/templatebackendSubstituteFieldRegexConfig'
+      createdAt:
+        type: string
+        format: date-time
+      deletedAt:
+        type: string
+        format: date-time
   templatebackendTransformDatasetReply:
     type: object
     properties:

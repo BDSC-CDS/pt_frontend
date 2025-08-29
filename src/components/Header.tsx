@@ -1,11 +1,9 @@
 import Link from "next/link";
+import Image from 'next/image';
+
 import AuthWidget from "./AuthWidget";
 
 export default function Header() {
-
-    const logoStyle = {
-        backgroundImage: `url('logo.png')`
-    };
 
     return (
         <>
@@ -13,7 +11,13 @@ export default function Header() {
                 <nav className="flex justify-between items-center h-full">
                     <Link href="/">
                         <div className="flex items-center">
-                            <div style={logoStyle} className="w-16 h-14 my-auto ml-5 m-2 bg-no-repeat bg-contain bg-center"></div>
+                            <Image
+                                src="/logo.png"
+                                alt="Privacy Toolbox Logo"
+                                width={128}
+                                height={44}
+                                className="h-11 w-auto min-w-8 max-w-28 my-auto ml-5 m-2"
+                            />
                             <p className="font-bold text-lg w-40">Privacy Toolbox</p>
                         </div>
                     </Link>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'flowbite-react';
 import { HiChevronUpDown } from 'react-icons/hi2';
 import { Question } from '~/utils/questions';
@@ -13,6 +13,12 @@ interface QuestionnaireSelectInputProps {
  */
 function QuestionnaireSelectInput({question, onSelect}: QuestionnaireSelectInputProps) {
     const [selected, setSelected] = useState<string | null>(question.answers.find(answer => answer.selected)?.answerDescription || null);
+
+    // Update the selected state when the question's answers change
+    useEffect(() => {
+        const selectedAnswer = question.answers.find(answer => answer.selected);
+        setSelected(selectedAnswer?.answerDescription || null);
+    }, [question.answers]);
 
     const handleSelect = (answerId: string | null) => {
         setSelected(question.answers.find(answer => answer.answerId === answerId)?.answerDescription || null);
