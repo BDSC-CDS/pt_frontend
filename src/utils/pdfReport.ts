@@ -160,7 +160,7 @@ export class PDFReportService {
         this.pdf.setFontSize(14);
         this.pdf.setTextColor("#FFFFFF");
         // Assume logo width is stored somewhere accessible
-        this.pdf.text("Privacy Toolbox", this.config.margin + 50, this.config.headerHeight / 1.5);
+        this.pdf.text("Privacy Toolbox", this.config.margin + 80, this.config.headerHeight / 1.6);
     }
 
     private addFooter(replyName: string | undefined): void {
