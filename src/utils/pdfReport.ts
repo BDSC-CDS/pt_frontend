@@ -328,7 +328,7 @@ export class PDFReportService {
 
         this.pdf.addField(textField);
 
-        this.cursorY += textField.height + 16; // move cursor after the field
+        this.cursorY += textField.height + 20; // move cursor after the field
     }
 
     private setRiskColor(color: string): void {
