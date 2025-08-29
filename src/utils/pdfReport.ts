@@ -50,12 +50,16 @@ export class PDFReportService {
 
         // Add content sections
         this.addSummarySection(replyName, currentRisk, reportData, riskLabel);
-        this.addQuestionsSection(questions);
 
         // Add high-risk explanation section
         if (reportData.totalHighRiskAnswers > 0) {
+            this.addHighRiskSection(questions)
             this.addHighRiskExplanation(questions);
+            
         }
+        this.addQuestionsSection(questions);
+
+
 
         // Save the PDF
         const filename = this.generateFilename(replyName);
@@ -156,7 +160,7 @@ export class PDFReportService {
         this.pdf.setFontSize(14);
         this.pdf.setTextColor("#FFFFFF");
         // Assume logo width is stored somewhere accessible
-        this.pdf.text("Privacy Toolbox", this.config.margin + 50, this.config.headerHeight / 1.5);
+        this.pdf.text("Privacy Toolbox", this.config.margin + 80, this.config.headerHeight / 1.6);
     }
 
     private addFooter(replyName: string | undefined): void {
@@ -208,11 +212,12 @@ export class PDFReportService {
                 : "None"}`,
             `Overall Completion Rate: ${reportData.overallCompletionRate}`,
             `Risk Score: ${currentRisk}`,
-            `Total High Risk Answers: ${reportData.totalHighRiskAnswers}`,
+            `Total High-Risk Answers: ${reportData.totalHighRiskAnswers}`,
             `Risk Level: ${riskLabel.text}`
         ];
     }
 
+    
     private addTextContent(content: string[], riskLabel: { text: string; color: string }): void {
         content.forEach((line) => {
             this.checkPageBreak();
@@ -229,6 +234,78 @@ export class PDFReportService {
         });
         
         this.pdf.setTextColor(0, 0, 0);
+    }
+
+    private addHighRiskSection(questions: Questions): void {
+        this.checkPageBreak(10);
+
+        this.pdf.setFont("helvetica", "bold");
+        this.pdf.setFontSize(14);
+        this.pdf.text("High-Risk Answers", this.config.margin, this.cursorY);
+        this.cursorY += 10;
+
+        // Gather all high-risk questions
+        let allQuestions: { tab: string; question: any; risk: number }[] = [];
+        Object.keys(questions).forEach((tab) => {
+            questions[tab]?.forEach((question: any) => {
+                const selectedAnswer = question.answers.find(
+                    (answer: any) => answer.selected && answer.highRisk
+                );
+                if (selectedAnswer) {
+                    const risk = selectedAnswer.riskLevel * question.riskWeight;
+                    allQuestions.push({ tab, question, risk });
+                }
+            });
+        });
+
+        // Sort by risk descending, take top 5
+        const topQuestions = allQuestions
+            .sort((a, b) => b.risk - a.risk)
+            .slice(0, 5);
+
+        if (topQuestions.length === 0) {
+            this.pdf.setFont("helvetica", "normal");
+            this.pdf.setFontSize(12);
+            this.pdf.text("No high-risk questions found.", this.config.margin, this.cursorY);
+            this.cursorY += 14;
+            return;
+        }
+
+        topQuestions.forEach(({ tab, question }, index) => {
+            this.addHighRiskQuestion(question, index, tab);
+        });
+
+        this.cursorY += 5;
+    }
+
+    private addHighRiskQuestion(question: any, index: number, tabName: string): void {
+        this.checkPageBreak(15);
+
+        // Question text
+        this.pdf.setFont("helvetica", "normal");
+        this.pdf.setFontSize(12);
+        const questionText = `${index + 1}. ${question.questionDescription} (Tab: ${tabName})`;
+        const questionLines = this.pdf.splitTextToSize(
+            questionText,
+            this.config.pageWidth - 2 * this.config.margin
+        );
+        this.pdf.text(questionLines, this.config.margin, this.cursorY);
+        this.cursorY += questionLines.length * 6;
+
+        // Selected answer
+        this.pdf.setFont("helvetica", "italic");
+        const selectedAnswer = question.answers.find((a: any) => a.selected);
+        const answerText = selectedAnswer
+            ? `Selected Answer: ${selectedAnswer.answerDescription}`
+            : "Selected Answer: Not Answered";
+        const answerLines = this.pdf.splitTextToSize(
+            answerText,
+            this.config.pageWidth - 2 * this.config.margin
+        );
+        this.pdf.setTextColor(200, 0, 0); // red for risk emphasis
+        this.pdf.text(answerLines, this.config.margin + 10, this.cursorY);
+        this.pdf.setTextColor(0, 0, 0); // reset
+        this.cursorY += answerLines.length * 6 + 5;
     }
 
     private addHighRiskExplanation(questions: Questions): void {
@@ -251,7 +328,7 @@ export class PDFReportService {
 
         this.pdf.addField(textField);
 
-        this.cursorY += textField.height + 16; // move cursor after the field
+        this.cursorY += textField.height + 20; // move cursor after the field
     }
 
     private setRiskColor(color: string): void {
