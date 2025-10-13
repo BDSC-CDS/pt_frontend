@@ -7,18 +7,32 @@
 export async function downloadBytesFile(fileName: string, byteData: BlobPart) {
     try {
         const blob = new Blob([byteData]);
-        const downloadUrl = URL.createObjectURL(blob);
+        
+        if ((window as any).showSaveFilePicker !== undefined) {
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: fileName,
+            });
+    
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+        } else {
+            const downloadUrl = URL.createObjectURL(blob);
+    
+            const link = Object.assign(document.createElement('a'), {
+                href: downloadUrl,
+                download: fileName,
+            });
+    
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+        }
+        
 
-        const link = Object.assign(document.createElement('a'), {
-            href: downloadUrl,
-            download: fileName,
-        });
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(downloadUrl);
     } catch (error) {
-        throw new Error('Error downloading file');
+        console.error("Error downloading file", error);
+        if ((error as Error & { name?: string })?.name !== 'AbortError') throw new Error('Error downloading file');
     }
 }
